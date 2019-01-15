@@ -10,7 +10,7 @@
 
 #if OSLW_TOOL_IMPORT_MATH || OSLW_TOOL_IMPORT_ALL
 
-void OSlwToolMatrixInitial(OSlwToolMatrixSTU *m, lw_u16 row, lw_u16 col, ParaType *a)
+void OSlwToolMatrixInitial(OSlwToolMatrixSTU *m, LwMatRowType row, LwMatColType col, ParaType *a)
 {
 
     OSLW_assert(!(m));
@@ -822,7 +822,7 @@ OSlwToolMatrixVar
 
 
 //s=x*we+bi
-//神经网络中
+//神经网络中(放弃)
 // xout=(Weight * xin) +Bias
 OSLW_TOOL_FUN(OSlwToolMatrixSTU*, OSlwToolMatrixMPYA,
 (OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *x, OSlwToolMatrixSTU *we, OSlwToolMatrixSTU *bi),
@@ -1013,6 +1013,62 @@ OSLW_TOOL_FUN(
 
 OSLW_TOOL_FUN(
 	OSlwToolMatrixSTU*,
+	OSlwToolMatrixXWeBi,
+	(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *we, OSlwToolMatrixSTU *x, OSlwToolMatrixSTU *bi),
+	OSlwToolMatrixXWeBi
+)
+{
+	register lw_u16 i, j, k, row, col, row1;
+	register ParaType sum, *_s, *_x, *_we, *_web, *_xb, *_bi;
+	register ParaType *_we_a, *_bi_a;
+
+	OSLW_assert(!(s));
+	OSLW_assert(!(x));
+	OSLW_assert(!(we));
+	OSLW_assert(!(bi));
+
+	//神经网络前向传播
+	if (s->col == we->col && s->row == x->row && we->row == x->col && s->col == bi->length)//满足神经网络前向条件
+	{
+		row = s->row;
+		col = we->col;
+		row1 = we->row;
+		_s = s->a;
+		_xb = x->a;
+		_web = we->a;
+		_bi = bi->a;
+		_we_a = we->a;
+		_bi_a = bi->a;
+
+		for (i = 0; i<row; i++)
+		{
+			for (j = 0; j<col; j++)
+			{
+				_we = _web;
+				_x = _xb;
+
+				sum = _ParaFrom(0);
+				for (k = 0; k<row1; k++)
+				{
+					sum = _ParaAdd(sum, _ParaMpy(*_x, *_we));
+					_we += col;
+					_x++;
+				}//行向量*列向量
+
+				*_s++ = _ParaAdd(sum, *_bi);
+				_bi++;
+				_web++;
+			}
+			_xb += row1;
+			_bi = _bi_a;
+			_web = _we_a;
+
+		}
+	}
+}
+
+OSLW_TOOL_FUN(
+	OSlwToolMatrixSTU*,
 	OSlwToolMatrixTurnMpy,
 	(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *m1, OSlwToolMatrixSTU *m2, lw_u8 flag),
 	OSlwToolMatrixTurnMpy
@@ -1168,6 +1224,331 @@ OSLW_TOOL_FUN(
 }
 
 
+OSLW_TOOL_FUN(
+	void *,
+	OSlwToolMatrixConv2,
+	(
+		OSlwToolMatrixSTU *s, //目标的
+		OSlwToolMatrixSTU *m_kernal, //卷积核
+		OSlwToolMatrixSTU *m2,//被卷积 
+		lw_u32 move_x, lw_u32 move_y,//横向纵向移动距离
+		lw_u8 EqualModel, //赋值模式 1:直接复制 0:相加
+		lw_u8 MoveModel, //移动模式 's'/'f'
+		lw_u8 KernalModel, //核模式 0/180 180+‘f’=数学二维卷积
+		ParaType *fast_buf//快速卷积内存区
+	),
+	OSlwToolMatrixConv2
+)
+{
+	lw_u8 model_flag = ((MoveModel == 's') << 1) | (KernalModel == 0);
+	
+	ParaType sum_buf, temp;
+
+	ParaType *s_a;
+	ParaType *k_a, *k_p;
+	ParaType *m_r, *m_c, *m_p;
+
+	lw_32 sum_jump, i, j, k, l, kern_r, kern_c, out_r, out_c, m_row, m_col;
+
+	OSLW_assert(!(s));
+	OSLW_assert(!(m_kernal));
+	OSLW_assert(!(m2));
+	OSLW_assert(!(move_x));
+	OSLW_assert(!(move_y));
+	s_a = s->a;
+	
+	m_r = m2->a;
+	sum_jump = m2->col - m_kernal->col;
+	out_r = s->row;
+	out_c = s->col;
+	kern_r = m_kernal->row;
+	kern_c = m_kernal->col;
+	m_row = m2->row;
+	m_col = m2->col;
+	if (fast_buf==NULL)
+	{
+		switch (model_flag)
+		{
+		//完全数学卷积
+		case 0:
+			k_a = m_kernal->a + m_kernal->length - 1;
+			out_r = m_row + kern_r - 1;
+			out_c = m_col + kern_c - 1;
+			if (EqualModel)
+			{
+				for (i = 0; i < out_r; i+=move_x)
+				{
+					for (j = 0; j < out_c; j+=move_y)
+					{
+						//求和
+						sum_buf = _ParaFint(0);
+						k_p = k_a;
+						for (k = i- kern_c+1; k <= i; k++)
+						{
+							l = j - kern_r + 1;
+							for (m_c= m_r + k*m_col + l; l <= j; ++l, --k_p, ++m_c)
+							{
+								if (!(k<0 || k>=m_col || l<0 || l>=m_row))
+								{
+									sum_buf += _ParaMpy(*k_p, *m_c);
+								}				
+							}
+						}
+						*s_a++ = sum_buf;
+					}
+				}
+			}
+			else
+			{
+				for (i = 0; i < out_r; i += move_x)
+				{
+					for (j = 0; j < out_c; j += move_y)
+					{
+						//求和
+						sum_buf = _ParaFint(0);
+						k_p = k_a;
+						for (k = i - kern_c + 1; k <= i; k++)
+						{
+							l = j - kern_r + 1;
+							for (m_c = m_r + k*m_col + l; l <= j; ++l, --k_p, ++m_c)
+							{
+								if (!(k<0 || k >= m_col || l<0 || l >= m_row))
+								{
+									sum_buf += _ParaMpy(*k_p, *m_c);
+								}
+							}
+						}
+						*s_a += sum_buf;
+						s_a++;
+					}
+				}
+			}
+			break;
+
+		case 1:
+			OSLW_assert(1);//先不管
+			break;
+
+		case 2:
+			OSLW_assert(1);//先不管
+			break;
+
+		//CNN 标准模式
+		case 3:
+			k_a = m_kernal->a;
+			move_y *= m2->col;
+			if (EqualModel)
+			{
+				for (i = 0,m_r=m2->a; i < out_r; i++,m_r+= move_y)
+				{
+					for ( j = 0,m_c=m_r; j < out_c; j++,m_c+=move_x)
+					{
+
+						//求和
+						sum_buf = _ParaFint(0);
+						k_p = k_a;
+						m_p = m_c;
+						for (k = 0; k < kern_c; k++, m_p += sum_jump)
+							for (l = 0; l < kern_r; l++)
+								sum_buf += _ParaMpy(*k_p++, *m_p++);
+
+						*s_a++ = sum_buf;
+					}
+				}
+			}
+			else
+			{
+				for (i = 0, m_r = m2->a; i < out_r; i++, m_r += move_y)
+				{
+					for (j = 0, m_c = m_r; j < out_c; j++, m_c += move_x)
+					{
+
+						//求和
+						sum_buf = _ParaFint(0);
+						k_p = k_a;
+						m_p = m_c;
+						for (k = 0; k < kern_c; k++, m_p += sum_jump)
+							for (l = 0; l < kern_r; l++)
+								sum_buf += _ParaMpy(*k_p++, *m_p++);
+
+						*s_a += sum_buf;
+						s_a++;
+					}
+				}
+			}
+			break;
+
+		default:
+			break;
+		}
+	}
+	else
+	{
+		//考虑到嵌入式系统特性 暂时不进行优化 
+		//而且CNN优化算法将卷积变为矩阵相乘 并没有改变运算量 适用于GPU
+		OSLW_assert(1);
+	}
+
+	return s;
+
+}
+
+//只计算一个batch
+OSLW_TOOL_FUN(
+	void*, OSlwToolMatrixConvFastMultCh,
+	(
+		OSlwToolMatrixSTU *m_out, //输出 row-col 代表一个通道 length代表真正大小
+		OSlwToolMatrixSTU *m_kernal, //卷积核 row-col 代表一个通道 length 代表一个核真正大小 [2,2,4] row:2 col:2 length:16
+		OSlwToolMatrixSTU *m_in,//被卷积 row-col 代表一个通道
+		OSlwToolMatrixSTU *bias,//偏置 row-col-length 无所谓
+		lw_u16 in_high,//输入高度 
+		lw_u16 out_high,//输出高度
+		lw_u16 move_x, lw_u16 move_y,//横向纵向移动距离
+		lw_u8 FD_1_or_BK_0,//前向传递或者反向传递
+		ParaType *fast_buf//核 区域
+		),
+	OSlwToolMatrixConvFastMultCh
+)
+{
+
+	lw_32 i, j, k, l, n;
+	lw_32 out_r, out_c;
+	lw_32 sum_jump1, sum_jump2, out_jump, kern_len;
+	lw_32 kern_r, kern_c, kern_one_len;
+	lw_32 in_r, in_c;
+
+	ParaType temp, sum_buf;
+	ParaType *o_a, *o_pic;
+	ParaType *k_a, *k_p, *k_p2;
+	ParaType *m_r, *m_c, *m_p, *m_px, *m_py;
+	ParaType *pbuf, *pbuf2;
+
+
+	o_a = m_out->a;
+	out_r = m_out->row;
+	out_c = m_out->col;
+	kern_r = m_kernal->row;
+	kern_c = m_kernal->col;
+	in_r = m_in->row;
+	in_c = m_in->col;
+	k_a = m_kernal->a;
+	kern_len = m_kernal->length;
+	kern_one_len = kern_c*kern_r;
+	
+	//先加上偏置
+	if (bias)
+	{
+		l = m_out->col*m_out->row;
+		for (i = 0; i < out_high; i++)
+		{
+			temp = bias->a[i];
+			for ( j = 0; j < l; j++)
+			{
+				*o_a++ = temp;
+			}
+		}
+
+		o_a = m_out->a;
+	}
+	else
+	{
+		LW_MAT_CLR(m_out);
+	}
+
+	if (FD_1_or_BK_0)
+	{
+		move_y *= m_in->col;
+		sum_jump1 = m_in->col;
+		sum_jump2 = in_c*in_r;
+		out_jump = out_c*out_r;
+		for (i = 0, m_r = m_in->a; i < out_r; i++, m_r += move_y)
+		{
+			for (j = 0, m_c = m_r; j < out_c; j++, m_c += move_x)
+			{
+
+				//抠图
+				pbuf = fast_buf;//得到缓冲区
+				for (k = 0, m_py = m_c; k < in_high; k++,m_py+=sum_jump2)
+					for (l = 0, m_px=m_py; l < kern_r; l++, m_px+=sum_jump1)
+						for (n = 0,m_p=m_px; n < kern_c; n++)
+							*pbuf++ = *m_p++;
+
+				//求和
+				for (k = 0, k_p = k_a,o_pic=o_a; k < out_high; k++, o_pic += out_jump)
+				{
+					for (sum_buf = _ParaFint(0), pbuf = fast_buf, l = 0; l < kern_len; l++)
+					{
+						sum_buf+= _ParaMpy(*k_p++, *pbuf++);
+					}
+					(*o_pic) += sum_buf;
+				}
+
+				o_a++;
+			}
+		}
+	}
+	else
+	{
+		sum_jump1 = kern_len + kern_one_len;
+		sum_jump2 = out_c*out_r;
+		m_r = m_in->a;
+		out_jump = in_c*in_r;
+		for (i = 0; i < out_r; i += move_x)
+		{
+			for (j = 0; j < out_c; j += move_y)
+			{
+				//抠图
+				pbuf = fast_buf;//得到缓冲区
+				for (k = i - kern_c + 1; k <= i; k++)
+				{
+					l = j - kern_r + 1;
+					for (m_c = m_r + k*in_c + l; l <= j; ++l, ++m_c)
+					{
+						pbuf2 = pbuf++;						
+						if (!(k<0 || k >= in_c || l<0 || l >= in_r))
+						{
+							//连续几张图片都采样这个点
+							for ( n = 0, m_p = m_c; n < in_high; n++, pbuf2+=kern_one_len, m_p += out_jump)
+							{
+								*pbuf2 = *m_p;
+							}
+						}
+						else
+						{
+							for (n = 0; n < in_high; n++, pbuf2 += kern_one_len)
+							{
+								*pbuf2 = _ParaFint(0);
+							}
+						}
+					}
+				}
+
+				//求和				
+				//循环每一个维度
+				for ( k = 0, o_pic=o_a,k_p=k_a; k < out_high; k++,k_p+=kern_one_len)
+				{
+					//循环每一个通道
+					for ( l = 0, pbuf = fast_buf, k_p2 = k_p + kern_one_len - 1, sum_buf = _ParaFint(0); l < in_high; l++, k_p2 += sum_jump1)
+					{
+						for ( n = 0; n < kern_one_len; n++)
+						{
+							sum_buf += _ParaMpy(*k_p2--, *pbuf++);
+						}
+					}
+
+					*o_pic += sum_buf;
+					o_pic += sum_jump2;
+
+				}
+				o_a++;
+			}
+		}
+	}
+
+
+
+}
+
 
 OSLW_TOOL_FUN(OSlwToolMatrixSTU*, OSlwToolMatrix_RATIO_ADD,
 (OSlwToolMatrixSTU *s,ParaType a, OSlwToolMatrixSTU *m1, ParaType b, OSlwToolMatrixSTU *m2),
@@ -1202,6 +1583,7 @@ OSlwToolMatrix_RATIO_ADD
 
 	return s;
 }
+
 #endif //OSLW_TOOL_IMPORT_MATH || OSLW_TOOL_IMPORT_ALL
 
 #endif // !(OSLW_SIMPLE_LEVEL >= 4)

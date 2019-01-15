@@ -14,8 +14,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-typedef int8_t lw_8;
-typedef uint8_t lw_u8;
+typedef char lw_8;
+typedef unsigned char lw_u8;
 typedef int16_t lw_16;
 typedef uint16_t lw_u16;
 
@@ -57,11 +57,11 @@ typedef intptr_t lw_ptr;
 //CPU任务数量
 #define OSLW_TASK_NUM_MAX 8
 
-//#define DEBUG
+#define DEBUG
 #if !defined(DEBUG)
 #define OSLW_assert(is_error) ((void)0)
 #else
-#define OSLW_assert(is_error)   if((is_error)) {printf("\n******\n%s\n********\n",__func__); return;}
+#define OSLW_assert(is_error)   if((is_error)) {while(1);}
 #endif
 
 #if OSLW_SIMPLE_MODE

@@ -1244,10 +1244,8 @@ void OSlwToolDQNetTarinInitial(
         &(pDQN->MainNet),
         qref,
         pDQN->basic.basic.pmem,
-        1,
 		loss,
-        nl,
-		OSlwToolNNTrainUpdateMethod_Manu
+        nl
     );
 }
 
@@ -1912,10 +1910,8 @@ void OSlwToolDDPGradTarinInitial(
 		&(pDDPG->ActorMainNet),
 		qref,
 		pDDPG->PGradBasic.basic.pmem,
-		1,
 		loss,
-		nl,
-		OSlwToolNNTrainUpdateMethod_Manu
+		nl
 	);
 
 	OSlwToolBPNNTrainInit
@@ -1923,10 +1919,8 @@ void OSlwToolDDPGradTarinInitial(
 		&(pDDPG->CriticMainNet),
 		qref,
 		pDDPG->PGradBasic.basic.pmem,
-		1,
 		loss,
-		nl,
-		OSlwToolNNTrainUpdateMethod_Manu
+		nl
 	);
 }
 
@@ -2496,3 +2490,4 @@ OSlwToolPPOptimSTU* OSlwToolPPOptimLearning(OSlwToolPPOptimSTU *pPPO)
 #endif //OSLW_TOOL_IMPORT_RL || OSLW_TOOL_IMPORT_ALL
 
 #endif // !(OSLW_SIMPLE_LEVEL >= 2)
+

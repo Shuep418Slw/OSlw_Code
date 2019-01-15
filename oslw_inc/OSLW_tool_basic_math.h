@@ -17,10 +17,16 @@
 
 #if OSLW_TOOL_IMPORT_MATH || OSLW_TOOL_IMPORT_ALL
 
+typedef lw_u32 LwMatRowType;
+typedef lw_u16 LwMatColType;
+typedef lw_u16 LwMatLenType;
+
 typedef struct OSLW_TOOL_MATRIX_STRUCT {
 	ParaType *a;
-	lw_u32 length;
-	lw_u16 row, col;
+	LwMatLenType length;
+	LwMatRowType row;
+	LwMatColType col;
+
 }OSlwToolMatrixSTU;
 
 typedef OSlwToolMatrixSTU OSlwMat;
@@ -34,7 +40,7 @@ typedef enum
 
 }OSlwMartixResNum;
 
-void OSlwToolMatrixInitial(OSlwToolMatrixSTU *m, lw_u16 row, lw_u16 col, ParaType *a);
+void OSlwToolMatrixInitial(OSlwToolMatrixSTU *m, LwMatRowType row, LwMatColType col, ParaType *a);
 
 //OSlwToolMatrixSTU* OSlwToolMatrixAdd(OSlwToolMatrixSTU *s,OSlwToolMatrixSTU *m1,OSlwToolMatrixSTU *m2);
 //typedef OSlwToolMatrixSTU* (*pOSlwToolMatrixAddFunType)(OSlwToolMatrixSTU *s,OSlwToolMatrixSTU *m1,OSlwToolMatrixSTU *m2);
@@ -102,11 +108,41 @@ OSLW_TOOL_FUN_STATEMENT(OSlwToolMatrixSTU*, OSlwToolMatrixMPYA,
 OSLW_TOOL_FUN_STATEMENT(OSlwToolMatrixSTU*, OSlwToolMatrixWeXBi,
 (OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *we, OSlwToolMatrixSTU *x, OSlwToolMatrixSTU *bi));
 
+OSLW_TOOL_FUN_STATEMENT(OSlwToolMatrixSTU*, OSlwToolMatrixXWeBi,
+(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *we, OSlwToolMatrixSTU *x, OSlwToolMatrixSTU *bi));
+
 OSLW_TOOL_FUN_STATEMENT(OSlwToolMatrixSTU*,OSlwToolMatrixTurnMpy,
 	(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *m1, OSlwToolMatrixSTU *m2, lw_u8 flag));
 
+
+OSLW_TOOL_FUN_STATEMENT(void*, OSlwToolMatrixConv2,
+(
+	OSlwToolMatrixSTU *s, //目标的
+	OSlwToolMatrixSTU *m_kernal, //卷积核
+	OSlwToolMatrixSTU *m2,//被卷积 
+	lw_u16 move_x,lw_u16 move_y,//横向纵向移动距离
+	lw_u8 EqualModel, //赋值模式 1:直接复制 0:相加
+	lw_u8 MoveModel, //移动模式 's'/'f'
+	lw_u8 KernalModel, //核模式 0/180 180+‘f’=数学二维卷积
+	ParaType *fast_buf//快速卷积内存区
+	));
+
+//只计算一个batch
+OSLW_TOOL_FUN_STATEMENT(void*, OSlwToolMatrixConvFastMultCh,
+(
+	OSlwToolMatrixSTU *m_out, //输出 row-col 代表一个通道 length代表真正大小
+	OSlwToolMatrixSTU *m_kernal, //卷积核 row-col 代表一个通道
+	OSlwToolMatrixSTU *m_in,//被卷积 row-col 代表一个通道
+	OSlwToolMatrixSTU *bias,//偏置 row-col-length 无所谓
+	lw_u16 in_high,//输入高度 
+	lw_u16 out_high,//输出高度
+	lw_u16 move_x, lw_u16 move_y,//横向纵向移动距离
+	lw_u8 FD_1_or_BK_0,//前向传递或者反向传递
+	ParaType *fast_buf//核 区域
+	));
+
 OSLW_TOOL_FUN_STATEMENT(
-	OSlwToolMatrixSTU*, 
+	OSlwToolMatrixSTU*,
 	OSlwToolMatrix_RATIO_ADD,
 	(OSlwToolMatrixSTU *s, ParaType a, OSlwToolMatrixSTU *m1, ParaType b, OSlwToolMatrixSTU *m2)
 );
@@ -125,6 +161,27 @@ OSLW_TOOL_FUN_STATEMENT(
 #define OSlwMatGetR(M,R) ((M).a+(R)*(M).col)
 
 #define OSLW_TOOL_M_DY_INIT(M,R,C,PMEM) do{OSlwToolMatrixInitial(&(M),(R),(C),(PMEM)->Malloc((PMEM) , PARA_MEM_CAL((R)*(C))));}while(0)
+
+#define OSlwMatInit OSlwToolMatrixInitial
+
+#define OSlwMatNew OSLW_TOOL_M_DY_INIT
+
+
+#if PARA_LEN==8
+#define LW_MAT_CLR(A) do{\
+	register lw_u32 *_pCLR_D=(void *)((A)->a);\
+	register lw_u32 _CLR_len=((A)->length<<1);\
+	while (_CLR_len--) *_pCLR_D++=0;\
+}while(0)
+#elif PARA_LEN==4
+#define LW_MAT_CLR(A) do{\
+	register lw_u32 *_pCLR_D=(void *)((A)->a);\
+	register lw_u32 _CLR_len=(A)->length;\
+	while (_CLR_len--) *_pCLR_D++=0;\
+}while(0)
+
+#endif
+
 
 #endif //OSLW_TOOL_IMPORT_MATH || OSLW_TOOL_IMPORT_ALL
 

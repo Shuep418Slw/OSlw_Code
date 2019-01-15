@@ -74,6 +74,7 @@ void OSlwInlineTaskBoringExe(OSlwTaskSTU *_pta)
     {
 
         //while(!(pta_last->PrivateMem.m8[0])) {;} //等待任务完成一次 !!!!!可以在此时进入低功耗模式!!!!!!!!
+		pta->pOS->CurrentTaskIndex = OSLW_TASK_NUM_MAX - 1;
 #if !OSLW_SPEED_RUNNING			
         while (pta->TaskGroupFlag.AimStatus.all) {
             OSLW_LOW_POW_ENABLE();    //等待任务完成一次 !!!!!可以在此时进入低功耗模式!!!!!!!!
