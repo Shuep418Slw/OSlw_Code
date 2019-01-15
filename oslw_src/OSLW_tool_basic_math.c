@@ -1231,7 +1231,7 @@ OSLW_TOOL_FUN(
 		OSlwToolMatrixSTU *s, //目标的
 		OSlwToolMatrixSTU *m_kernal, //卷积核
 		OSlwToolMatrixSTU *m2,//被卷积 
-		lw_u32 move_x, lw_u32 move_y,//横向纵向移动距离
+		lw_u16 move_x, lw_u16 move_y,//横向纵向移动距离
 		lw_u8 EqualModel, //赋值模式 1:直接复制 0:相加
 		lw_u8 MoveModel, //移动模式 's'/'f'
 		lw_u8 KernalModel, //核模式 0/180 180+‘f’=数学二维卷积

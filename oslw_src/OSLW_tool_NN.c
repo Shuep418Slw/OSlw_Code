@@ -1862,7 +1862,7 @@ lw_ptr OSlwToolBPNNLayerFullConBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRU
 	{
 		//直接覆盖
 		//dw=in'*out
-		pOSlwToolMatrixTurnMpy(&(pfc->DeltW), &(pNNSLB->in), &(pNNSLB->out), 0b010);
+		pOSlwToolMatrixTurnMpy(&(pfc->DeltW), &(pNNSLB->in), &(pNNSLB->out), 2);
 		
 		//db = sum(out, 1);按列求和
 		_out_b = pNNSLB->out.a;
@@ -1882,13 +1882,13 @@ lw_ptr OSlwToolBPNNLayerFullConBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRU
 		}
 
 		//xd = out*w';
-		OSlwToolMatrixTurnMpy(&(pNNSLB->in), &(pNNSLB->out), &(pfc->Weight), 0b001);
+		OSlwToolMatrixTurnMpy(&(pNNSLB->in), &(pNNSLB->out), &(pfc->Weight), 1);
 	}
 	else
 	{
 		//采用叠加方法
 		//dw=in'*out
-		pOSlwToolMatrixTurnMpy(&(pfc->DeltW), &(pNNSLB->in), &(pNNSLB->out), 0b110);
+		pOSlwToolMatrixTurnMpy(&(pfc->DeltW), &(pNNSLB->in), &(pNNSLB->out), 6);
 
 
 		//db = sum(out, 1);按列求和
@@ -1910,7 +1910,7 @@ lw_ptr OSlwToolBPNNLayerFullConBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRU
 			_out_b++;
 		}
 		//xd = out*w';
-		OSlwToolMatrixTurnMpy(&(pNNSLB->in), &(pNNSLB->out), &(pfc->Weight), 0b101);
+		OSlwToolMatrixTurnMpy(&(pNNSLB->in), &(pNNSLB->out), &(pfc->Weight), 5);
 	}
 
 	//还原
