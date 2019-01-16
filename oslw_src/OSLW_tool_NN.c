@@ -5309,8 +5309,47 @@ void OSlwToolBPNNLoadX(OSlwToolBPNNSTU *pBPNN, OSlwMat *xs)
 	lw_32 res;
 	OSLW_assert(!(pBPNN));
 	OSLW_assert(!(xs));
+#if OSLW_TOOL_NN_DATA_FRAME==OSLW_TOOL_NN_D_FRAME_C
+	if (xs->col != pBPNN->x.col)
+	{
+		OSLW_assert(1);
+		return;
+	}
 
-	if (xs->col != pBPNN->x.row)
+	//计算剩余的批容量
+	if (pBPNN->Train.mini_batch_max < (pBPNN->Train.mini_batch_now + xs->row))
+	{
+		OSLW_assert(1);
+		return;
+	}
+
+	res = pBPNN->Train.mini_batch_max - pBPNN->Train.mini_batch_now;
+
+	
+	
+	if (res < xs->row)
+	{
+		//输入batch超过了最大
+		//调整输入矩阵
+		xs->row=res;
+		xs->length=xs->col*res;
+	}
+	else
+	{
+		res=xs->row;
+	}
+	
+	
+
+	//初始化
+	OSlwMatInit(&_x,res,xs->col,OSlwMatGetR(pBPNN->x,pBPNN->Train.mini_batch_now));
+	
+	//复制矩阵
+	LW_MAT_CPY(&(_x),xs);
+	
+	
+#elif OSLW_TOOL_NN_DATA_FRAME OSLW_TOOL_NN_D_FRAME_F
+		if (xs->col != pBPNN->x.row)
 	{
 		OSLW_assert(1);
 		return;
@@ -5326,14 +5365,23 @@ void OSlwToolBPNNLoadX(OSlwToolBPNNSTU *pBPNN, OSlwMat *xs)
 	res = pBPNN->Train.mini_batch_max - pBPNN->Train.mini_batch_now;
 
 	if (res < xs->row)
-	{
+	{	
 		xs->row = res;
 	}
+	else
+	{
+		res=xs->row;
+	}
+	
 
 	//初始化
 	OSlwMatInit(&_x, pBPNN->x.row, res, pBPNN->x.a + pBPNN->Train.mini_batch_now);
 
 	pOSlwToolMatrixTurn(&_x, xs);
+	
+#endif
+	
+
 
 	//更新批数量
 	pBPNN->Train.mini_batch_now += res;
@@ -5346,7 +5394,20 @@ void OSlwToolBPNNLoadY(OSlwToolBPNNSTU *pBPNN, OSlwMat *ys)
 	OSlwMat _y;
 	OSLW_assert(!(pBPNN));
 	OSLW_assert(!(ys));
+#if OSLW_TOOL_NN_DATA_FRAME==OSLW_TOOL_NN_D_FRAME_C
+	if (ys->col != pBPNN->ref.col || pBPNN->Train.mini_batch_now != ys->row )
+	{
+		OSLW_assert(1);
+		return;
+	}
 
+	//初始化
+	OSlwMatInit(&_y, pBPNN->ref.row, pBPNN->ref.col, pBPNN->ref.a);	
+
+	//复制矩阵
+	LW_MAT_CPY(&(_y),ys);	
+	
+#elif OSLW_TOOL_NN_DATA_FRAME OSLW_TOOL_NN_D_FRAME_F
 	if (ys->col != pBPNN->ref.row || pBPNN->Train.mini_batch_now != ys->row )
 	{
 		OSLW_assert(1);
@@ -5357,6 +5418,10 @@ void OSlwToolBPNNLoadY(OSlwToolBPNNSTU *pBPNN, OSlwMat *ys)
 	OSlwMatInit(&_y, pBPNN->ref.row, pBPNN->ref.col, pBPNN->ref.a);
 
 	pOSlwToolMatrixTurn(&_y, ys);
+	
+#endif
+	
+
 
 
 }

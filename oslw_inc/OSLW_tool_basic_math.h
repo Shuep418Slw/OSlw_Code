@@ -173,12 +173,28 @@ OSLW_TOOL_FUN_STATEMENT(
 	register lw_u32 _CLR_len=((A)->length<<1);\
 	while (_CLR_len--) *_pCLR_D++=0;\
 }while(0)
+
+#define LW_MAT_CPY(A,B) do{\
+	register lw_u32 *_pCLR_D1=(void *)((A)->a);\
+	register lw_u32 *_pCLR_D2=(void *)((B)->a);\
+	register lw_u32 _CLR_len=(((A)->length)<<1);\
+	while (_CLR_len--) *_pCLR_D1++=*_pCLR_D2++;\
+}while(0)
+
 #elif PARA_LEN==4
 #define LW_MAT_CLR(A) do{\
 	register lw_u32 *_pCLR_D=(void *)((A)->a);\
 	register lw_u32 _CLR_len=(A)->length;\
 	while (_CLR_len--) *_pCLR_D++=0;\
 }while(0)
+
+#define LW_MAT_CPY(A,B) do{\
+	register lw_u32 *_pCLR_D1=(void *)((A)->a);\
+	register lw_u32 *_pCLR_D2=(void *)((B)->a);\
+	register lw_u32 _CLR_len=(A)->length;\
+	while (_CLR_len--) *_pCLR_D1++=*_pCLR_D2++;\
+}while(0)
+
 
 #endif
 
