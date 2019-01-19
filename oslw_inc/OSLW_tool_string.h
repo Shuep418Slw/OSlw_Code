@@ -8,16 +8,16 @@
 #if !(OSLW_SIMPLE_LEVEL >= 4)
 
 
-ParaType OSlwToolStringToParaType(const lw_u8 *str);
+lw_sf OSlwToolStringTolw_sf(const lw_u8 *str);
 lw_32 OSlwToolStringToInt(const lw_u8 *str);
 
 lw_u8* OSlwToolString_itoa(lw_32 value, lw_u8 *str, lw_32 radix);
 lw_u8* OSlwToolString_utoa(lw_u32 value, lw_u8 *str, lw_32 radix);
-lw_u8* OSlwToolString_gcvt(ParaType value, lw_32 ndigit, lw_u8 *buf);
+lw_u8* OSlwToolString_gcvt(lw_sf value, lw_32 ndigit, lw_u8 *buf);
 void* OSlwToolStringVSprintf(lw_8 *buf, const lw_8 *fmt, va_list args);
 void* OSlwToolStringSprintf(lw_8 *buf, const lw_8 *fmt, ...);
 
-#define LwStr2F(S) OSlwToolStringToParaType(S)
+#define LwStr2F(S) OSlwToolStringTolw_sf(S)
 #define LwStr2I(S) OSlwToolStringToInt(S)
 #define LwI2Str(S,D) OSlwToolString_itoa(S,D,10)
 #define LwF2Str(S,D) OSlwToolString_gcvt(D,4,S)

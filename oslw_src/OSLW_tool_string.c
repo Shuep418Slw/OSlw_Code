@@ -10,10 +10,10 @@
 
 
 
-ParaType OSlwToolStringToParaType(const lw_u8 *str)
+lw_sf OSlwToolStringTolw_sf(const lw_u8 *str)
 {
-	ParaType s = _ParaFrom(0.0);
-	ParaType d = _ParaFrom(10.0);
+	lw_sf s = _ParaFrom(0.0);
+	lw_sf d = _ParaFrom(10.0);
 	lw_u32 jishu = 0;
 
 	lw_u8 falg = 0;
@@ -173,12 +173,12 @@ lw_u8* OSlwToolString_utoa(lw_u32 value, lw_u8 *str, lw_32 radix)
 }
 
 
-lw_u8* OSlwToolString_gcvt(ParaType value, lw_32 ndigit, lw_u8 *buf) 
+lw_u8* OSlwToolString_gcvt(lw_sf value, lw_32 ndigit, lw_u8 *buf) 
 {
 	lw_8 tmpbuf[40];
 	lw_32 int_part = (int)value;
 
-	ParaType folat_part = value - int_part;
+	lw_sf folat_part = value - int_part;
 	lw_8 *p;
 
 	if (folat_part < 0) folat_part = -folat_part;

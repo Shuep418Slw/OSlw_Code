@@ -21,7 +21,7 @@
 
 // NN TOOL
 #define OSLW_TOOL_IMPORT_NN 0 
-#define OSLW_TOOL_IMPORT_NN_BPNN 0
+#define OSLW_TOOL_IMPORT_NN_BPnn 0
 
 #define OSLW_TOOL_NN_D_FRAME_C 'C'
 #define OSLW_TOOL_NN_D_FRAME_F 'F'

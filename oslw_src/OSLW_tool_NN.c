@@ -260,7 +260,7 @@ OSLW_TOOL_FUN
 #endif // 0
 
 
-#if OSLW_TOOL_IMPORT_NN_BPNN || OSLW_TOOL_IMPORT_ALL
+#if OSLW_TOOL_IMPORT_NN_BPnn || OSLW_TOOL_IMPORT_ALL
 
 
 
@@ -269,7 +269,7 @@ OSLW_TOOL_FUN
 
 
 //网络层初始化函数
-void OSlwToolBPNNLayerInitial(OSlwToolNNLayerFullConSTU *pNNL//网络层结构体
+void OSlwToolBPnnLayerInitial(OSlwToolNNLayerFullConSTU *pNNL//网络层结构体
 	, OSlwToolNNLayerActFunSTU *pAF//激活函数
 	, lw_u16 size_row, lw_u16 size_col//层大小
 	, ParaType *pW//系数矩阵数据块
@@ -308,7 +308,7 @@ void OSlwToolBPNNLayerInitial(OSlwToolNNLayerFullConSTU *pNNL//网络层结构体
 }
 
 //前向传播初始化
-void OSlwToolBPNNLayerForwardInitial(OSlwToolNNLayerFullConSTU *pNNL, ParaType *pIN, ParaType *pOUT, ParaType *pOUT_X)
+void OSlwToolBPnnLayerForwardInitial(OSlwToolNNLayerFullConSTU *pNNL, ParaType *pIN, ParaType *pOUT, ParaType *pOUT_X)
 {
 	OSLW_assert(!(pNNL));
 	OSlwToolMatrixInitial(&pNNL->in, 1, pNNL->w.row, pIN);
@@ -318,7 +318,7 @@ void OSlwToolBPNNLayerForwardInitial(OSlwToolNNLayerFullConSTU *pNNL, ParaType *
 
 
 //后向传播初始化
-void OSlwToolBPNNLayerBackwardInitial(OSlwToolNNLayerFullConSTU *pNNL, ParaType *pINerr, ParaType *pdelt, ParaType *pOuterr)
+void OSlwToolBPnnLayerBackwardInitial(OSlwToolNNLayerFullConSTU *pNNL, ParaType *pINerr, ParaType *pdelt, ParaType *pOuterr)
 {
 
 	OSLW_assert(!(pNNL));
@@ -331,7 +331,7 @@ void OSlwToolBPNNLayerBackwardInitial(OSlwToolNNLayerFullConSTU *pNNL, ParaType 
 
 //BN初始化
 /*
-void OSlwToolBPNNLayerBatchNormInitial(OSlwToolNNLayerFullConSTU *pNNL, OSlwToolNNBatchNormSTU *pBN,ParaType epsi)
+void OSlwToolBPnnLayerBatchNormInitial(OSlwToolNNLayerFullConSTU *pNNL, OSlwToolNNBatchNormSTU *pBN,ParaType epsi)
 {
 
 	OSLW_assert(!(pNNL));
@@ -348,7 +348,7 @@ void OSlwToolBPNNLayerBatchNormInitial(OSlwToolNNLayerFullConSTU *pNNL, OSlwTool
 
 /*
 由于dropout 新版本舍弃
-void OSlwToolBPNNLayerReSize(OSlwToolNNLayerFullConSTU *pNNL,lw_u16 r,lw_u16 c)
+void OSlwToolBPnnLayerReSize(OSlwToolNNLayerFullConSTU *pNNL,lw_u16 r,lw_u16 c)
 {
 
     OSLW_assert(!(pNNL));
@@ -370,7 +370,7 @@ void OSlwToolBPNNLayerReSize(OSlwToolNNLayerFullConSTU *pNNL,lw_u16 r,lw_u16 c)
 */
 
 /*
-void  OSlwToolBPNNDropOutInitial(OSlwToolNNLayerFullConSTU *pNNL,ParaType P,ParaType *pWBuf,ParaType *pBiasUN.biasBuf,lw_u16 *pList1,lw_u16 *pList2)
+void  OSlwToolBPnnDropOutInitial(OSlwToolNNLayerFullConSTU *pNNL,ParaType P,ParaType *pWBuf,ParaType *pBiasUN.biasBuf,lw_u16 *pList1,lw_u16 *pList2)
 {
 
     OSLW_assert(!(pNNL));
@@ -388,7 +388,7 @@ void  OSlwToolBPNNDropOutInitial(OSlwToolNNLayerFullConSTU *pNNL,ParaType P,Para
 }
 */
 
-void  OSlwToolBPNNDropOutInitial(OSlwToolNNLayerFullConSTU *pNNL,OSlwToolNNDropOutSTU *pdrop, ParaType P, ParaType *pDropList)
+void  OSlwToolBPnnDropOutInitial(OSlwToolNNLayerFullConSTU *pNNL,OSlwToolNNDropOutSTU *pdrop, ParaType P, ParaType *pDropList)
 {
 
 	OSLW_assert(!(pNNL));
@@ -401,38 +401,38 @@ void  OSlwToolBPNNDropOutInitial(OSlwToolNNLayerFullConSTU *pNNL,OSlwToolNNDropO
 }
 
 //神经网络层追加 使用的是tool中的双向链表
-OSlwToolBPNNSTU *OSlwToolBPNNAppend(OSlwToolBPNNSTU *pBPNN, OSlwToolDListNodeSTU *pDLN, OSlwToolNNLayerFullConSTU *pNNL)
+OSlwToolBPnnSTU *OSlwToolBPnnAppend(OSlwToolBPnnSTU *pBPnn, OSlwToolDListNodeSTU *pDLN, OSlwToolNNLayerFullConSTU *pNNL)
 {
-	OSLW_assert(!(pBPNN));
+	OSLW_assert(!(pBPnn));
 	OSLW_assert(!(pDLN));
 	OSLW_assert(!(pNNL));
 
-	pBPNN->Net.AppendFUN(&pBPNN->Net, pDLN);
+	pBPnn->Net.AppendFUN(&pBPnn->Net, pDLN);
 	pDLN->Data.uData = sizeof(OSlwToolNNLayerFullConSTU);
 	pDLN->Data.pData = (void *)pNNL;
-	if (pBPNN->ParaGroupNum == 0)
+	if (pBPnn->ParaGroupNum == 0)
 	{
 
-		OSlwToolMatrixInitial(&pBPNN->x, pNNL->in.row, pNNL->in.col, pNNL->in.a);
+		OSlwToolMatrixInitial(&pBPnn->x, pNNL->in.row, pNNL->in.col, pNNL->in.a);
 
 	}
 
-	OSlwToolMatrixInitial(&pBPNN->y, pNNL->out.row, pNNL->out.col, pNNL->out.a);
+	OSlwToolMatrixInitial(&pBPnn->y, pNNL->out.row, pNNL->out.col, pNNL->out.a);
 
-	pBPNN->ParaGroupNum += 2;//同时加上偏置与权重
+	pBPnn->ParaGroupNum += 2;//同时加上偏置与权重
 
-	pBPNN->WeightParaNum += pNNL->w.length;
-	pBPNN->BiasParaNum += pNNL->BiasUN.bias.length;
+	pBPnn->WeightParaNum += pNNL->w.length;
+	pBPnn->BiasParaNum += pNNL->BiasUN.bias.length;
 
 
-	return pBPNN;
+	return pBPnn;
 }
 
 
 void*
-OSlwToolBPNNLayerAppend_Dynamic
+OSlwToolBPnnLayerAppend_Dynamic
 (
-	OSlwToolBPNNSTU *pBPNN,
+	OSlwToolBPnnSTU *pBPnn,
 	OSlwToolNNLayerActFunSTU *pAF,
 	lw_u16 row,
 	lw_u16 col,
@@ -447,7 +447,7 @@ OSlwToolBPNNLayerAppend_Dynamic
 	void *p1 = NULL, *p2 = NULL, *p3 = NULL, *p4 = NULL, *p5 = NULL, *p6 = NULL, *p7 = NULL, *p8 = NULL;
     OSlwToolNNLayerFullConSTU *pTNNL;
 
-    OSLW_assert(!(pBPNN));
+    OSLW_assert(!(pBPnn));
     OSLW_assert(!(pAF));
     OSLW_assert(!(pTRB));
     OSLW_assert(!(pMem));
@@ -461,7 +461,7 @@ OSlwToolBPNNLayerAppend_Dynamic
         return NULL;
     }
 
-    OSlwToolBPNNLayerInitial(p1, pAF, row, col, p2, p3, pTRB, Rmax, Rmin, nl);
+    OSlwToolBPnnLayerInitial(p1, pAF, row, col, p2, p3, pTRB, Rmax, Rmin, nl);
     if (!(pout))//如果没有自定义输出
     {
         p3 = pMem->Malloc(pMem, sizeof(ParaType)*col);//分配一个输出
@@ -473,7 +473,7 @@ OSlwToolBPNNLayerAppend_Dynamic
 
 	p8 = pMem->Malloc(pMem, sizeof(ParaType)*col);//分配一个X输出
 
-    if(pBPNN->ParaGroupNum == 0)//只有输入层
+    if(pBPnn->ParaGroupNum == 0)//只有输入层
     {
 
         if (!pin)//如果没有定义输入
@@ -492,7 +492,7 @@ OSlwToolBPNNLayerAppend_Dynamic
     }
     else
     {
-        pTNNL = pBPNN->Net.pTail->Data.pData;//得到上一层内存地址
+        pTNNL = pBPnn->Net.pTail->Data.pData;//得到上一层内存地址
         p2 = pTNNL->out.a;
         p4 = pTNNL->outErr.a;//输入的误差是上一层输出误差
         p5 = pMem->Malloc(pMem, sizeof(ParaType) * 1 * col);//delt
@@ -513,15 +513,15 @@ OSlwToolBPNNLayerAppend_Dynamic
     memset(p7, 0, sizeof(OSlwToolDListNodeSTU));
 
 
-    OSlwToolBPNNLayerForwardInitial(p1, p2, p3, p8);
-    OSlwToolBPNNLayerBackwardInitial(p1, p4, p5, p6);
-    OSlwToolBPNNAppend(pBPNN, p7, p1);
+    OSlwToolBPnnLayerForwardInitial(p1, p2, p3, p8);
+    OSlwToolBPnnLayerBackwardInitial(p1, p4, p5, p6);
+    OSlwToolBPnnAppend(pBPnn, p7, p1);
 
 	
 	if (DropOutEps > _ParaFint(0))
 	{
 	
-		OSlwToolBPNNDropOutInitial(p1, pMem->Malloc(pMem, sizeof(OSlwToolNNDropOutSTU)), DropOutEps, pMem->Malloc(pMem, sizeof(ParaType) * 1 * col));
+		OSlwToolBPnnDropOutInitial(p1, pMem->Malloc(pMem, sizeof(OSlwToolNNDropOutSTU)), DropOutEps, pMem->Malloc(pMem, sizeof(ParaType) * 1 * col));
 
 	}
 	else
@@ -537,18 +537,18 @@ OSlwToolBPNNLayerAppend_Dynamic
 
 
 //神经网络初始化
-void OSlwToolBPNNInitial(OSlwToolBPNNSTU *pBPNN)
+void OSlwToolBPnnInitial(OSlwToolBPnnSTU *pBPnn)
 {
-    OSLW_assert(!(pBPNN));
-    memset(pBPNN, 0, sizeof(OSlwToolBPNNSTU));
-    OSlwToolDListInitial(&pBPNN->Net,sizeof(OSlwToolNNLayerFullConSTU),NULL);
-    pBPNN->_nl_factor = _ParaFrom(1.0);
+    OSLW_assert(!(pBPnn));
+    memset(pBPnn, 0, sizeof(OSlwToolBPnnSTU));
+    OSlwToolDListInitial(&pBPnn->Net,sizeof(OSlwToolNNLayerFullConSTU),NULL);
+    pBPnn->_nl_factor = _ParaFrom(1.0);
 
 }
 
 
-void OSlwToolBPNNLossInitial(
-    OSlwToolBPNNSTU *pBPNN,
+void OSlwToolBPnnLossInitial(
+    OSlwToolBPnnSTU *pBPnn,
     ParaType *pRef,
     OSlwToolRandomBasicSTU *pRand,
     OSlwMemoryBasicSTU *pMem,
@@ -566,32 +566,32 @@ void OSlwToolBPNNLossInitial(
     OSlwToolDListNodeSTU  *pDLN;
     OSlwToolNNLayerFullConSTU *pNNL;
 
-    OSLW_assert(!(pBPNN));
+    OSLW_assert(!(pBPnn));
 	OSLW_assert(!(pRef));
 	//OSLW_assert(!(loss));
     OSLW_assert(!(pRand));
     OSLW_assert(!(pMem));
 
-    pTNL=pBPNN->Net.pTail->Data.pData;
+    pTNL=pBPnn->Net.pTail->Data.pData;
 
 
 
 
-    OSlwToolMatrixInitial(&(pBPNN->ref),1,pTNL->out.col,pRef);
-    pBPNN->Train.BatchSetLength = set_len - 1;
-	pBPNN->Train.SampleSetLength = sample_len;
-    pBPNN->Train.BatchSampleDiv = set_len / sample_len;
-    pBPNN->Train.BatchSampleDiv = pBPNN->Train.BatchSampleDiv ? pBPNN->Train.BatchSampleDiv : 1;
+    OSlwToolMatrixInitial(&(pBPnn->ref),1,pTNL->out.col,pRef);
+    pBPnn->Train.BatchSetLength = set_len - 1;
+	pBPnn->Train.SampleSetLength = sample_len;
+    pBPnn->Train.BatchSampleDiv = set_len / sample_len;
+    pBPnn->Train.BatchSampleDiv = pBPnn->Train.BatchSampleDiv ? pBPnn->Train.BatchSampleDiv : 1;
 
-    pBPNN->Train.LossFun = loss;
-    pBPNN->Train.pRand = pRand;
-    pBPNN->Train.Flag.SaveMethod = savem;
-    pBPNN->Train.Flag.UpdateMethod = updatem;
+    pBPnn->Train.LossFun = loss;
+    pBPnn->Train.pRand = pRand;
+    pBPnn->Train.Flag.SaveMethod = savem;
+    pBPnn->Train.Flag.UpdateMethod = updatem;
 
-	pKind = pMem->Malloc(pMem, sizeof(lw_u32)*(pBPNN->ParaGroupNum + 1));
+	pKind = pMem->Malloc(pMem, sizeof(lw_u32)*(pBPnn->ParaGroupNum + 1));
     pKind[i++] = PARA_MEM_CAL(1);
     //得到每一列的大小
-    pDLN = pBPNN->Net.pTail;
+    pDLN = pBPnn->Net.pTail;
     do {
         pNNL = (OSlwToolNNLayerFullConSTU *)pDLN->Data.pData;
         pKind[i++] = PARA_MEM_CAL(pNNL->w.length);
@@ -601,48 +601,48 @@ void OSlwToolBPNNLossInitial(
     } while (pDLN->Key.uData);
 
 
-    if (pBPNN->Train.Flag.SaveMethod == OSlwToolNNTrainSaveMethod_AllSave)
+    if (pBPnn->Train.Flag.SaveMethod == OSlwToolNNTrainSaveMethod_AllSave)
     {
-        OSlwToolTableInitial(&(pBPNN->Train.DeltTable), sample_len, NULL, pBPNN->ParaGroupNum + 1, pMem, NULL, pKind);//完全存储就会全部存下
+        OSlwToolTableInitial(&(pBPnn->Train.DeltTable), sample_len, NULL, pBPnn->ParaGroupNum + 1, pMem, NULL, pKind);//完全存储就会全部存下
     }
     else
     {
-        OSlwToolTableInitial(&(pBPNN->Train.DeltTable), 1, NULL,  pBPNN->ParaGroupNum + 1, pMem, NULL, pKind);//节约存储只会存一条delt
+        OSlwToolTableInitial(&(pBPnn->Train.DeltTable), 1, NULL,  pBPnn->ParaGroupNum + 1, pMem, NULL, pKind);//节约存储只会存一条delt
     }
 
     //pMem->Free(pMem, pKind);
 
-    //pBPNN->loss=loss;
+    //pBPnn->loss=loss;
 }
 
-void OSlwToolBPNNReguInitial(OSlwToolBPNNSTU *pBPNN, OSlwToolNNReguTypeNUM ReguType, ParaType lambda)
+void OSlwToolBPnnReguInitial(OSlwToolBPnnSTU *pBPnn, OSlwToolNNReguTypeNUM ReguType, ParaType lambda)
 {
 
-	OSLW_assert(!pBPNN);
+	OSLW_assert(!pBPnn);
 
-	pBPNN->Regu.ReguType = ReguType;
-	pBPNN->Regu.Lambda = lambda;
+	pBPnn->Regu.ReguType = ReguType;
+	pBPnn->Regu.Lambda = lambda;
 
 }
 
 /*(Ver.=0.9~)(Beg.=0.9)
 //对网络减肥
 //dropout 效果不好
-OSlwToolBPNNSTU* OSlwToolBPNNDropOutStart(OSlwToolBPNNSTU *_pBPNN)
+OSlwToolBPnnSTU* OSlwToolBPnnDropOutStart(OSlwToolBPnnSTU *_pBPnn)
 {
-    static OSlwToolBPNNSTU *pBPNN;
+    static OSlwToolBPnnSTU *pBPnn;
     static OSlwToolDListNodeSTU  *pDLN;
     static OSlwToolNNLayerFullConSTU *pNNL;
     static ParaType *pbuf;
     static lw_u16 i,j,count_row=0,count_col=0,*prow,*pcol;
-    OSLW_assert(!(pBPNN));
+    OSLW_assert(!(pBPnn));
 
-    pBPNN=_pBPNN;
+    pBPnn=_pBPnn;
 
-    if(!(pBPNN->LayerNumber))
+    if(!(pBPnn->LayerNumber))
         return NULL;
 
-    pDLN=(OSlwToolDListNodeSTU *)pBPNN->Net.Head.con.pNext;
+    pDLN=(OSlwToolDListNodeSTU *)pBPnn->Net.Head.con.pNext;
 
     do
     {
@@ -657,7 +657,7 @@ OSlwToolBPNNSTU* OSlwToolBPNNDropOutStart(OSlwToolBPNNSTU *_pBPNN)
         count_row=count_col;
         count_col=0;
         //准备过程 得到具体的行和列
-        if(pDLN == (OSlwToolDListNodeSTU *)pBPNN->Net.Head.con.pNext)
+        if(pDLN == (OSlwToolDListNodeSTU *)pBPnn->Net.Head.con.pNext)
         {
 
             count_row=pNNL->size_row;
@@ -672,7 +672,7 @@ OSlwToolBPNNSTU* OSlwToolBPNNDropOutStart(OSlwToolBPNNSTU *_pBPNN)
                 }//end if
             }//end for
         }//end if
-        else if(pDLN == pBPNN->Net.pTail)
+        else if(pDLN == pBPnn->Net.pTail)
         {
             count_col=pNNL->size_col;
             for(j=0; j<pNNL->size_col; j++) //行不要dropout
@@ -720,32 +720,32 @@ OSlwToolBPNNSTU* OSlwToolBPNNDropOutStart(OSlwToolBPNNSTU *_pBPNN)
 
 
         //调整层大小
-        OSlwToolBPNNLayerReSize(pNNL,count_row,count_col);
+        OSlwToolBPnnLayerReSize(pNNL,count_row,count_col);
 
         pDLN=(OSlwToolDListNodeSTU *)pDLN->con.pNext;
 
     } while(pDLN);
 
-    return pBPNN;
+    return pBPnn;
 
 }
 
 //恢复网络
-OSlwToolBPNNSTU* OSlwToolBPNNDropOutStop(OSlwToolBPNNSTU *_pBPNN)
+OSlwToolBPnnSTU* OSlwToolBPnnDropOutStop(OSlwToolBPnnSTU *_pBPnn)
 {
-    static OSlwToolBPNNSTU *pBPNN;
+    static OSlwToolBPnnSTU *pBPnn;
     static OSlwToolDListNodeSTU  *pDLN;
     static OSlwToolNNLayerFullConSTU *pNNL;
     static ParaType *pbuf;
     static lw_u16 i,j,count_row=0,count_col=0,*prow,*pcol;
-    OSLW_assert(!(pBPNN));
+    OSLW_assert(!(pBPnn));
 
-    pBPNN=_pBPNN;
+    pBPnn=_pBPnn;
 
-    if(!(pBPNN->LayerNumber))
+    if(!(pBPnn->LayerNumber))
         return NULL;
 
-    pDLN=(OSlwToolDListNodeSTU *)pBPNN->Net.Head.con.pNext;
+    pDLN=(OSlwToolDListNodeSTU *)pBPnn->Net.Head.con.pNext;
 
     do
     {
@@ -787,29 +787,29 @@ OSlwToolBPNNSTU* OSlwToolBPNNDropOutStop(OSlwToolBPNNSTU *_pBPNN)
 
 
         //调整层大小
-        OSlwToolBPNNLayerReSize(pNNL,pNNL->size_row,pNNL->size_col);
+        OSlwToolBPnnLayerReSize(pNNL,pNNL->size_row,pNNL->size_col);
 
         pDLN=(OSlwToolDListNodeSTU *)pDLN->con.pNext;
     } while(pDLN);
 
-    return pBPNN;
+    return pBPnn;
 
 
 }
 */
 
 //前向传播
-OSlwToolBPNNSTU *OSlwToolBPNNRunning(OSlwToolBPNNSTU *_pBPNN)
+OSlwToolBPnnSTU *OSlwToolBPnnRunning(OSlwToolBPnnSTU *_pBPnn)
 {
 
-    OSlwToolBPNNSTU *pBPNN;
+    OSlwToolBPnnSTU *pBPnn;
     OSlwToolDListNodeSTU  *pDLN;
     OSlwToolNNLayerFullConSTU *pNNL;
-    OSLW_assert(!(_pBPNN));
-    pBPNN=_pBPNN;
-    if(!(pBPNN->ParaGroupNum))
-        return _pBPNN;
-    pDLN=(OSlwToolDListNodeSTU *)pBPNN->Net.Head.con.pNext;
+    OSLW_assert(!(_pBPnn));
+    pBPnn=_pBPnn;
+    if(!(pBPnn->ParaGroupNum))
+        return _pBPnn;
+    pDLN=(OSlwToolDListNodeSTU *)pBPnn->Net.Head.con.pNext;
     do {
         pNNL=(OSlwToolNNLayerFullConSTU *)pDLN->Data.pData;
 
@@ -822,7 +822,7 @@ OSlwToolBPNNSTU *OSlwToolBPNNRunning(OSlwToolBPNNSTU *_pBPNN)
 			stas.row = stas.col = stas.length = 2;
 			stas.a = &stas_res;
 
-			if (pBPNN->Train.Flag.Status != OSlwToolNNTrainStatus_Using)//在训练状态
+			if (pBPnn->Train.Flag.Status != OSlwToolNNTrainStatus_Using)//在训练状态
 			{
 
 				OSlwToolMatrixSTU m1;
@@ -895,7 +895,7 @@ OSlwToolBPNNSTU *OSlwToolBPNNRunning(OSlwToolBPNNSTU *_pBPNN)
 		}
 		*/
 
-		if (pBPNN->Train.Flag.Status != OSlwToolNNTrainStatus_Using && pNNL->pDropOut)
+		if (pBPnn->Train.Flag.Status != OSlwToolNNTrainStatus_Using && pNNL->pDropOut)
 		{
 			lw_u32 i = pNNL->size_col;
 			ParaType *pd = pNNL->pDropOut->DropOutMat.a;
@@ -931,28 +931,28 @@ OSlwToolBPNNSTU *OSlwToolBPNNRunning(OSlwToolBPNNSTU *_pBPNN)
     } while(pDLN);
 
 
-    return pBPNN;
+    return pBPnn;
 }
 
 
 
-OSlwToolBPNNSTU *OSlwToolBPNNErrCalu(OSlwToolBPNNSTU *pBPNN)
+OSlwToolBPnnSTU *OSlwToolBPnnErrCalu(OSlwToolBPnnSTU *pBPnn)
 {
 
 
     OSlwToolNNLayerFullConSTU *pTNL;
-    OSLW_assert(!(pBPNN));
+    OSLW_assert(!(pBPnn));
 
-    pTNL=pBPNN->Net.pTail->Data.pData;
+    pTNL=pBPnn->Net.pTail->Data.pData;
 
-    if(pBPNN->Train.LossFun)
+    if(pBPnn->Train.LossFun)
     {
 
-        pBPNN->Error  = pBPNN->Train.LossFun(&(pTNL->outErr),&(pBPNN->ref),&(pTNL->out));
+        pBPnn->Error  = pBPnn->Train.LossFun(&(pTNL->outErr),&(pBPnn->ref),&(pTNL->out));
 
     }
 
-    return pBPNN;
+    return pBPnn;
 
 }
 
@@ -960,20 +960,20 @@ OSlwToolBPNNSTU *OSlwToolBPNNErrCalu(OSlwToolBPNNSTU *pBPNN)
 /*(Ver.=0.9~)(Beg.=0.9)
 //旧版本
 //后向传播
-OSlwToolBPNNSTU *OSlwToolBPNNUpdate(OSlwToolBPNNSTU *_pBPNN)
+OSlwToolBPnnSTU *OSlwToolBPnnUpdate(OSlwToolBPnnSTU *_pBPnn)
 {
 
-    OSlwToolBPNNSTU *pBPNN;
+    OSlwToolBPnnSTU *pBPnn;
     OSlwToolDListNodeSTU  *pDLN;
     OSlwToolNNLayerFullConSTU *pNNL;
     lw_u16 i,j;
     ParaType temp;
-    OSLW_assert(!(_pBPNN));
-    pBPNN=_pBPNN;
+    OSLW_assert(!(_pBPnn));
+    pBPnn=_pBPnn;
 
-    if(!(pBPNN->LayerNumber))
-        return _pBPNN;
-    pDLN=pBPNN->Net.pTail;
+    if(!(pBPnn->LayerNumber))
+        return _pBPnn;
+    pDLN=pBPnn->Net.pTail;
     //假设w（m*n）
     do {
         pNNL=(OSlwToolNNLayerFullConSTU *)pDLN->Data.pData;
@@ -1015,7 +1015,7 @@ OSlwToolBPNNSTU *OSlwToolBPNNUpdate(OSlwToolBPNNSTU *_pBPNN)
     } while(pDLN->Key.uData);
 
 
-    return pBPNN;
+    return pBPnn;
 }
 */
 
@@ -1023,10 +1023,10 @@ OSlwToolBPNNSTU *OSlwToolBPNNUpdate(OSlwToolBPNNSTU *_pBPNN)
 
 
 
-OSlwToolBPNNSTU *OSlwToolBPNNDeltCalu(OSlwToolBPNNSTU *_pBPNN,lw_u16 _batch_index)
+OSlwToolBPnnSTU *OSlwToolBPnnDeltCalu(OSlwToolBPnnSTU *_pBPnn,lw_u16 _batch_index)
 {
 
-    OSlwToolBPNNSTU *pBPNN;
+    OSlwToolBPnnSTU *pBPnn;
     OSlwToolDListNodeSTU  *pDLN;
     OSlwToolNNLayerFullConSTU *pNNL;
     lw_u16 i, j, count = 1, len;
@@ -1034,17 +1034,17 @@ OSlwToolBPNNSTU *OSlwToolBPNNDeltCalu(OSlwToolBPNNSTU *_pBPNN,lw_u16 _batch_inde
 	OSlwToolMatrixSTU dw, dbias;
     OSlwToolTableSTU *ptable;
 
-    OSLW_assert(!(_pBPNN));
-    pBPNN = _pBPNN;
+    OSLW_assert(!(_pBPnn));
+    pBPnn = _pBPnn;
 
-    if (!(pBPNN->ParaGroupNum))
-        return _pBPNN;
+    if (!(pBPnn->ParaGroupNum))
+        return _pBPnn;
 
 
-    pDLN = pBPNN->Net.pTail;
-    ptable = &(pBPNN->Train.DeltTable);
+    pDLN = pBPnn->Net.pTail;
+    ptable = &(pBPnn->Train.DeltTable);
 	
-	_regu_k_B = _ParaMpy(pBPNN->Regu.Lambda, _ParaFrom(pBPNN->WeightParaNum));
+	_regu_k_B = _ParaMpy(pBPnn->Regu.Lambda, _ParaFrom(pBPnn->WeightParaNum));
 	
 
     //假设w（m*n）
@@ -1057,7 +1057,7 @@ OSlwToolBPNNSTU *OSlwToolBPNNDeltCalu(OSlwToolBPNNSTU *_pBPNN,lw_u16 _batch_inde
 		dw.col = pNNL->w.col;
 		dw.a = ptable->ReadFun(ptable, _batch_index, count++, &len);
 
-		nl = _ParaMpy(pNNL->nl, pBPNN->_nl_factor);
+		nl = _ParaMpy(pNNL->nl, pBPnn->_nl_factor);
 		
 		/*
 		//初版失败 不是对一个向量x[1:n]进行归一化 而是对整个mini-batch求 均值是mini-batch的均值
@@ -1202,7 +1202,7 @@ OSlwToolBPNNSTU *OSlwToolBPNNDeltCalu(OSlwToolBPNNSTU *_pBPNN,lw_u16 _batch_inde
 
 
 		//正则化
-		switch (pBPNN->Regu.ReguType)
+		switch (pBPnn->Regu.ReguType)
 		{
 		case OSlwToolNNReguType_NAN:
 
@@ -1250,31 +1250,31 @@ OSlwToolBPNNSTU *OSlwToolBPNNDeltCalu(OSlwToolBPNNSTU *_pBPNN,lw_u16 _batch_inde
     } while (pDLN->Key.uData);
 
 
-    return pBPNN;
+    return pBPnn;
 }
 
 
-ParaType *OSlwToolBPNNGradForInput(OSlwToolBPNNSTU *_pBPNN)
+ParaType *OSlwToolBPnnGradForInput(OSlwToolBPnnSTU *_pBPnn)
 {
 
-	OSlwToolBPNNSTU *pBPNN;
+	OSlwToolBPnnSTU *pBPnn;
 	OSlwToolDListNodeSTU  *pDLN;
 	OSlwToolNNLayerFullConSTU *pNNL;
 	lw_u16 i, j;
 	ParaType temp, *pret_in_err;
 
-	OSLW_assert(!(_pBPNN));
-	pBPNN = _pBPNN;
+	OSLW_assert(!(_pBPnn));
+	pBPnn = _pBPnn;
 
-	if (!(pBPNN->ParaGroupNum))
+	if (!(pBPnn->ParaGroupNum))
 		return NULL;
 
 
-	pNNL = pBPNN->Net.pTail->Data.pData;
+	pNNL = pBPnn->Net.pTail->Data.pData;
 
 	pOSlwToolMatrixSet(&(pNNL->outErr), _ParaFint(1), NULL);//输出误差为1 方便直接求导
 
-	pDLN = pBPNN->Net.pTail;
+	pDLN = pBPnn->Net.pTail;
 	do
 	{
 		pNNL = (OSlwToolNNLayerFullConSTU *)pDLN->Data.pData;
@@ -1299,23 +1299,23 @@ ParaType *OSlwToolBPNNGradForInput(OSlwToolBPNNSTU *_pBPNN)
 }
 
 
-OSlwToolBPNNSTU *_OSlwToolBPNNReviewOnce(OSlwToolBPNNSTU *_pBPNN,lw_u16 batch_num, OSlwToolMatrixSTU *pmat_k)
+OSlwToolBPnnSTU *_OSlwToolBPnnReviewOnce(OSlwToolBPnnSTU *_pBPnn,lw_u16 batch_num, OSlwToolMatrixSTU *pmat_k)
 {
-	OSlwToolBPNNSTU *pBPNN;
+	OSlwToolBPnnSTU *pBPnn;
 	OSlwToolDListNodeSTU  *pDLN;
 	OSlwToolNNLayerFullConSTU *pNNL;
 	OSlwToolTableSTU *ptable;
 	lw_u16 count = 1, len;
 	OSlwToolMatrixSTU dw, dbias;
 
-	OSLW_assert(!(_pBPNN));
-	pBPNN = _pBPNN;
+	OSLW_assert(!(_pBPnn));
+	pBPnn = _pBPnn;
 
-	if (!(pBPNN->ParaGroupNum))
-		return _pBPNN;
-	ptable = &(pBPNN->Train.DeltTable);
+	if (!(pBPnn->ParaGroupNum))
+		return _pBPnn;
+	ptable = &(pBPnn->Train.DeltTable);
 
-	pDLN = pBPNN->Net.pTail;
+	pDLN = pBPnn->Net.pTail;
 	do {
 		pNNL = (OSlwToolNNLayerFullConSTU *)pDLN->Data.pData;
 		//取出dw 与 dbias
@@ -1355,33 +1355,33 @@ OSlwToolBPNNSTU *_OSlwToolBPNNReviewOnce(OSlwToolBPNNSTU *_pBPNN,lw_u16 batch_nu
 
 
 
-	return pBPNN;
+	return pBPnn;
 }
 
 
-OSlwToolBPNNSTU *OSlwToolBPNNReview(OSlwToolBPNNSTU *_pBPNN)
+OSlwToolBPnnSTU *OSlwToolBPnnReview(OSlwToolBPnnSTU *_pBPnn)
 {
 
-    OSlwToolBPNNSTU *pBPNN;
+    OSlwToolBPnnSTU *pBPnn;
     lw_u16 batch_num;
     ParaType temp;
 	OSlwToolMatrixSTU mat_k;
     OSlwToolTableSTU *ptable;
 
-    OSLW_assert(!(_pBPNN));
-    pBPNN = _pBPNN;
+    OSLW_assert(!(_pBPnn));
+    pBPnn = _pBPnn;
 
-    if (!(pBPNN->ParaGroupNum))
-        return _pBPNN;
-    ptable = &(pBPNN->Train.DeltTable);
-	temp = _ParaDiv(_ParaFint(1), _ParaFrom(pBPNN->Train.SampleSetLength));
+    if (!(pBPnn->ParaGroupNum))
+        return _pBPnn;
+    ptable = &(pBPnn->Train.DeltTable);
+	temp = _ParaDiv(_ParaFint(1), _ParaFrom(pBPnn->Train.SampleSetLength));
 	mat_k.length = 1;
 	mat_k.a = &temp;
 
     //更新 w 与 bias
-    for ( batch_num = 0; batch_num < pBPNN->Train.SampleCount+1; batch_num++)
+    for ( batch_num = 0; batch_num < pBPnn->Train.SampleCount+1; batch_num++)
     {
-		_OSlwToolBPNNReviewOnce(pBPNN, batch_num, &mat_k);
+		_OSlwToolBPnnReviewOnce(pBPnn, batch_num, &mat_k);
 
     }
 
@@ -1390,27 +1390,27 @@ OSlwToolBPNNSTU *OSlwToolBPNNReview(OSlwToolBPNNSTU *_pBPNN)
 
 
     //状态重置
-    pBPNN->Train.count = 0;
-    pBPNN->Train.SampleCount = 0;
-    pBPNN->Train.Flag.Status = OSlwToolNNTrainStatus_Wait;
+    pBPnn->Train.count = 0;
+    pBPnn->Train.SampleCount = 0;
+    pBPnn->Train.Flag.Status = OSlwToolNNTrainStatus_Wait;
 
-    return pBPNN;
+    return pBPnn;
 }
 
 
 
-OSlwToolBPNNSTU *OSlwToolBPNNTrain(OSlwToolBPNNSTU *_pBPNN)
+OSlwToolBPnnSTU *OSlwToolBPnnTrain(OSlwToolBPnnSTU *_pBPnn)
 {
-    OSlwToolBPNNSTU *pBPNN;
+    OSlwToolBPnnSTU *pBPnn;
     OSlwToolNNTrainSTU *pTr;
 
-    OSLW_assert(!(_pBPNN));
-    pBPNN = _pBPNN;
+    OSLW_assert(!(_pBPnn));
+    pBPnn = _pBPnn;
 
-    if (!(pBPNN->ParaGroupNum))
-        return _pBPNN;
+    if (!(pBPnn->ParaGroupNum))
+        return _pBPnn;
 
-    pTr = &(pBPNN->Train);
+    pTr = &(pBPnn->Train);
     switch (pTr->Flag.Status)
     {
     case OSlwToolNNTrainStatus_Wait:
@@ -1427,8 +1427,8 @@ OSlwToolBPNNSTU *OSlwToolBPNNTrain(OSlwToolBPNNSTU *_pBPNN)
                 pTr->SampleCount++;//向后存
             }
 
-            OSlwToolBPNNErrCalu(pBPNN);
-            OSlwToolBPNNDeltCalu(pBPNN, pTr->SampleCount);
+            OSlwToolBPnnErrCalu(pBPnn);
+            OSlwToolBPnnDeltCalu(pBPnn, pTr->SampleCount);
         }
 
         if (pTr->count == pTr->BatchSetLength)//采集满了
@@ -1436,7 +1436,7 @@ OSlwToolBPNNSTU *OSlwToolBPNNTrain(OSlwToolBPNNSTU *_pBPNN)
             pTr->Flag.Status = OSlwToolNNTrainStatus_Complete;
             if (pTr->Flag.UpdateMethod == OSlwToolNNTrainUpdateMethod_Auto)//如果自动更新
             {
-                OSlwToolBPNNReview(pBPNN);
+                OSlwToolBPnnReview(pBPnn);
             }
         }
         else
@@ -1456,28 +1456,28 @@ OSlwToolBPNNSTU *OSlwToolBPNNTrain(OSlwToolBPNNSTU *_pBPNN)
 		break;
 
     default:
-        pBPNN->Train.Flag.Status = OSlwToolNNTrainStatus_Wait;
+        pBPnn->Train.Flag.Status = OSlwToolNNTrainStatus_Wait;
         break;
     }
 
-    return _pBPNN;
+    return _pBPnn;
 }
 
 
 //
-OSlwToolBPNNSTU *OSlwToolBPNNCopy(OSlwToolBPNNSTU *pBPNN1, OSlwToolBPNNSTU *pBPNN2)
+OSlwToolBPnnSTU *OSlwToolBPnnCopy(OSlwToolBPnnSTU *pBPnn1, OSlwToolBPnnSTU *pBPnn2)
 {
     OSlwToolDListNodeSTU  *pDLN1, *pDLN2;
     OSlwToolNNLayerFullConSTU *pNNL1, *pNNL2;
 
-    OSLW_assert(!(pBPNN1));
-    OSLW_assert(!(pBPNN2));
+    OSLW_assert(!(pBPnn1));
+    OSLW_assert(!(pBPnn2));
 
-    if ((pBPNN1->ParaGroupNum == 0 || pBPNN2->ParaGroupNum ==0) || pBPNN1->ParaGroupNum != pBPNN2->ParaGroupNum)
+    if ((pBPnn1->ParaGroupNum == 0 || pBPnn2->ParaGroupNum ==0) || pBPnn1->ParaGroupNum != pBPnn2->ParaGroupNum)
         return NULL;
 
-    pDLN1 = (OSlwToolDListNodeSTU *)pBPNN1->Net.Head.con.pNext;
-    pDLN2 = (OSlwToolDListNodeSTU *)pBPNN2->Net.Head.con.pNext;
+    pDLN1 = (OSlwToolDListNodeSTU *)pBPnn1->Net.Head.con.pNext;
+    pDLN2 = (OSlwToolDListNodeSTU *)pBPnn2->Net.Head.con.pNext;
     do {
         pNNL1 = (OSlwToolNNLayerFullConSTU *)pDLN1->Data.pData;
         pNNL2 = (OSlwToolNNLayerFullConSTU *)pDLN2->Data.pData;
@@ -1504,25 +1504,25 @@ OSlwToolBPNNSTU *OSlwToolBPNNCopy(OSlwToolBPNNSTU *pBPNN1, OSlwToolBPNNSTU *pBPN
 
     } while (pDLN2 && pDLN2);
 
-    return pBPNN1;
+    return pBPnn1;
 
 }
 
 
 //软替换函数 用于新老网络参数更新（DDPG）
-OSlwToolBPNNSTU *OSlwToolBPNNSoftReplace(OSlwToolBPNNSTU *pBPNN1, OSlwToolBPNNSTU *pBPNN2,ParaType tu)
+OSlwToolBPnnSTU *OSlwToolBPnnSoftReplace(OSlwToolBPnnSTU *pBPnn1, OSlwToolBPnnSTU *pBPnn2,ParaType tu)
 {
 	OSlwToolDListNodeSTU  *pDLN1, *pDLN2;
 	OSlwToolNNLayerFullConSTU *pNNL1, *pNNL2;
 
-	OSLW_assert(!(pBPNN1));
-	OSLW_assert(!(pBPNN2));
+	OSLW_assert(!(pBPnn1));
+	OSLW_assert(!(pBPnn2));
 
-	if ((pBPNN1->ParaGroupNum == 0 || pBPNN2->ParaGroupNum == 0) || pBPNN2->ParaGroupNum != pBPNN1->ParaGroupNum)
+	if ((pBPnn1->ParaGroupNum == 0 || pBPnn2->ParaGroupNum == 0) || pBPnn2->ParaGroupNum != pBPnn1->ParaGroupNum)
 		return NULL;
 
-	pDLN1 = (OSlwToolDListNodeSTU *)pBPNN1->Net.Head.con.pNext;
-	pDLN2 = (OSlwToolDListNodeSTU *)pBPNN2->Net.Head.con.pNext;
+	pDLN1 = (OSlwToolDListNodeSTU *)pBPnn1->Net.Head.con.pNext;
+	pDLN2 = (OSlwToolDListNodeSTU *)pBPnn2->Net.Head.con.pNext;
 
 	do {
 		pNNL1 = (OSlwToolNNLayerFullConSTU *)pDLN1->Data.pData;
@@ -1570,19 +1570,19 @@ OSlwToolBPNNSTU *OSlwToolBPNNSoftReplace(OSlwToolBPNNSTU *pBPNN1, OSlwToolBPNNST
 
 	} while (pDLN2 && pDLN2);
 
-	return pBPNN1;
+	return pBPnn1;
 
 }
 #endif // 0
 
-lw_ptr OSlwToolBPNNLayerForwardDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num) { return mini_b_num; }
-lw_ptr OSlwToolBPNNLayerBackwardDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num) { return mini_b_num; }
-lw_ptr OSlwToolBPNNLayerUpdateDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB) { return 0; }
-lw_ptr OSlwToolBPNNLayerNNmallocDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, void *pmemForward, void *pmemBackward) { return 0; }
-lw_ptr OSlwToolBPNNLayerTrainCompleteCallBackDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB) { return 0; }
-lw_ptr OSlwToolBPNNLayerDataInitDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB) { return 0; }
-lw_ptr OSlwToolBPNNLayerCopyDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB1, struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB2) { return 0; }
-lw_ptr OSlwToolBPNNLayerSoftReplaceDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB1, struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB2, ParaType Raido) { return 0; }
+lw_ptr OSlwToolBPnnLayerForwardDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num) { return mini_b_num; }
+lw_ptr OSlwToolBPnnLayerBackwardDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num) { return mini_b_num; }
+lw_ptr OSlwToolBPnnLayerUpdateDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB) { return 0; }
+lw_ptr OSlwToolBPnnLayerNNmallocDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, void *pmemForward, void *pmemBackward) { return 0; }
+lw_ptr OSlwToolBPnnLayerTrainCompleteCallBackDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB) { return 0; }
+lw_ptr OSlwToolBPnnLayerDataInitDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB) { return 0; }
+lw_ptr OSlwToolBPnnLayerCopyDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB1, struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB2) { return 0; }
+lw_ptr OSlwToolBPnnLayerSoftReplaceDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB1, struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB2, ParaType Raido) { return 0; }
 
 
 OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerFullConNew(
@@ -1680,14 +1680,14 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerFullConNew(
 
 
 	//成员函数
-	node->basic.Forward = OSlwToolBPNNLayerFullConForward;
-	node->basic.Backward = OSlwToolBPNNLayerFullConBackward;
-	node->basic.Update = OSlwToolBPNNLayerFullConUpdate;
-	node->basic.NNmalloc = OSlwToolBPNNLayerFullConNNmalloc;
-	node->basic.TrainCompleteCB = OSlwToolBPNNLayerFullConTrainCompleteCallBack;
-	node->basic.DataInit = OSlwToolBPNNLayerFullConDataInit;
-	node->basic.Copy = OSlwToolBPNNLayerFullConCopy;
-	node->basic.SoftReplace = OSlwToolBPNNLayerFullConSoftReplace;
+	node->basic.Forward = OSlwToolBPnnLayerFullConForward;
+	node->basic.Backward = OSlwToolBPnnLayerFullConBackward;
+	node->basic.Update = OSlwToolBPnnLayerFullConUpdate;
+	node->basic.NNmalloc = OSlwToolBPnnLayerFullConNNmalloc;
+	node->basic.TrainCompleteCB = OSlwToolBPnnLayerFullConTrainCompleteCallBack;
+	node->basic.DataInit = OSlwToolBPnnLayerFullConDataInit;
+	node->basic.Copy = OSlwToolBPnnLayerFullConCopy;
+	node->basic.SoftReplace = OSlwToolBPnnLayerFullConSoftReplace;
 
 	
 
@@ -1777,7 +1777,7 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerActFunNew(
 }
 
 
-lw_ptr OSlwToolBPNNLayerFullConForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
+lw_ptr OSlwToolBPnnLayerFullConForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
 	register lw_u16 buf1;
 	register OSlwToolNNLayerFullConSTU *pfc;
@@ -1836,7 +1836,7 @@ lw_ptr OSlwToolBPNNLayerFullConForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUC
 }
 
 
-lw_ptr OSlwToolBPNNLayerFullConBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
+lw_ptr OSlwToolBPnnLayerFullConBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
 
 	register lw_u16 buf1;
@@ -1857,13 +1857,12 @@ lw_ptr OSlwToolBPNNLayerFullConBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRU
 	pNNSLB->in.row = mini_b_num;
 
 
-	//表示第一次反向传递
+	//表示第一次反向传递 update函数自动清空梯度
 	if (pNNSLB->pNN->Train._batch_stream_count <= 1)
 	{
 		//直接覆盖
 		//dw=in'*out
 		pOSlwToolMatrixTurnMpy(&(pfc->DeltW), &(pNNSLB->in), &(pNNSLB->out), 2);
-		
 		//db = sum(out, 1);按列求和
 		_out_b = pNNSLB->out.a;
 		_db = pfc->DeltB.a;
@@ -1880,17 +1879,14 @@ lw_ptr OSlwToolBPNNLayerFullConBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRU
 			*_db++ = _sum;
 			_out_b ++;
 		}
-
 		//xd = out*w';
-		OSlwToolMatrixTurnMpy(&(pNNSLB->in), &(pNNSLB->out), &(pfc->Weight), 1);
+		pOSlwToolMatrixTurnMpy(&(pNNSLB->in), &(pNNSLB->out), &(pfc->Weight), 1);
 	}
 	else
 	{
 		//采用叠加方法
 		//dw=in'*out
 		pOSlwToolMatrixTurnMpy(&(pfc->DeltW), &(pNNSLB->in), &(pNNSLB->out), 6);
-
-
 		//db = sum(out, 1);按列求和
 		_out_b = pNNSLB->out.a;
 		_db = pfc->DeltB.a;
@@ -1906,12 +1902,13 @@ lw_ptr OSlwToolBPNNLayerFullConBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRU
 			}
 			*_db = _ParaAdd(*_db, _sum);
 			_db++;
-
 			_out_b++;
 		}
 		//xd = out*w';
-		OSlwToolMatrixTurnMpy(&(pNNSLB->in), &(pNNSLB->out), &(pfc->Weight), 5);
+		pOSlwToolMatrixTurnMpy(&(pNNSLB->in), &(pNNSLB->out), &(pfc->Weight), 1);
 	}
+
+
 
 	//还原
 	pNNSLB->out.row = buf1;
@@ -1996,7 +1993,7 @@ lw_ptr OSlwToolBPNNLayerFullConBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRU
 }
 
 
-lw_ptr OSlwToolBPNNLayerFullConUpdate(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB)
+lw_ptr OSlwToolBPnnLayerFullConUpdate(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB)
 {
 	register lw_u32 i, all_batch_count;
 	register ParaType k, _div_m;
@@ -2005,47 +2002,47 @@ lw_ptr OSlwToolBPNNLayerFullConUpdate(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT
 	register ParaType *_vw, *_vb;
 	register ParaType *_uw, *_ub;
 	register OSlwToolNNLayerFullConSTU *pfc;
-	register OSlwToolBPNNSTU *pBPNN;
+	register OSlwToolBPnnSTU *pBPnn;
 	ParaType b1, nb1, b2, nb2, e, b1t, b2t;
 	ParaType vbbuf, ubbuf, vwbuf, uwbuf;
 	ParaType bbuf, wbuf;
+	ParaType l2regu_k;
 
 	OSLW_assert(!(pNNSLB));
 	pfc = (OSlwToolNNLayerFullConSTU *)pNNSLB;
-	pBPNN = pNNSLB->pNN;
+	pBPnn = pNNSLB->pNN;
 
-	all_batch_count = pBPNN->Train.AllBatchCount == 0 ? 1 : pBPNN->Train.AllBatchCount;
+	all_batch_count = pBPnn->Train.AllBatchCount == 0 ? 1 : pBPnn->Train.AllBatchCount;
 	
 	_mw = pfc->Weight.a;
 	_mwd = pfc->DeltW.a;
 	_mb = pfc->Bias.a;
 	_mbd = pfc->DeltB.a;
 
+	l2regu_k = _ParaFint(1) - _ParaDiv(_ParaMpy(pNNSLB->nl, pNNSLB->LamdaL2), _ParaFint(all_batch_count));
 
-	switch (pBPNN->Train.Flag.Optim)
+	switch (pBPnn->Train.Flag.Optim)
 	{
 	case OSlwToolNNOptim_GradDesc:
-		k = _ParaDiv(_ParaMpy(pBPNN->_nl_factor, pNNSLB->nl), _ParaFint(all_batch_count));
+		k = _ParaDiv(_ParaMpy(pBPnn->_nl_factor, pNNSLB->nl), _ParaFint(all_batch_count));
 		//单纯梯度下降法
-		for (i = 0; i < pfc->Bias.length; i++)
+		for (i = 0; i < pfc->Bias.length; i++, _mw++, _mwd++, _mb++, _mbd++)
 		{
-			*_mw = _ParaAdd(*_mw, _ParaMpy(k, *_mwd));
-			_mw++;
-			_mwd++;
-
+			*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), _ParaMpy(k, *_mwd));
 			*_mb = _ParaAdd(*_mb, _ParaMpy(k, *_mbd));
-			_mb++;
-			_mbd++;
-
+			*_mwd = _ParaFint(0);
+			*_mbd = _ParaFint(0);
 		}
 
 		//少循环一点是一点
 		i = pfc->Weight.length - pfc->Bias.length;
 		while (i--)
 		{
-			*_mw = _ParaAdd(*_mw, _ParaMpy(k, *_mwd));
+			*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), _ParaMpy(k, *_mwd));
+			*_mwd = _ParaFint(0);
 			_mw++;
 			_mwd++;
+			
 		}
 
 
@@ -2054,45 +2051,44 @@ lw_ptr OSlwToolBPNNLayerFullConUpdate(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT
 	case OSlwToolNNOptim_M:
 		_vw = pfc->DeltW.a + pfc->DeltW.length;
 		_vb = pfc->DeltB.a + pfc->DeltB.length;
-		b1 = pBPNN->Train.Beta1T;
+		b1 = pBPnn->Train.Beta1T;
 		nb1 = _ParaFrom(1) - b1;
 
-		k = pBPNN->_nl_factor* pNNSLB->nl;
-		_div_m = _ParaFrom(1) / _ParaFint(all_batch_count);
+		k = _ParaMpy(pBPnn->_nl_factor, pNNSLB->nl);
+		_div_m = _ParaDiv(_ParaFrom(1) , _ParaFint(all_batch_count));
 
 		//动量法
-		for (i = 0; i < pfc->Bias.length; i++)
+		for (i = 0; i < pfc->Bias.length; i++, _mw++, _mwd++, _vw++, _mb++, _mbd++, _vb++)
 		{
 			//计算出的梯度要先除以batch
-			wbuf = *_mwd * _div_m;
-			bbuf = *_mbd * _div_m;
+			wbuf = _ParaMpy(*_mwd , _div_m);
+			bbuf = _ParaMpy(*_mbd , _div_m);
 
 			//动量法 v=0.9v+0.1d
-			*_vw = *_vw * b1 + wbuf *nb1;
-			*_vb = *_vb * b1 + bbuf *nb1;
+			*_vw = _ParaMpy(*_vw , b1) + _ParaMpy(wbuf ,nb1);
+			*_vb = _ParaMpy(*_vb , b1) + _ParaMpy(bbuf ,nb1);
 
 			//w=w+v
-			*_mw = _ParaAdd(*_mw, _ParaMpy(k, *_vw));
-			_mw++;
-			_mwd++;
-			_vw++;
-
+			*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), _ParaMpy(k, *_vw));
 			*_mb = _ParaAdd(*_mb, _ParaMpy(k, *_vb));
-			_mb++;
-			_mbd++;
-			_vb++;
+
+			*_mwd = _ParaFint(0);
+			*_mbd = _ParaFint(0);
+			
 
 		}
 
 		i = pfc->Weight.length - pfc->Bias.length;
 		while (i--)
 		{
-			wbuf = *_mwd * _div_m;
-			*_vw = *_vw * b1 + wbuf *nb1;
-			*_mw = _ParaAdd(*_mw, _ParaMpy(k, *_vw));
+			wbuf = _ParaMpy(*_mwd , _div_m);
+			*_vw = _ParaMpy(*_vw , b1) + _ParaMpy(wbuf ,nb1);
+			*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), _ParaMpy(k, *_vw));
+			*_mwd = _ParaFint(0);
 			_mw++;
 			_mwd++;
 			_vw++;
+		
 		}
 
 
@@ -2101,47 +2097,44 @@ lw_ptr OSlwToolBPNNLayerFullConUpdate(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT
 	case OSlwToolNNOptim_RMSp:
 		_uw = pfc->DeltW.a + pfc->DeltW.length;
 		_ub = pfc->DeltB.a + pfc->DeltB.length;
-		b2 = pBPNN->Train.Beta2T;
+		b2 = pBPnn->Train.Beta2T;
 		nb2 = _ParaFrom(1) - b2;
-		e = pBPNN->Train.Epsi;
+		e = pBPnn->Train.Epsi;
 
-		k = pBPNN->_nl_factor* pNNSLB->nl;
-		_div_m = _ParaFrom(1) / _ParaFint(all_batch_count);
+		k = _ParaMpy(pBPnn->_nl_factor, pNNSLB->nl);
+		_div_m = _ParaDiv(_ParaFrom(1) , _ParaFint(all_batch_count));
 
 		//RMS
-		for (i = 0; i < pfc->Bias.length; i++)
+		for (i = 0; i < pfc->Bias.length; i++, _mw++, _mwd++, _uw++, _mb++, _mbd++,_ub++)
 		{
 			//计算出的梯度要先除以batch
-			wbuf = *_mwd * _div_m;
-			bbuf = *_mbd * _div_m;
+			wbuf = _ParaMpy(*_mwd , _div_m);
+			bbuf = _ParaMpy(*_mbd , _div_m);
 
 			//RMS法u=0.9u+0.1d*d
-			*_uw = *_uw * b2 + wbuf * wbuf * nb2;
-			*_ub = *_ub * b2 + bbuf * bbuf * nb2;
+			*_uw = _ParaMpy(*_uw , b2) + _ParaMpy(_ParaMpy(wbuf , wbuf) , nb2);
+			*_ub = _ParaMpy(*_ub , b2) + _ParaMpy(_ParaMpy(bbuf , bbuf) , nb2);
 
-			*_mw = _ParaAdd(*_mw, _ParaMpy(k, wbuf / (e + _ParaSqrt(*_uw))));
-			_mw++;
-			_mwd++;
-			_uw++;
-
-			*_mb = _ParaAdd(*_mb, _ParaMpy(k, bbuf / (e + _ParaSqrt(*_ub))));
-			_mb++;
-			_mbd++;
-			_ub++;
-
+			*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), _ParaMpy(k, _ParaDiv(wbuf , (e + _ParaSqrt(*_uw)))));
+			*_mb = _ParaAdd(*_mb, _ParaMpy(k, _ParaDiv(bbuf , (e + _ParaSqrt(*_ub)))));
+			
+			*_mwd = _ParaFint(0);
+			*_mbd = _ParaFint(0);
 		}
 
 		//少循环一点是一点
 		i = pfc->Weight.length - pfc->Bias.length;
 		while (i--)
 		{
-			wbuf = *_mwd * _div_m;
-			*_uw = *_uw * b2 + wbuf * wbuf * nb2;
+			wbuf = _ParaMpy(*_mwd, _div_m);
+			*_uw = _ParaMpy(*_uw, b2) + _ParaMpy(_ParaMpy(wbuf, wbuf), nb2);
 
-			*_mw = _ParaAdd(*_mw, _ParaMpy(k, wbuf / (e + _ParaSqrt(*_uw))));
+			*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), _ParaMpy(k, _ParaDiv(wbuf, (e + _ParaSqrt(*_uw)))));
+			*_mwd = _ParaFint(0);
 			_mw++;
 			_mwd++;
 			_uw++;
+			
 		}
 
 		break;
@@ -2149,54 +2142,47 @@ lw_ptr OSlwToolBPNNLayerFullConUpdate(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT
 	case OSlwToolNNOptim_Adam:
 		_vw = pfc->DeltW.a + pfc->DeltW.length;
 		_vb = pfc->DeltB.a + pfc->DeltB.length;
-		b1 = pBPNN->Train.Beta1;
+		b1 = pBPnn->Train.Beta1;
 		nb1 = _ParaFrom(1) - b1;
 
 		_uw = pfc->DeltW.a + (pfc->Weight.length<<1);
 		_ub = pfc->DeltB.a + (pfc->DeltB.length<<1);
-		b2 = pBPNN->Train.Beta2;
+		b2 = pBPnn->Train.Beta2;
 		nb2 = _ParaFrom(1) - b2;
-		e = pBPNN->Train.Epsi;
+		e = pBPnn->Train.Epsi;
 
-		b1t = _ParaFrom(1)- pBPNN->Train.Beta1T;
-		b2t = _ParaFrom(1)- pBPNN->Train.Beta2T;
+		b1t = _ParaFrom(1)- pBPnn->Train.Beta1T;
+		b2t = _ParaFrom(1)- pBPnn->Train.Beta2T;
 
-		k = pBPNN->_nl_factor* pNNSLB->nl;
-		_div_m = _ParaFrom(1) / _ParaFint(all_batch_count);
+		k = _ParaMpy(pBPnn->_nl_factor, pNNSLB->nl);
+		_div_m = _ParaDiv(_ParaFrom(1) , _ParaFint(all_batch_count));
 
-		pBPNN->Train.Beta1T *= b1;
-		pBPNN->Train.Beta2T *= b2;
+		pBPnn->Train.Beta1T = _ParaMpy(pBPnn->Train.Beta1T,b1);
+		pBPnn->Train.Beta2T = _ParaMpy(pBPnn->Train.Beta2T,b2);
 
 		//adam
-		for (i = 0; i < pfc->Bias.length; i++)
+		for (i = 0; i < pfc->Bias.length; i++,_mw++, _mwd++, _uw++, _vw++, _mb++, _mbd++, _ub++,_vb++)
 		{
 			//计算出的梯度要先除以batch
-			wbuf = *_mwd * _div_m;
-			bbuf = *_mbd * _div_m;
+			wbuf = _ParaMpy(*_mwd , _div_m);
+			bbuf = _ParaMpy(*_mbd , _div_m);
 
-			*_vw = *_vw * b1 + wbuf *nb1;
-			*_vb = *_vb * b1 + bbuf *nb1;
+			*_vw = _ParaMpy(*_vw , b1) + _ParaMpy(wbuf ,nb1);
+			*_vb = _ParaMpy(*_vb , b1) + _ParaMpy(bbuf ,nb1);
 
-			*_uw = *_uw * b2 + wbuf * wbuf * nb2;
-			*_ub = *_ub * b2 + bbuf * bbuf * nb2;
+			*_uw = _ParaMpy(*_uw , b2) + _ParaMpy(_ParaMpy(wbuf , wbuf) , nb2);
+			*_ub = _ParaMpy(*_ub , b2) + _ParaMpy(_ParaMpy(bbuf , bbuf) , nb2);
 
-			vwbuf = *_vw / b1t;
-			uwbuf = *_uw / b2t;
-			vbbuf = *_vb / b1t;
-			ubbuf = *_ub / b2t;
+			vwbuf = _ParaDiv(*_vw , b1t);
+			uwbuf = _ParaDiv(*_uw , b2t);
+			vbbuf = _ParaDiv(*_vb , b1t);
+			ubbuf = _ParaDiv(*_ub , b2t);
 
-			*_mw = _ParaAdd(*_mw, _ParaMpy(k, vwbuf / (e + _ParaSqrt(uwbuf))));
-			_mw++;
-			_mwd++;
-			_uw++;
-			_vw++;
+			*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), _ParaMpy(k, _ParaDiv(vwbuf , (e + _ParaSqrt(uwbuf)))));
+			*_mb = _ParaAdd(*_mb, _ParaMpy(k, _ParaDiv(vbbuf , (e + _ParaSqrt(ubbuf)))));
 
-			*_mb = _ParaAdd(*_mb, _ParaMpy(k, vbbuf / (e + _ParaSqrt(ubbuf))));
-			_mb++;
-			_mbd++;
-			_ub++;
-			_vb++;
-
+			*_mwd = _ParaFint(0);
+			*_mbd = _ParaFint(0);
 		}
 
 		//少循环一点是一点
@@ -2204,19 +2190,22 @@ lw_ptr OSlwToolBPNNLayerFullConUpdate(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT
 		while (i--)
 		{
 
-			wbuf = *_mwd * _div_m;
+			wbuf = _ParaMpy(*_mwd, _div_m);
 
-			*_vw = *_vw * b1 + wbuf *nb1;
-			*_uw = *_uw * b2 + wbuf* wbuf *nb2;
+			*_vw = _ParaMpy(*_vw, b1) + _ParaMpy(wbuf, nb1);
+			*_uw = _ParaMpy(*_uw, b2) + _ParaMpy(_ParaMpy(wbuf, wbuf), nb2);
 
-			vwbuf = *_vw / b1t;
-			uwbuf = *_uw / b2t;
+			vwbuf = _ParaDiv(*_vw, b1t);
+			uwbuf = _ParaDiv(*_uw, b2t);
 
-			*_mw = _ParaAdd(*_mw, _ParaMpy(k, vwbuf / (e + _ParaSqrt(uwbuf))));
+			*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), _ParaMpy(k, _ParaDiv(vwbuf, (e + _ParaSqrt(uwbuf)))));
+			*_mwd = _ParaFint(0);
 			_mw++;
 			_mwd++;
 			_uw++;
 			_vw++;
+
+			
 		}
 		break;
 
@@ -2236,7 +2225,7 @@ lw_ptr OSlwToolBPNNLayerFullConUpdate(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT
 
 
 
-lw_ptr OSlwToolBPNNLayerFullConNNmalloc(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, void *pmemForward, void *pmemBackward)
+lw_ptr OSlwToolBPnnLayerFullConNNmalloc(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, void *pmemForward, void *pmemBackward)
 {
 	register OSlwToolNNLayerFullConSTU *pfc;
 
@@ -2261,7 +2250,7 @@ lw_ptr OSlwToolBPNNLayerFullConNNmalloc(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRU
 
 }
 
-lw_ptr OSlwToolBPNNLayerFullConTrainCompleteCallBack(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB)
+lw_ptr OSlwToolBPnnLayerFullConTrainCompleteCallBack(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB)
 {
 	register OSlwToolNNLayerFullConSTU *pfc;
 	OSLW_assert(!(pNNSLB));
@@ -2275,7 +2264,7 @@ lw_ptr OSlwToolBPNNLayerFullConTrainCompleteCallBack(struct OSLW_TOOL_NN_SUB_LAY
 
 
 
-lw_ptr OSlwToolBPNNLayerFullConDataInit(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB)
+lw_ptr OSlwToolBPnnLayerFullConDataInit(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB)
 {
 	register lw_u32 i;
 	register ParaType *w, *b, *dw, *db;
@@ -2303,6 +2292,12 @@ lw_ptr OSlwToolBPNNLayerFullConDataInit(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRU
 	if (pNNSLB->nl == _ParaFint(0))
 	{
 		pNNSLB->nl = pNNSLB->pNN->Train.nl;
+	}
+
+	//正则化参数
+	if (pNNSLB->LamdaL2 == _ParaFint(0))
+	{
+		pNNSLB->LamdaL2 = pNNSLB->pNN->Train.L2Regu;
 	}
 	
 	if (pfc->_BiasInitFun)
@@ -2381,7 +2376,7 @@ lw_ptr OSlwToolBPNNLayerFullConDataInit(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRU
 
 }
 
-lw_ptr OSlwToolBPNNLayerFullConCopy(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB1, struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB2)
+lw_ptr OSlwToolBPnnLayerFullConCopy(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB1, struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB2)
 {
 	OSlwToolNNLayerFullConSTU *pfc1, *pfc2;
 	OSLW_assert(!(pNNSLB1));
@@ -2397,7 +2392,7 @@ lw_ptr OSlwToolBPNNLayerFullConCopy(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *
 }
 
 
-lw_ptr OSlwToolBPNNLayerFullConSoftReplace(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB1, struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB2, ParaType Raido)
+lw_ptr OSlwToolBPnnLayerFullConSoftReplace(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB1, struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB2, ParaType Raido)
 {
 	OSlwToolNNLayerFullConSTU *pfc1, *pfc2;
 	OSLW_assert(!(pNNSLB1));
@@ -2427,7 +2422,7 @@ lw_ptr OSlwToolBPNNLayerFullConSoftReplace(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_S
 
 OSlwToolNNLayerActFunSTU _OSlwToolNNSigmoid = { _OSLW_TOOL_NN_ACT_FUN_DEFAULT(Sigmoid,OSlwToolNNLayerActFunSTU)};
 OSlwToolNNLayerActFunSTU *LwSigmoid = (OSlwToolNNLayerActFunSTU *)&_OSlwToolNNSigmoid;
-lw_ptr OSlwToolBPNNLayerSigmoidForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
+lw_ptr OSlwToolBPnnLayerSigmoidForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
 	_OSLW_TOOL_NN_ACTFUN_SEMI1(pNNSLB)
 		*_out=_ParaDiv(_ParaFint(1), _ParaAdd(_ParaFint(1), _ParaExp(_ParaMpy(*_in, _ParaFint(-1)))));
@@ -2436,7 +2431,7 @@ lw_ptr OSlwToolBPNNLayerSigmoidForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUC
 
 }
 
-lw_ptr OSlwToolBPNNLayerSigmoidBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
+lw_ptr OSlwToolBPnnLayerSigmoidBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
 	_OSLW_TOOL_NN_ACTFUN_SEMI1(pNNSLB)
 		*_in = _ParaMpy(
@@ -2449,7 +2444,7 @@ lw_ptr OSlwToolBPNNLayerSigmoidBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRU
 OSlwToolNNLayerActFunSTU _OSlwToolNNTanh = { _OSLW_TOOL_NN_ACT_FUN_DEFAULT(Tanh,OSlwToolNNLayerActFunSTU) };
 OSlwToolNNLayerActFunSTU *LwTanh = (OSlwToolNNLayerActFunSTU *)&_OSlwToolNNTanh;
 
-lw_ptr OSlwToolBPNNLayerTanhForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
+lw_ptr OSlwToolBPnnLayerTanhForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
 	ParaType _exp_x,_exp_nx;
 	_OSLW_TOOL_NN_ACTFUN_SEMI1(pNNSLB)
@@ -2465,7 +2460,7 @@ lw_ptr OSlwToolBPNNLayerTanhForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *
 
 }
 
-lw_ptr OSlwToolBPNNLayerTanhBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
+lw_ptr OSlwToolBPnnLayerTanhBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
 	_OSLW_TOOL_NN_ACTFUN_SEMI1(pNNSLB)
 		*_in = _ParaSub(
@@ -2480,7 +2475,7 @@ lw_ptr OSlwToolBPNNLayerTanhBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT 
 
 OSlwToolNNLayerActFunSTU _OSlwToolNNReLU = { _OSLW_TOOL_NN_ACT_FUN_DEFAULT(ReLU,OSlwToolNNLayerActFunSTU) };
 OSlwToolNNLayerActFunSTU *LwReLU = (OSlwToolNNLayerActFunSTU *)&_OSlwToolNNReLU;
-lw_ptr OSlwToolBPNNLayerReLUForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
+lw_ptr OSlwToolBPnnLayerReLUForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
 
 	_OSLW_TOOL_NN_ACTFUN_SEMI1(pNNSLB)
@@ -2490,7 +2485,7 @@ lw_ptr OSlwToolBPNNLayerReLUForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *
 
 }
 
-lw_ptr OSlwToolBPNNLayerReLUBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
+lw_ptr OSlwToolBPnnLayerReLUBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
 	_OSLW_TOOL_NN_ACTFUN_SEMI1(pNNSLB)
 		*_in = _ParaMpy(
@@ -2504,7 +2499,7 @@ lw_ptr OSlwToolBPNNLayerReLUBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT 
 OSlwToolNNLayerActFunSTU _OSlwToolNNReLU6 = { _OSLW_TOOL_NN_ACT_FUN_DEFAULT(ReLU6,OSlwToolNNLayerActFunSTU) };
 OSlwToolNNLayerActFunSTU *LwReLU6 = (OSlwToolNNLayerActFunSTU *)&_OSlwToolNNReLU6;
 
-lw_ptr OSlwToolBPNNLayerReLU6Forward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
+lw_ptr OSlwToolBPnnLayerReLU6Forward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
 
 	_OSLW_TOOL_NN_ACTFUN_SEMI1(pNNSLB)
@@ -2515,7 +2510,7 @@ lw_ptr OSlwToolBPNNLayerReLU6Forward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT 
 
 }
 
-lw_ptr OSlwToolBPNNLayerReLU6Backward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
+lw_ptr OSlwToolBPnnLayerReLU6Backward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
 	register ParaType temp;
 	_OSLW_TOOL_NN_ACTFUN_SEMI1(pNNSLB)
@@ -2533,7 +2528,7 @@ lw_ptr OSlwToolBPNNLayerReLU6Backward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT
 OSlwToolNNLayerActFunSTU _OSlwToolNNSwish = { _OSLW_TOOL_NN_ACT_FUN_DEFAULT(Swish,OSlwToolNNLayerActFunSTU) };
 OSlwToolNNLayerActFunSTU *LwSwish = (OSlwToolNNLayerActFunSTU *)&_OSlwToolNNSwish;
 
-lw_ptr OSlwToolBPNNLayerSwishForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
+lw_ptr OSlwToolBPnnLayerSwishForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
 
 	_OSLW_TOOL_NN_ACTFUN_SEMI1(pNNSLB)
@@ -2555,7 +2550,7 @@ lw_ptr OSlwToolBPNNLayerSwishForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT 
 
 }
 
-lw_ptr OSlwToolBPNNLayerSwishBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
+lw_ptr OSlwToolBPnnLayerSwishBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
 	register ParaType temp;
 	_OSLW_TOOL_NN_ACTFUN_SEMI1(pNNSLB)
@@ -2581,7 +2576,7 @@ static ParaType _OSlwToolNNSeLU_Default[2] = { _ParaFrom(1.050700987355480493419
 OSlwToolNNLayerActFunSeLUSTU _OSlwToolNNSeLU = { _OSLW_TOOL_NN_ACT_FUN_DEFAULT(SeLU,OSlwToolNNLayerActFunSeLUSTU),_OSlwToolNNSeLU_Default,NULL};
 OSlwToolNNLayerActFunSTU *LwSeLU = (OSlwToolNNLayerActFunSTU *)&_OSlwToolNNSeLU;
 
-lw_ptr OSlwToolBPNNLayerSeLUForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
+lw_ptr OSlwToolBPnnLayerSeLUForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
 #if OSLW_TOOL_NN_DATA_FRAME==OSLW_TOOL_NN_D_FRAME_C
 
@@ -2669,7 +2664,7 @@ lw_ptr OSlwToolBPNNLayerSeLUForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *
 }
 
 
-lw_ptr OSlwToolBPNNLayerSeLUBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
+lw_ptr OSlwToolBPnnLayerSeLUBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
 
 #if OSLW_TOOL_NN_DATA_FRAME==OSLW_TOOL_NN_D_FRAME_C
@@ -2762,7 +2757,7 @@ lw_ptr OSlwToolBPNNLayerSeLUBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT 
 OSlwToolNNLayerActFunSTU _OSlwToolNNSoftMax = { _OSLW_TOOL_NN_ACT_FUN_DEFAULT(SoftMax,OSlwToolNNLayerActFunSTU) };
 OSlwToolNNLayerActFunSTU *LwSoftMax = (OSlwToolNNLayerActFunSTU *)&_OSlwToolNNSoftMax;
 
-lw_ptr OSlwToolBPNNLayerSoftMaxForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
+lw_ptr OSlwToolBPnnLayerSoftMaxForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
 	
 #if OSLW_TOOL_NN_DATA_FRAME==OSLW_TOOL_NN_D_FRAME_C
@@ -2874,7 +2869,7 @@ lw_ptr OSlwToolBPNNLayerSoftMaxForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUC
 
 }
 
-lw_ptr OSlwToolBPNNLayerSoftMaxBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
+lw_ptr OSlwToolBPnnLayerSoftMaxBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
 
 	_OSLW_TOOL_NN_ACTFUN_SEMI1(pNNSLB)
@@ -2993,15 +2988,15 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerConvNew(
 
 
 	//成员函数(只有前向传递与反向传递采用独立函数)
-	node->databasic.basic.Forward = OSlwToolBPNNLayerConvForward;
-	node->databasic.basic.Backward = OSlwToolBPNNLayerConvBackward;
+	node->databasic.basic.Forward = OSlwToolBPnnLayerConvForward;
+	node->databasic.basic.Backward = OSlwToolBPnnLayerConvBackward;
 
-	node->databasic.basic.Update = OSlwToolBPNNLayerFullConUpdate;
-	node->databasic.basic.NNmalloc = OSlwToolBPNNLayerFullConNNmalloc;
-	node->databasic.basic.TrainCompleteCB = OSlwToolBPNNLayerFullConTrainCompleteCallBack;
-	node->databasic.basic.DataInit = OSlwToolBPNNLayerFullConDataInit;
-	node->databasic.basic.Copy = OSlwToolBPNNLayerFullConCopy;
-	node->databasic.basic.SoftReplace = OSlwToolBPNNLayerFullConSoftReplace;
+	node->databasic.basic.Update = OSlwToolBPnnLayerFullConUpdate;
+	node->databasic.basic.NNmalloc = OSlwToolBPnnLayerFullConNNmalloc;
+	node->databasic.basic.TrainCompleteCB = OSlwToolBPnnLayerFullConTrainCompleteCallBack;
+	node->databasic.basic.DataInit = OSlwToolBPnnLayerFullConDataInit;
+	node->databasic.basic.Copy = OSlwToolBPnnLayerFullConCopy;
+	node->databasic.basic.SoftReplace = OSlwToolBPnnLayerFullConSoftReplace;
 
 	if (info)
 	{
@@ -3472,7 +3467,7 @@ ParaType _OSlwToolNNKernalConvCalDeltOnce
 #endif // OSLW_TOOL_NN_DATA_FRAME==OSLW_TOOL_NN_D_FRAME_F
 
 
-lw_ptr OSlwToolBPNNLayerConvForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
+lw_ptr OSlwToolBPnnLayerConvForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
 	OSlwToolNNLayerFullConSTU *pfc;
 	OSlwToolNNLayerConvSTU *pcv;
@@ -3540,7 +3535,7 @@ lw_ptr OSlwToolBPNNLayerConvForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *
 }
 
 
-lw_ptr OSlwToolBPNNLayerConvBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
+lw_ptr OSlwToolBPnnLayerConvBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
 	OSlwToolNNLayerFullConSTU *pfc;
 	OSlwToolNNLayerConvSTU *pcv;
@@ -3561,37 +3556,34 @@ lw_ptr OSlwToolBPNNLayerConvBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT 
 	OSlwMatInit(&m_in, pcv->in_x, pcv->in_y, pfc->basic.in.a);
 	OSlwMatInit(&m_out, pcv->out_x, pcv->out_y, pfc->basic.out.a);
 
-	//如果是第一次反向传播 需要覆盖原先的梯度
-	if (pNNSLB->pNN->Train._batch_stream_count <= 1)
-	{
-		//对于每一个卷积核
-		for ( j = 0, m_out.a= pfc->basic.out.a; j < pcv->conv_kernal_num; j++,m_out.a+=m_out.length)
-		{
-			//计算db
-			for ( k = 0, delt_bias=_ParaFint(0), dbm=m_out.a; k < m_out.length; k++, dbm++)
-			{
-				delt_bias += *dbm;
-			}
-			*db++ = delt_bias;
-
-			//对于每一个维度
-			for ( k = 0, m_in.a= pfc->basic.in.a; k < pcv->conv_kernal_z; k++,m_in.a+=m_in.length)
-			{
-				pOSlwToolMatrixConv2(
-					&m_dw, &m_out, &m_in,
-					pcv->move_delt, pcv->move_delt,
-					1,
-					's',
-					0,
-					NULL
-				);
-				m_dw.a += m_dw.length;
-			}
-		}
-		i--;
-	}
-
-
+	////如果是第一次反向传播 需要覆盖原先的梯度 update函数自动清空梯度
+	//if (pNNSLB->pNN->Train._batch_stream_count <= 1)
+	//{
+	//	//对于每一个卷积核
+	//	for ( j = 0, m_out.a= pfc->basic.out.a; j < pcv->conv_kernal_num; j++,m_out.a+=m_out.length)
+	//	{
+	//		//计算db
+	//		for ( k = 0, delt_bias=_ParaFint(0), dbm=m_out.a; k < m_out.length; k++, dbm++)
+	//		{
+	//			delt_bias += *dbm;
+	//		}
+	//		*db++ = delt_bias;
+	//		//对于每一个维度
+	//		for ( k = 0, m_in.a= pfc->basic.in.a; k < pcv->conv_kernal_z; k++,m_in.a+=m_in.length)
+	//		{
+	//			pOSlwToolMatrixConv2(
+	//				&m_dw, &m_out, &m_in,
+	//				pcv->move_delt, pcv->move_delt,
+	//				1,
+	//				's',
+	//				0,
+	//				NULL
+	//			);
+	//			m_dw.a += m_dw.length;
+	//		}
+	//	}
+	//	i--;
+	//}
 
 	while (i--)
 	{
@@ -3821,15 +3813,15 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerPoolNew(
 
 
 	//成员函数 只用前向传递采用采用函数其他采用默认
-	node->basic.Forward = OSlwToolBPNNLayerPoolForward;
-	node->basic.Backward = OSlwToolBPNNLayerPoolBackward;
+	node->basic.Forward = OSlwToolBPnnLayerPoolForward;
+	node->basic.Backward = OSlwToolBPnnLayerPoolBackward;
 
-	node->basic.Update = OSlwToolBPNNLayerUpdateDefault;
-	node->basic.NNmalloc = OSlwToolBPNNLayerNNmallocDefault;
-	node->basic.TrainCompleteCB = OSlwToolBPNNLayerTrainCompleteCallBackDefault;
-	node->basic.DataInit = OSlwToolBPNNLayerDataInitDefault;
-	node->basic.Copy = OSlwToolBPNNLayerCopyDefault;
-	node->basic.SoftReplace = OSlwToolBPNNLayerSoftReplaceDefault;
+	node->basic.Update = OSlwToolBPnnLayerUpdateDefault;
+	node->basic.NNmalloc = OSlwToolBPnnLayerNNmallocDefault;
+	node->basic.TrainCompleteCB = OSlwToolBPnnLayerTrainCompleteCallBackDefault;
+	node->basic.DataInit = OSlwToolBPnnLayerDataInitDefault;
+	node->basic.Copy = OSlwToolBPnnLayerCopyDefault;
+	node->basic.SoftReplace = OSlwToolBPnnLayerSoftReplaceDefault;
 
 	if (info)
 	{
@@ -4379,7 +4371,7 @@ OSlwToolMatrixSTU* _OSlwToolNNAvgPoolingBK
 #endif // OSLW_TOOL_NN_DATA_FRAME==OSLW_TOOL_NN_D_FRAME_C
 
 
-lw_ptr OSlwToolBPNNLayerPoolForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
+lw_ptr OSlwToolBPnnLayerPoolForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
 	OSlwToolNNLayerPoolSTU *pPL;
 	OSLW_assert(!(pNNSLB));
@@ -4419,7 +4411,7 @@ lw_ptr OSlwToolBPNNLayerPoolForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *
 }
 
 
-lw_ptr OSlwToolBPNNLayerPoolBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
+lw_ptr OSlwToolBPnnLayerPoolBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
 	OSlwToolNNLayerPoolSTU *pPL;
 	OSLW_assert(!(pNNSLB));
@@ -4459,22 +4451,22 @@ lw_ptr OSlwToolBPNNLayerPoolBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT 
 }
 
 
-void OSlwToolBPNNInit(OSlwToolBPNNSTU *pBPNN,lw_u16 max_mini_batch)
+void OSlwToolBPnnInit(OSlwToolBPnnSTU *pBPnn,lw_u16 max_mini_batch)
 {
-	OSLW_assert(!(pBPNN));
+	OSLW_assert(!(pBPnn));
 
-	memset(pBPNN, 0, sizeof(OSlwToolBPNNSTU));
-	OSlwToolDListInitial(&pBPNN->Net, sizeof(OSlwToolNNLayerFullConSTU), NULL);
-	pBPNN->_nl_factor = _ParaFrom(1.0);
-	pBPNN->Train.mini_batch_max = max_mini_batch;
-	pBPNN->Train._MemAllocCoff = 1;
-	pBPNN->Train.Epsi = _ParaFrom(1e-8);
+	memset(pBPnn, 0, sizeof(OSlwToolBPnnSTU));
+	OSlwToolDListInitial(&pBPnn->Net, sizeof(OSlwToolNNLayerFullConSTU), NULL);
+	pBPnn->_nl_factor = _ParaFrom(1.0);
+	pBPnn->Train.mini_batch_max = max_mini_batch;
+	pBPnn->Train._MemAllocCoff = 1;
+	pBPnn->Train.Epsi = _ParaFrom(1e-6);
 }
 
 
-void OSlwToolBPNNLayerAppend
+void OSlwToolBPnnLayerAppend
 (
-	OSlwToolBPNNSTU *pBPNN,
+	OSlwToolBPnnSTU *pBPnn,
 	OSlwToolDListNodeSTU *pnode,
 	lw_u32 len,
 	void *LayerList
@@ -4482,28 +4474,28 @@ void OSlwToolBPNNLayerAppend
 {
 	lw_u16 i;
 	OSlwToolNNSubLayerBasicSTU **ppLIST1;
-	OSLW_assert(!(pBPNN));
+	OSLW_assert(!(pBPnn));
 	OSLW_assert(!(pnode));
 	OSLW_assert(!(len));
 	OSLW_assert(!(LayerList));
 
-	pBPNN->Net.AppendFUN(&(pBPNN->Net), pnode);
+	pBPnn->Net.AppendFUN(&(pBPnn->Net), pnode);
 	pnode->Data.uData = len;
 	pnode->Data.pData = (void *)LayerList;
 
 	ppLIST1 = LayerList;
 	for (i = 0; i < len; i++)
 	{
-		ppLIST1[i]->pNN = pBPNN;
+		ppLIST1[i]->pNN = pBPnn;
 	}
 
 	return;
 }
 
 
-void* OSlwToolBPNNFullConAppend
+void* OSlwToolBPnnFullConAppend
 (
-	OSlwToolBPNNSTU *pBPNN,
+	OSlwToolBPnnSTU *pBPnn,
 	lw_u16 in_col, lw_u16 out_col,
 	ParaType *pin, ParaType *pout,
 	ParaType *pWe, ParaType *pBi,
@@ -4520,37 +4512,37 @@ void* OSlwToolBPNNFullConAppend
 	OSlwToolDListNodeSTU *pln1, *pln2;
 	ParaType *pWreal, *pBreal;
 	OSlwToolNNSubLayerBasicSTU **ppLIST1, **ppLIST2, **pptail;
-	OSLW_assert(!(pBPNN));
+	OSLW_assert(!(pBPnn));
 	OSLW_assert(!(pmem));
 	
 	if (pTemplet)
 	{
 		
 		//只有输入层
-		if (pBPNN->Net.NowLen == 1)
+		if (pBPnn->Net.NowLen == 1)
 		{
 			if (pin == NULL)
 			{
-				pin = pmem->Malloc(pmem, PARA_MEM_CAL(in_col*pBPNN->Train.mini_batch_max));			
+				pin = pmem->Malloc(pmem, PARA_MEM_CAL(in_col*pBPnn->Train.mini_batch_max));			
 			}
-			OSlwToolMatrixInitial(&(pBPNN->x), in_col, pBPNN->Train.mini_batch_max, pin);
+			OSlwToolMatrixInitial(&(pBPnn->x), in_col, pBPnn->Train.mini_batch_max, pin);
 		}
 		else
 		{
-			pptail = pBPNN->Net.pTail->Data.pData;
+			pptail = pBPnn->Net.pTail->Data.pData;
 			pin = pptail[0]->out.a;
 		}
 
 		pnode1 = OSlwToolNNLayerFullConNew(
 			pin, NULL,
 			in_col, out_col,
-			pBPNN->Train.mini_batch_max,
+			pBPnn->Train.mini_batch_max,
 			pmem
 		);
 
 		pnode2 = OSlwToolNNLayerActFunNew(
 			pnode1->out.a, pout, 
-			out_col, pBPNN->Train.mini_batch_max, 
+			out_col, pBPnn->Train.mini_batch_max, 
 			pmem, pTemplet, 0
 		);  
 
@@ -4564,11 +4556,11 @@ void* OSlwToolBPNNFullConAppend
 		ppLIST1[0] = pnode1;
 		ppLIST2[0] = pnode2;
 
-		OSlwToolBPNNLayerAppend(pBPNN, pln1, 1, ppLIST1);
-		OSlwToolBPNNLayerAppend(pBPNN, pln2, 1, ppLIST2);
+		OSlwToolBPnnLayerAppend(pBPnn, pln1, 1, ppLIST1);
+		OSlwToolBPnnLayerAppend(pBPnn, pln2, 1, ppLIST2);
 
 		//每次都要复制输出层
-		memcpy(&(pBPNN->y), &(pnode2->out), sizeof(OSlwMat));
+		memcpy(&(pBPnn->y), &(pnode2->out), sizeof(OSlwMat));
 
 		pfc = (OSlwToolNNLayerFullConSTU *)pnode1;
 	}
@@ -4576,24 +4568,24 @@ void* OSlwToolBPNNFullConAppend
 	{
 
 		//只有输入层
-		if (pBPNN->Net.NowLen == 1)
+		if (pBPnn->Net.NowLen == 1)
 		{
 			if (pin == NULL)
 			{
-				pin = pmem->Malloc(pmem, PARA_MEM_CAL(in_col*pBPNN->Train.mini_batch_max));		
+				pin = pmem->Malloc(pmem, PARA_MEM_CAL(in_col*pBPnn->Train.mini_batch_max));		
 			}
-			OSlwToolMatrixInitial(&(pBPNN->x), in_col, pBPNN->Train.mini_batch_max, pin);
+			OSlwToolMatrixInitial(&(pBPnn->x), in_col, pBPnn->Train.mini_batch_max, pin);
 		}
 		else
 		{
-			pptail = pBPNN->Net.pTail->Data.pData;
+			pptail = pBPnn->Net.pTail->Data.pData;
 			pin = pptail[0]->out.a;
 		}
 
 		pnode1 = OSlwToolNNLayerFullConNew(
 			pin, pout,
 			in_col, out_col,
-			pBPNN->Train.mini_batch_max,
+			pBPnn->Train.mini_batch_max,
 			pmem
 		);
 
@@ -4603,10 +4595,10 @@ void* OSlwToolBPNNFullConAppend
 		ppLIST1 = pmem->Malloc(pmem, sizeof(OSlwToolNNSubLayerBasicSTU *) * 1);
 		ppLIST1[0] = pnode1;
 
-		OSlwToolBPNNLayerAppend(pBPNN, pln1, 1, ppLIST1);
+		OSlwToolBPnnLayerAppend(pBPnn, pln1, 1, ppLIST1);
 		
 		//每次都要复制输出层
-		memcpy(&(pBPNN->y), &(pnode1->out), sizeof(OSlwMat));
+		memcpy(&(pBPnn->y), &(pnode1->out), sizeof(OSlwMat));
 
 		pfc = (OSlwToolNNLayerFullConSTU *)pnode1;
 	}
@@ -4621,7 +4613,7 @@ void* OSlwToolBPNNFullConAppend
 
 
 	//碎片化存储 直接进行内存分配
-	if (pBPNN->Train.Flag.MemoryMethod== OSlwToolNNMemoryMethod_Chip)
+	if (pBPnn->Train.Flag.MemoryMethod== OSlwToolNNMemoryMethod_Chip)
 	{
 		if (pWe==NULL)
 		{
@@ -4643,24 +4635,24 @@ void* OSlwToolBPNNFullConAppend
 
 		pfc->Weight.a = pWreal;
 		pfc->Bias.a = pBreal;
-		if (pBPNN->Train.Flag.NeedTrain==OSlwToolNNNeedTrain_Need)
+		if (pBPnn->Train.Flag.NeedTrain==OSlwToolNNNeedTrain_Need)
 		{
-			pnode1->NNmalloc(pnode1, NULL, pmem->Malloc(pmem, pnode1->sizeofdata * (lw_u32)(pBPNN->Train._MemAllocCoff)));
+			pnode1->NNmalloc(pnode1, NULL, pmem->Malloc(pmem, pnode1->sizeofdata * (lw_u32)(pBPnn->Train._MemAllocCoff)));
 		}
 		
 
 	}
 
 
-	pBPNN->ParaGroupNum++;
+	pBPnn->ParaGroupNum++;
 	
 	return pnode1;
 }
 
 
-void* OSlwToolBPNNConvAppend
+void* OSlwToolBPnnConvAppend
 (
-	OSlwToolBPNNSTU *pBPNN,
+	OSlwToolBPnnSTU *pBPnn,
 	lw_u16 in_x, lw_u16 in_y, lw_u16 in_z,
 	lw_u16 kern_x, lw_u16 kern_y, lw_u16 kern_num,
 	ParaType *pin, ParaType *pout,
@@ -4682,7 +4674,7 @@ void* OSlwToolBPNNConvAppend
 	OSlwToolNNSubLayerBasicSTU **ppLIST1, **ppLIST2, **pptail;
 	LwMatRowType mat_in_col, mat_out_col;
 	lw_u32 out_x, out_y;
-	OSLW_assert(!(pBPNN));
+	OSLW_assert(!(pBPnn));
 	OSLW_assert(!(pmem));
 
 	mat_in_col = in_x*in_y*in_z;
@@ -4694,17 +4686,17 @@ void* OSlwToolBPNNConvAppend
 	{
 
 		//只有输入层
-		if (pBPNN->Net.NowLen == 1)
+		if (pBPnn->Net.NowLen == 1)
 		{
 			if (pin == NULL)
 			{
-				pin = pmem->Malloc(pmem, PARA_MEM_CAL(mat_in_col*pBPNN->Train.mini_batch_max));
+				pin = pmem->Malloc(pmem, PARA_MEM_CAL(mat_in_col*pBPnn->Train.mini_batch_max));
 			}
-			OSlwToolMatrixInitial(&(pBPNN->x), mat_in_col, pBPNN->Train.mini_batch_max, pin);
+			OSlwToolMatrixInitial(&(pBPnn->x), mat_in_col, pBPnn->Train.mini_batch_max, pin);
 		}
 		else
 		{
-			pptail = pBPNN->Net.pTail->Data.pData;
+			pptail = pBPnn->Net.pTail->Data.pData;
 			pin = pptail[0]->out.a;
 		}
 
@@ -4715,14 +4707,14 @@ void* OSlwToolBPNNConvAppend
 			kern_x, kern_y, kern_num,
 			1,
 			's',
-			pBPNN->Train.mini_batch_max,
+			pBPnn->Train.mini_batch_max,
 			pmem,
 			info
 		);
 
 		pnode2 = OSlwToolNNLayerActFunNew(
 			pnode1->out.a, pout,
-			mat_out_col, pBPNN->Train.mini_batch_max,
+			mat_out_col, pBPnn->Train.mini_batch_max,
 			pmem, pTemplet, 0
 		);
 
@@ -4736,11 +4728,11 @@ void* OSlwToolBPNNConvAppend
 		ppLIST1[0] = pnode1;
 		ppLIST2[0] = pnode2;
 
-		OSlwToolBPNNLayerAppend(pBPNN, pln1, 1, ppLIST1);
-		OSlwToolBPNNLayerAppend(pBPNN, pln2, 1, ppLIST2);
+		OSlwToolBPnnLayerAppend(pBPnn, pln1, 1, ppLIST1);
+		OSlwToolBPnnLayerAppend(pBPnn, pln2, 1, ppLIST2);
 
 		//每次都要复制输出层
-		memcpy(&(pBPNN->y), &(pnode2->out), sizeof(OSlwMat));
+		memcpy(&(pBPnn->y), &(pnode2->out), sizeof(OSlwMat));
 
 		pcv = (void *)pnode1;
 		pfc = (void *)pnode1;
@@ -4749,17 +4741,17 @@ void* OSlwToolBPNNConvAppend
 	{
 
 		//只有输入层
-		if (pBPNN->Net.NowLen == 1)
+		if (pBPnn->Net.NowLen == 1)
 		{
 			if (pin == NULL)
 			{
-				pin = pmem->Malloc(pmem, PARA_MEM_CAL(mat_in_col*pBPNN->Train.mini_batch_max));
+				pin = pmem->Malloc(pmem, PARA_MEM_CAL(mat_in_col*pBPnn->Train.mini_batch_max));
 			}
-			OSlwToolMatrixInitial(&(pBPNN->x), mat_in_col, pBPNN->Train.mini_batch_max, pin);
+			OSlwToolMatrixInitial(&(pBPnn->x), mat_in_col, pBPnn->Train.mini_batch_max, pin);
 		}
 		else
 		{
-			pptail = pBPNN->Net.pTail->Data.pData;
+			pptail = pBPnn->Net.pTail->Data.pData;
 			pin = pptail[0]->out.a;
 		}
 
@@ -4770,7 +4762,7 @@ void* OSlwToolBPNNConvAppend
 			kern_x, kern_y, kern_num,
 			1,
 			's',
-			pBPNN->Train.mini_batch_max,
+			pBPnn->Train.mini_batch_max,
 			pmem,
 			info
 		);
@@ -4781,10 +4773,10 @@ void* OSlwToolBPNNConvAppend
 		ppLIST1 = pmem->Malloc(pmem, sizeof(OSlwToolNNSubLayerBasicSTU *) * 1);
 		ppLIST1[0] = pnode1;
 
-		OSlwToolBPNNLayerAppend(pBPNN, pln1, 1, ppLIST1);
+		OSlwToolBPnnLayerAppend(pBPnn, pln1, 1, ppLIST1);
 
 		//每次都要复制输出层
-		memcpy(&(pBPNN->y), &(pnode1->out), sizeof(OSlwMat));
+		memcpy(&(pBPnn->y), &(pnode1->out), sizeof(OSlwMat));
 
 		pcv = (void *)pnode1;
 		pfc = (void *)pnode1;
@@ -4808,7 +4800,7 @@ void* OSlwToolBPNNConvAppend
 
 
 	//碎片化存储 直接进行内存分配
-	if (pBPNN->Train.Flag.MemoryMethod == OSlwToolNNMemoryMethod_Chip)
+	if (pBPnn->Train.Flag.MemoryMethod == OSlwToolNNMemoryMethod_Chip)
 	{
 		if (pWe == NULL)
 		{
@@ -4830,22 +4822,22 @@ void* OSlwToolBPNNConvAppend
 
 		pfc->Weight.a = pWreal;
 		pfc->Bias.a = pBreal;
-		if (pBPNN->Train.Flag.NeedTrain == OSlwToolNNNeedTrain_Need)
+		if (pBPnn->Train.Flag.NeedTrain == OSlwToolNNNeedTrain_Need)
 		{
-			pnode1->NNmalloc(pnode1, NULL, pmem->Malloc(pmem, pnode1->sizeofdata * (lw_u32)(pBPNN->Train._MemAllocCoff)));
+			pnode1->NNmalloc(pnode1, NULL, pmem->Malloc(pmem, pnode1->sizeofdata * (lw_u32)(pBPnn->Train._MemAllocCoff)));
 		}
 	}
 
 
-	pBPNN->ParaGroupNum++;
+	pBPnn->ParaGroupNum++;
 
 	return pnode1;
 }
 
 
-void* OSlwToolBPNNPoolAppend
+void* OSlwToolBPnnPoolAppend
 (
-	OSlwToolBPNNSTU *pBPNN,
+	OSlwToolBPnnSTU *pBPnn,
 	lw_u16 in_x, lw_u16 in_y, lw_u16 in_z,
 	lw_u16 pool_x, lw_u16 pool_y,
 	ParaType *pin, ParaType *pout,
@@ -4862,24 +4854,24 @@ void* OSlwToolBPNNPoolAppend
 	LwMatRowType mat_in_col;
 
 
-	OSLW_assert(!(pBPNN));
+	OSLW_assert(!(pBPnn));
 	OSLW_assert(!(pmem));
 
 	mat_in_col = in_x*in_y*in_z;
 
 
 	//只有输入层
-	if (pBPNN->Net.NowLen == 1)
+	if (pBPnn->Net.NowLen == 1)
 	{
 		if (pin == NULL)
 		{
-			pin = pmem->Malloc(pmem, PARA_MEM_CAL(mat_in_col*pBPNN->Train.mini_batch_max));
+			pin = pmem->Malloc(pmem, PARA_MEM_CAL(mat_in_col*pBPnn->Train.mini_batch_max));
 		}
-		OSlwToolMatrixInitial(&(pBPNN->x), mat_in_col, pBPNN->Train.mini_batch_max, pin);
+		OSlwToolMatrixInitial(&(pBPnn->x), mat_in_col, pBPnn->Train.mini_batch_max, pin);
 	}
 	else
 	{
-		pptail = pBPNN->Net.pTail->Data.pData;
+		pptail = pBPnn->Net.pTail->Data.pData;
 		pin = pptail[0]->out.a;
 	}
 
@@ -4889,7 +4881,7 @@ void* OSlwToolBPNNPoolAppend
 		in_x, in_y, in_z,
 		pool_x, pool_x,
 		pool_method,
-		pBPNN->Train.mini_batch_max,
+		pBPnn->Train.mini_batch_max,
 		pmem,
 		info
 	);
@@ -4899,17 +4891,17 @@ void* OSlwToolBPNNPoolAppend
 
 	ppLIST1[0] = pnode1;
 
-	OSlwToolBPNNLayerAppend(pBPNN, pln1, 1, ppLIST1);
+	OSlwToolBPnnLayerAppend(pBPnn, pln1, 1, ppLIST1);
 
 	//每次都要复制输出层
-	memcpy(&(pBPNN->y), &(pnode1->out), sizeof(OSlwMat));
+	memcpy(&(pBPnn->y), &(pnode1->out), sizeof(OSlwMat));
 
 	return pnode1;
 }
 
 
-void OSlwToolBPNNTrainInit(
-	OSlwToolBPNNSTU *pBPNN,
+void OSlwToolBPnnTrainInit(
+	OSlwToolBPnnSTU *pBPnn,
 	ParaType *pRef,
 	OSlwMemoryBasicSTU *pmem,
 	LossFunTYPE loss,
@@ -4917,67 +4909,67 @@ void OSlwToolBPNNTrainInit(
 )
 {
 
-	OSLW_assert(!(pBPNN));
+	OSLW_assert(!(pBPnn));
 	OSLW_assert(!(pmem));
 
 
-	memcpy(&pBPNN->ref, &pBPNN->y, sizeof(OSlwMat));
+	memcpy(&pBPnn->ref, &pBPnn->y, sizeof(OSlwMat));
 
 	if (pRef==NULL)
 	{
-		pRef = pmem->Malloc(pmem, PARA_MEM_CAL(pBPNN->ref.length));
+		pRef = pmem->Malloc(pmem, PARA_MEM_CAL(pBPnn->ref.length));
 	}
 
-	pBPNN->ref.a = pRef;
+	pBPnn->ref.a = pRef;
 
-	pBPNN->Train.LossFun = loss;
-	pBPNN->Train.nl = nl;
+	pBPnn->Train.LossFun = loss;
+	pBPnn->Train.nl = nl;
 
 }
 
-void OSlwToolBPNNOptimInit(
-	OSlwToolBPNNSTU *pBPNN,
+void OSlwToolBPnnOptimInit(
+	OSlwToolBPnnSTU *pBPnn,
 	OSlwToolNNOptimNum optim,
 	ParaType beta1,
 	ParaType beta2
 )
 {
-	OSLW_assert(!(pBPNN));
+	OSLW_assert(!(pBPnn));
 
-	pBPNN->Train.Epsi = _ParaFrom(5e-8);
-	pBPNN->Train.Flag.Optim = optim;
+	pBPnn->Train.Epsi = _ParaFrom(1e-6);
+	pBPnn->Train.Flag.Optim = optim;
 	switch (optim)
 	{
 	case OSlwToolNNOptim_GradDesc:
-		pBPNN->Train._MemAllocCoff = 1;
+		pBPnn->Train._MemAllocCoff = 1;
 		break;
 
 	case OSlwToolNNOptim_M:
-		pBPNN->Train.Beta1 = beta1;
-		pBPNN->Train.Beta1T = beta1;
-		pBPNN->Train._MemAllocCoff = 2;
+		pBPnn->Train.Beta1 = beta1;
+		pBPnn->Train.Beta1T = beta1;
+		pBPnn->Train._MemAllocCoff = 2;
 		break;
 
 	case OSlwToolNNOptim_RMSp:
-		pBPNN->Train.Beta2 = beta2;
-		pBPNN->Train.Beta2T = beta2;
-		pBPNN->Train._MemAllocCoff = 2;
+		pBPnn->Train.Beta2 = beta2;
+		pBPnn->Train.Beta2T = beta2;
+		pBPnn->Train._MemAllocCoff = 2;
 		break;
 
 	case OSlwToolNNOptim_Adam:
-		pBPNN->Train.Beta1 = beta1;
-		pBPNN->Train.Beta1T = beta1;
-		pBPNN->Train.Beta2 = beta2;
-		pBPNN->Train.Beta2T = beta2;
-		pBPNN->Train._MemAllocCoff = 3;
+		pBPnn->Train.Beta1 = beta1;
+		pBPnn->Train.Beta1T = beta1;
+		pBPnn->Train.Beta2 = beta2;
+		pBPnn->Train.Beta2T = beta2;
+		pBPnn->Train._MemAllocCoff = 3;
 		break;
 
 	case OSlwToolNNOptim_Nadam:
-		pBPNN->Train.Beta1 = beta1;
-		pBPNN->Train.Beta1T = beta1;
-		pBPNN->Train.Beta2 = beta2;
-		pBPNN->Train.Beta2T = beta2;
-		pBPNN->Train._MemAllocCoff = 3;
+		pBPnn->Train.Beta1 = beta1;
+		pBPnn->Train.Beta1T = beta1;
+		pBPnn->Train.Beta2 = beta2;
+		pBPnn->Train.Beta2T = beta2;
+		pBPnn->Train._MemAllocCoff = 3;
 		break;
 
 	default:
@@ -4990,7 +4982,7 @@ void OSlwToolBPNNOptimInit(
 }
 
 
-void OSlwToolBPNNAllDataInit(OSlwToolBPNNSTU *pBPNN,OSlwMemoryBasicSTU *pMem)
+void OSlwToolBPnnAllDataInit(OSlwToolBPnnSTU *pBPnn,OSlwMemoryBasicSTU *pMem)
 {
 
 	OSlwToolDListNodeSTU *node;
@@ -4999,19 +4991,19 @@ void OSlwToolBPNNAllDataInit(OSlwToolBPNNSTU *pBPNN,OSlwMemoryBasicSTU *pMem)
 	register lw_u32 i, count = 0, j;
 	lw_u32 flowdatamax = 0;
 	void *pFlowDataAddr = NULL;
-	OSLW_assert(!(pBPNN));
+	OSLW_assert(!(pBPnn));
 	OSLW_assert(!(pMem));
 
-	if (pBPNN->ParaGroupNum==0)
+	if (pBPnn->ParaGroupNum==0)
 	{
 		return;
 	}
 
-	pBPNN->pmem = pMem;
+	pBPnn->pmem = pMem;
 
-	if (pBPNN->Train.Flag.MemoryMethod== OSlwToolNNMemoryMethod_Chip)
+	if (pBPnn->Train.Flag.MemoryMethod== OSlwToolNNMemoryMethod_Chip)
 	{
-		node = (OSlwToolDListNodeSTU *)pBPNN->Net.Head.con.pNext;
+		node = (OSlwToolDListNodeSTU *)pBPnn->Net.Head.con.pNext;
 		while (node)
 		{
 			ppNNL = node->Data.pData;
@@ -5030,7 +5022,7 @@ void OSlwToolBPNNAllDataInit(OSlwToolBPNNSTU *pBPNN,OSlwMemoryBasicSTU *pMem)
 		if (flowdatamax)
 		{
 			pFlowDataAddr = pMem->Malloc(pMem, flowdatamax);
-			node = (OSlwToolDListNodeSTU *)pBPNN->Net.Head.con.pNext;
+			node = (OSlwToolDListNodeSTU *)pBPnn->Net.Head.con.pNext;
 			while (node)
 			{
 				ppNNL = node->Data.pData;
@@ -5049,18 +5041,18 @@ void OSlwToolBPNNAllDataInit(OSlwToolBPNNSTU *pBPNN,OSlwMemoryBasicSTU *pMem)
 
 
 		//block方式统一存储内存
-		pKind = pMem->Malloc(pMem, sizeof(lw_u32)*(pBPNN->ParaGroupNum));
+		pKind = pMem->Malloc(pMem, sizeof(lw_u32)*(pBPnn->ParaGroupNum));
 	
 
 		//得到table的列
 		count = 0;
-		node = (OSlwToolDListNodeSTU *)pBPNN->Net.Head.con.pNext;
+		node = (OSlwToolDListNodeSTU *)pBPnn->Net.Head.con.pNext;
 		while (node)
 		{
 			ppNNL = node->Data.pData;
 			for (i = 0; i < node->Data.uData; i++)
 			{
-				pKind[count++] = ppNNL[i]->sizeofdata* (lw_u32)(pBPNN->Train._MemAllocCoff);
+				pKind[count++] = ppNNL[i]->sizeofdata* (lw_u32)(pBPnn->Train._MemAllocCoff);
 				if (ppNNL[i]->FlowData.uData >= flowdatamax && ppNNL[i]->FlowData.pData == NULL)
 				{
 					flowdatamax = ppNNL[i]->FlowData.uData;
@@ -5075,18 +5067,18 @@ void OSlwToolBPNNAllDataInit(OSlwToolBPNNSTU *pBPNN,OSlwMemoryBasicSTU *pMem)
 		}
 
 		//判断是否需要训练
-		if (pBPNN->Train.Flag.NeedTrain == OSlwToolNNNeedTrain_Need)
+		if (pBPnn->Train.Flag.NeedTrain == OSlwToolNNNeedTrain_Need)
 		{
-			OSlwToolTableInitial(&(pBPNN->Train.DataTable), 2, NULL, pBPNN->ParaGroupNum, pMem, NULL, pKind);//存储两行 分别是原始数值与delt
+			OSlwToolTableInitial(&(pBPnn->Train.DataTable), 2, NULL, pBPnn->ParaGroupNum, pMem, NULL, pKind);//存储两行 分别是原始数值与delt
 		}
 		else
 		{
-			OSlwToolTableInitial(&(pBPNN->Train.DataTable), 1, NULL, pBPNN->ParaGroupNum, pMem, NULL, pKind);//存储一行 原始数值
+			OSlwToolTableInitial(&(pBPnn->Train.DataTable), 1, NULL, pBPnn->ParaGroupNum, pMem, NULL, pKind);//存储一行 原始数值
 		}
 
 		//分配内存并且初始化
 		count = 0;
-		node = (OSlwToolDListNodeSTU *)pBPNN->Net.Head.con.pNext;
+		node = (OSlwToolDListNodeSTU *)pBPnn->Net.Head.con.pNext;
 		while (node)
 		{
 			ppNNL = node->Data.pData;
@@ -5101,12 +5093,12 @@ void OSlwToolBPNNAllDataInit(OSlwToolBPNNSTU *pBPNN,OSlwMemoryBasicSTU *pMem)
 					continue;
 				}
 
-				if (pBPNN->Train.Flag.NeedTrain == OSlwToolNNNeedTrain_Need)
+				if (pBPnn->Train.Flag.NeedTrain == OSlwToolNNNeedTrain_Need)
 				{
 					ppNNL[i]->NNmalloc(
 						ppNNL[i],
-						pBPNN->Train.DataTable.ReadFun(&pBPNN->Train.DataTable, 0, count, NULL),
-						pBPNN->Train.DataTable.ReadFun(&pBPNN->Train.DataTable, 1, count, NULL)
+						pBPnn->Train.DataTable.ReadFun(&pBPnn->Train.DataTable, 0, count, NULL),
+						pBPnn->Train.DataTable.ReadFun(&pBPnn->Train.DataTable, 1, count, NULL)
 					);
 
 					ppNNL[i]->DataInit(ppNNL[i]);
@@ -5116,7 +5108,7 @@ void OSlwToolBPNNAllDataInit(OSlwToolBPNNSTU *pBPNN,OSlwMemoryBasicSTU *pMem)
 				{
 					ppNNL[i]->NNmalloc(
 						ppNNL[i],
-						pBPNN->Train.DataTable.ReadFun(&pBPNN->Train.DataTable, 0, count, NULL),
+						pBPnn->Train.DataTable.ReadFun(&pBPnn->Train.DataTable, 0, count, NULL),
 						NULL
 					);
 
@@ -5132,20 +5124,20 @@ void OSlwToolBPNNAllDataInit(OSlwToolBPNNSTU *pBPNN,OSlwMemoryBasicSTU *pMem)
 
 void* OSlwToolNNLayerSimpleRecover
 (
-	OSlwToolBPNNSTU *pBPNN,
+	OSlwToolBPnnSTU *pBPnn,
 	ParaType *in,ParaType *out,
 	OSlwToolNNLayerSimpleBakSTU *pSimpleBak,
 	OSlwMemoryBasicSTU *pmem
 )
 {
 	OSlwToolNNLayerFullConSTU *pfc;
-	OSLW_assert(!(pBPNN));
+	OSLW_assert(!(pBPnn));
 	OSLW_assert(!(pmem));	
 	switch((*pSimpleBak).NN_Kind)
 	{
 		case OSlwToolNNSubLayerKind_FullCon:
-			pfc=OSlwToolBPNNFullConAppend(
-			pBPNN,
+			pfc=OSlwToolBPnnFullConAppend(
+			pBPnn,
 			(*pSimpleBak).info[0], (*pSimpleBak).info[1],
 			in, out,
 			NULL, NULL,
@@ -5157,8 +5149,8 @@ void* OSlwToolNNLayerSimpleRecover
 		break;
 
 		case OSlwToolNNSubLayerKind_Conv:
-			pfc=OSlwToolBPNNConvAppend(
-			pBPNN,
+			pfc=OSlwToolBPnnConvAppend(
+			pBPnn,
 			(*pSimpleBak).info[0],(*pSimpleBak).info[1],(*pSimpleBak).info[2],
 			(*pSimpleBak).info[3],(*pSimpleBak).info[4],(*pSimpleBak).info[5],
 			in,out,
@@ -5170,8 +5162,8 @@ void* OSlwToolNNLayerSimpleRecover
 		break;
 		
 		case OSlwToolNNSubLayerKind_Pool:
-			OSlwToolBPNNPoolAppend(
-			pBPNN,
+			OSlwToolBPnnPoolAppend(
+			pBPnn,
 			(*pSimpleBak).info[0],(*pSimpleBak).info[1],(*pSimpleBak).info[2],
 			(*pSimpleBak).info[3],(*pSimpleBak).info[4],
 			in,out,
@@ -5191,9 +5183,9 @@ void* OSlwToolNNLayerSimpleRecover
 }
 
 
-void* OSlwToolBPNNSimpleRecover
+void* OSlwToolBPnnSimpleRecover
 (
-	OSlwToolBPNNSTU *pBPNN,
+	OSlwToolBPnnSTU *pBPnn,
 	ParaType *in,ParaType *out,
 	OSlwToolNNLayerSimpleBakSTU *pSimpleBak,
 	lw_u16 simple_layer_len,
@@ -5203,35 +5195,35 @@ void* OSlwToolBPNNSimpleRecover
 	
 	lw_u16 i;
 	ParaType *pin=in;
-	OSLW_assert(!(pBPNN));
+	OSLW_assert(!(pBPnn));
 	OSLW_assert(!(pmem));	
 	
 		
 	
 	for(i=0;i<simple_layer_len-1;i++)
 	{
-		OSlwToolNNLayerSimpleRecover(pBPNN,pin,NULL,pSimpleBak,pmem);
+		OSlwToolNNLayerSimpleRecover(pBPnn,pin,NULL,pSimpleBak,pmem);
 		pin=NULL;
 		pSimpleBak++;
 	}
 	
-	OSlwToolNNLayerSimpleRecover(pBPNN,pin,out,pSimpleBak,pmem);
+	OSlwToolNNLayerSimpleRecover(pBPnn,pin,out,pSimpleBak,pmem);
 	
-	return pBPNN;
+	return pBPnn;
 	
 }
 
 
-void OSlwToolBPNNForward(OSlwToolBPNNSTU *pBPNN)
+void OSlwToolBPnnForward(OSlwToolBPnnSTU *pBPnn)
 {
 	OSlwToolDListNodeSTU *node;
 	OSlwToolNNSubLayerBasicSTU **ppNNL;
 	lw_ptr mmb;
 	register lw_u32 i;
-	OSLW_assert(!(pBPNN));
+	OSLW_assert(!(pBPnn));
 
-	mmb = pBPNN->Train.mini_batch_now;
-	node = (OSlwToolDListNodeSTU *)pBPNN->Net.Head.con.pNext;
+	mmb = pBPnn->Train.mini_batch_now;
+	node = (OSlwToolDListNodeSTU *)pBPnn->Net.Head.con.pNext;
 	while (node)
 	{
 		ppNNL = node->Data.pData;
@@ -5243,24 +5235,24 @@ void OSlwToolBPNNForward(OSlwToolBPNNSTU *pBPNN)
 		node = (OSlwToolDListNodeSTU *)node->con.pNext;
 	}
 
-	pBPNN->Train._batch_stream_count++;
-	pBPNN->Train.AllBatchCount += pBPNN->Train.mini_batch_now;
+	pBPnn->Train._batch_stream_count++;
+	pBPnn->Train.AllBatchCount += pBPnn->Train.mini_batch_now;
 	
 	return;
 
 }
 
 
-void OSlwToolBPNNBackward(OSlwToolBPNNSTU *pBPNN)
+void OSlwToolBPnnBackward(OSlwToolBPnnSTU *pBPnn)
 {
 	OSlwToolDListNodeSTU *node;
 	OSlwToolNNSubLayerBasicSTU **ppNNL;
 	lw_ptr mmb;
 	register lw_u32 i;
-	OSLW_assert(!(pBPNN));
+	OSLW_assert(!(pBPnn));
 
-	mmb = pBPNN->Train.mini_batch_now;
-	node = (OSlwToolDListNodeSTU *)pBPNN->Net.pTail;
+	mmb = pBPnn->Train.mini_batch_now;
+	node = (OSlwToolDListNodeSTU *)pBPnn->Net.pTail;
 	while (node->Key.uData)
 	{
 		ppNNL = node->Data.pData;
@@ -5275,14 +5267,14 @@ void OSlwToolBPNNBackward(OSlwToolBPNNSTU *pBPNN)
 	return;
 }
 
-void OSlwToolBPNNReview(OSlwToolBPNNSTU *pBPNN)
+void OSlwToolBPnnReview(OSlwToolBPnnSTU *pBPnn)
 {
 	OSlwToolDListNodeSTU *node;
 	OSlwToolNNSubLayerBasicSTU **ppNNL;
 	register lw_u32 i;
-	OSLW_assert(!(pBPNN));
+	OSLW_assert(!(pBPnn));
 
-	node = (OSlwToolDListNodeSTU *)pBPNN->Net.pTail;
+	node = (OSlwToolDListNodeSTU *)pBPnn->Net.pTail;
 	while (node->Key.uData)
 	{
 		ppNNL = node->Data.pData;
@@ -5294,36 +5286,36 @@ void OSlwToolBPNNReview(OSlwToolBPNNSTU *pBPNN)
 		node = (OSlwToolDListNodeSTU *)node->con.pLast;
 	}
 
-	pBPNN->Train.AllBatchCount = 0;
-	pBPNN->Train._batch_stream_count = 0;
-	pBPNN->Train.mini_batch_now = 0;
+	pBPnn->Train.AllBatchCount = 0;
+	pBPnn->Train._batch_stream_count = 0;
+	pBPnn->Train.mini_batch_now = 0;
 
 	return;
 
 }
 
 
-void OSlwToolBPNNLoadX(OSlwToolBPNNSTU *pBPNN, OSlwMat *xs)
+void OSlwToolBPnnLoadX(OSlwToolBPnnSTU *pBPnn, OSlwMat *xs)
 {
 	OSlwMat _x;
 	lw_32 res;
-	OSLW_assert(!(pBPNN));
+	OSLW_assert(!(pBPnn));
 	OSLW_assert(!(xs));
 #if OSLW_TOOL_NN_DATA_FRAME==OSLW_TOOL_NN_D_FRAME_C
-	if (xs->col != pBPNN->x.col)
+	if (xs->col != pBPnn->x.col)
 	{
 		OSLW_assert(1);
 		return;
 	}
 
 	//计算剩余的批容量
-	if (pBPNN->Train.mini_batch_max < (pBPNN->Train.mini_batch_now + xs->row))
+	if (pBPnn->Train.mini_batch_max < (pBPnn->Train.mini_batch_now + xs->row))
 	{
 		OSLW_assert(1);
 		return;
 	}
 
-	res = pBPNN->Train.mini_batch_max - pBPNN->Train.mini_batch_now;
+	res = pBPnn->Train.mini_batch_max - pBPnn->Train.mini_batch_now;
 
 	
 	
@@ -5342,27 +5334,27 @@ void OSlwToolBPNNLoadX(OSlwToolBPNNSTU *pBPNN, OSlwMat *xs)
 	
 
 	//初始化
-	OSlwMatInit(&_x,res,xs->col,OSlwMatGetR(pBPNN->x,pBPNN->Train.mini_batch_now));
+	OSlwMatInit(&_x,res,xs->col,OSlwMatGetR(pBPnn->x,pBPnn->Train.mini_batch_now));
 	
 	//复制矩阵
 	LW_MAT_CPY(&(_x),xs);
 	
 	
 #elif OSLW_TOOL_NN_DATA_FRAME OSLW_TOOL_NN_D_FRAME_F
-		if (xs->col != pBPNN->x.row)
+		if (xs->col != pBPnn->x.row)
 	{
 		OSLW_assert(1);
 		return;
 	}
 
 	//计算剩余的批容量
-	if (pBPNN->Train.mini_batch_max < (pBPNN->Train.mini_batch_now + xs->row))
+	if (pBPnn->Train.mini_batch_max < (pBPnn->Train.mini_batch_now + xs->row))
 	{
 		OSLW_assert(1);
 		return;
 	}
 
-	res = pBPNN->Train.mini_batch_max - pBPNN->Train.mini_batch_now;
+	res = pBPnn->Train.mini_batch_max - pBPnn->Train.mini_batch_now;
 
 	if (res < xs->row)
 	{	
@@ -5375,7 +5367,7 @@ void OSlwToolBPNNLoadX(OSlwToolBPNNSTU *pBPNN, OSlwMat *xs)
 	
 
 	//初始化
-	OSlwMatInit(&_x, pBPNN->x.row, res, pBPNN->x.a + pBPNN->Train.mini_batch_now);
+	OSlwMatInit(&_x, pBPnn->x.row, res, pBPnn->x.a + pBPnn->Train.mini_batch_now);
 
 	pOSlwToolMatrixTurn(&_x, xs);
 	
@@ -5384,38 +5376,38 @@ void OSlwToolBPNNLoadX(OSlwToolBPNNSTU *pBPNN, OSlwMat *xs)
 
 
 	//更新批数量
-	pBPNN->Train.mini_batch_now += res;
+	pBPnn->Train.mini_batch_now += res;
 }
 
 
 
-void OSlwToolBPNNLoadY(OSlwToolBPNNSTU *pBPNN, OSlwMat *ys)
+void OSlwToolBPnnLoadY(OSlwToolBPnnSTU *pBPnn, OSlwMat *ys)
 {
 	OSlwMat _y;
-	OSLW_assert(!(pBPNN));
+	OSLW_assert(!(pBPnn));
 	OSLW_assert(!(ys));
 #if OSLW_TOOL_NN_DATA_FRAME==OSLW_TOOL_NN_D_FRAME_C
-	if (ys->col != pBPNN->ref.col || pBPNN->Train.mini_batch_now != ys->row )
+	if (ys->col != pBPnn->ref.col || pBPnn->Train.mini_batch_now != ys->row )
 	{
 		OSLW_assert(1);
 		return;
 	}
 
 	//初始化
-	OSlwMatInit(&_y, pBPNN->ref.row, pBPNN->ref.col, pBPNN->ref.a);	
+	OSlwMatInit(&_y, pBPnn->ref.row, pBPnn->ref.col, pBPnn->ref.a);	
 
 	//复制矩阵
 	LW_MAT_CPY(&(_y),ys);	
 	
 #elif OSLW_TOOL_NN_DATA_FRAME OSLW_TOOL_NN_D_FRAME_F
-	if (ys->col != pBPNN->ref.row || pBPNN->Train.mini_batch_now != ys->row )
+	if (ys->col != pBPnn->ref.row || pBPnn->Train.mini_batch_now != ys->row )
 	{
 		OSLW_assert(1);
 		return;
 	}
 
 	//初始化
-	OSlwMatInit(&_y, pBPNN->ref.row, pBPNN->ref.col, pBPNN->ref.a);
+	OSlwMatInit(&_y, pBPnn->ref.row, pBPnn->ref.col, pBPnn->ref.a);
 
 	pOSlwToolMatrixTurn(&_y, ys);
 	
@@ -5426,72 +5418,92 @@ void OSlwToolBPNNLoadY(OSlwToolBPNNSTU *pBPNN, OSlwMat *ys)
 
 }
 
-void OSlwToolBPNNRun(OSlwToolBPNNSTU *pBPNN, OSlwMat *xs)
+void OSlwToolBPnnRun(OSlwToolBPnnSTU *pBPnn, OSlwMat *xs)
 {
 
-	OSLW_assert(!(pBPNN));
+	OSLW_assert(!(pBPnn));
 
 	if (!(xs==NULL))
 	{
-		OSlwToolBPNNLoadX(pBPNN, xs);
+		OSlwToolBPnnLoadX(pBPnn, xs);
 	}
 	else
 	{
-		pBPNN->Train.mini_batch_now = pBPNN->Train.mini_batch_max;
+		pBPnn->Train.mini_batch_now = pBPnn->Train.mini_batch_max;
 	}
 	
 	
-	OSlwToolBPNNForward(pBPNN);
+	OSlwToolBPnnForward(pBPnn);
 	
-	if (pBPNN->Train.Flag.NeedTrain == OSlwToolNNNeedTrain_NeedNot)
+	if (pBPnn->Train.Flag.NeedTrain == OSlwToolNNNeedTrain_NeedNot)
 	{
-		pBPNN->Train.mini_batch_now = 0;
-		pBPNN->Train._batch_stream_count = 0;
-		pBPNN->Train.AllBatchCount = 0;
+		pBPnn->Train.mini_batch_now = 0;
+		pBPnn->Train._batch_stream_count = 0;
+		pBPnn->Train.AllBatchCount = 0;
 	}
 
 }
 
 
-void OSlwToolBPNNCalErr(OSlwToolBPNNSTU *pBPNN)
+void OSlwToolBPnnCalErr(OSlwToolBPnnSTU *pBPnn)
 {
 	OSlwMat y, ref;
 
-	OSLW_assert(!(pBPNN));
+	OSLW_assert(!(pBPnn));
 
+#if OSLW_TOOL_NN_DATA_FRAME==OSLW_TOOL_NN_D_FRAME_C
 
-	OSlwMatInit(&y, pBPNN->y.row, pBPNN->Train.mini_batch_now, pBPNN->y.a);
-	OSlwMatInit(&ref, pBPNN->ref.row, pBPNN->Train.mini_batch_now, pBPNN->ref.a);
+	OSlwMatInit(&y, pBPnn->Train.mini_batch_now, pBPnn->y.row, pBPnn->y.a);
+	OSlwMatInit(&ref, pBPnn->Train.mini_batch_now, pBPnn->ref.row, pBPnn->ref.a);
 
-	if (pBPNN->Train.LossFun)
+	if (pBPnn->Train.LossFun)
 	{
-		pBPNN->Error = pBPNN->Train.LossFun(&(y), &(ref), &(y));
+		pBPnn->Error = pBPnn->Train.LossFun(&(y), &(ref), &(y));
 	}
 
-	OSlwToolBPNNBackward(pBPNN);
+#elif OSLW_TOOL_NN_DATA_FRAME == OSLW_TOOL_NN_D_FRAME_F
+	
+	OSlwMatInit(&y, pBPnn->y.row, pBPnn->Train.mini_batch_now, pBPnn->y.a);
+	OSlwMatInit(&ref, pBPnn->ref.row, pBPnn->Train.mini_batch_now, pBPnn->ref.a);
 
-	pBPNN->Train.mini_batch_now = 0;
+	if (pBPnn->Train.LossFun)
+	{
+		pBPnn->Error = pBPnn->Train.LossFun(&(y), &(ref), &(y));
+	}
+
+#else
+
+#error"NN data frame is unknown"
+	OSLW_assert(1);
+
+#endif // OSLW_TOOL_NN_DATA_FRAME==OSLW_TOOL_NN_D_FRAME_C
+
+
+
+	OSlwToolBPnnBackward(pBPnn);
+
+	pBPnn->Train.mini_batch_now = 0;
 
 
 }
 
-void OSlwToolBPNNTrain(OSlwToolBPNNSTU *pBPNN,OSlwMat *ys)
+void OSlwToolBPnnTrain(OSlwToolBPnnSTU *pBPnn,OSlwMat *ys)
 {
 
 	OSlwToolDListNodeSTU *node;
 	OSlwToolNNSubLayerBasicSTU **ppNNL;
 	lw_u32 i;
-	OSLW_assert(!(pBPNN));
+	OSLW_assert(!(pBPnn));
 
 	if (ys!=NULL)
 	{
-		OSlwToolBPNNLoadY(pBPNN, ys);
+		OSlwToolBPnnLoadY(pBPnn, ys);
 	}
 
-	OSlwToolBPNNCalErr(pBPNN);
-	OSlwToolBPNNReview(pBPNN);
+	OSlwToolBPnnCalErr(pBPnn);
+	OSlwToolBPnnReview(pBPnn);
 
-	node = (OSlwToolDListNodeSTU *)pBPNN->Net.pTail;
+	node = (OSlwToolDListNodeSTU *)pBPnn->Net.pTail;
 	while (node->Key.uData)
 	{
 		ppNNL = node->Data.pData;
@@ -5507,17 +5519,17 @@ void OSlwToolBPNNTrain(OSlwToolBPNNSTU *pBPNN,OSlwMat *ys)
 
 }
 
-void OSlwToolBPNNCopy(OSlwToolBPNNSTU *pBPNN1, OSlwToolBPNNSTU *pBPNN2)
+void OSlwToolBPnnCopy(OSlwToolBPnnSTU *pBPnn1, OSlwToolBPnnSTU *pBPnn2)
 {
 	OSlwToolDListNodeSTU *node1, *node2;
 	OSlwToolNNSubLayerBasicSTU **ppNNL1, **ppNNL2;
 	register lw_u32 i;
-	OSLW_assert(!(pBPNN1));
-	OSLW_assert(!(pBPNN2));
+	OSLW_assert(!(pBPnn1));
+	OSLW_assert(!(pBPnn2));
 
 
-	node1 = (OSlwToolDListNodeSTU *)pBPNN1->Net.Head.con.pNext;
-	node2 = (OSlwToolDListNodeSTU *)pBPNN2->Net.Head.con.pNext;
+	node1 = (OSlwToolDListNodeSTU *)pBPnn1->Net.Head.con.pNext;
+	node2 = (OSlwToolDListNodeSTU *)pBPnn2->Net.Head.con.pNext;
 	while (node1 && node2)
 	{
 		ppNNL1 = node1->Data.pData;
@@ -5536,17 +5548,17 @@ void OSlwToolBPNNCopy(OSlwToolBPNNSTU *pBPNN1, OSlwToolBPNNSTU *pBPNN2)
 }
 
 
-void OSlwToolBPNNSoftReplace(OSlwToolBPNNSTU *pBPNN1, OSlwToolBPNNSTU *pBPNN2,ParaType Tau)
+void OSlwToolBPnnSoftReplace(OSlwToolBPnnSTU *pBPnn1, OSlwToolBPnnSTU *pBPnn2,ParaType Tau)
 {
 	OSlwToolDListNodeSTU *node1, *node2;
 	OSlwToolNNSubLayerBasicSTU **ppNNL1, **ppNNL2;
 	register lw_u32 i;
-	OSLW_assert(!(pBPNN1));
-	OSLW_assert(!(pBPNN2));
+	OSLW_assert(!(pBPnn1));
+	OSLW_assert(!(pBPnn2));
 
 
-	node1 = (OSlwToolDListNodeSTU *)pBPNN1->Net.Head.con.pNext;
-	node2 = (OSlwToolDListNodeSTU *)pBPNN2->Net.Head.con.pNext;
+	node1 = (OSlwToolDListNodeSTU *)pBPnn1->Net.Head.con.pNext;
+	node2 = (OSlwToolDListNodeSTU *)pBPnn2->Net.Head.con.pNext;
 	while (node1 && node2)
 	{
 		ppNNL1 = node1->Data.pData;
@@ -5563,20 +5575,20 @@ void OSlwToolBPNNSoftReplace(OSlwToolBPNNSTU *pBPNN1, OSlwToolBPNNSTU *pBPNN2,Pa
 	return;
 }
 
-OSlwToolNNSubLayerBasicSTU *OSlwToolBPNNAt(OSlwToolBPNNSTU *pBPNN, lw_32 i, lw_32 j)
+OSlwToolNNSubLayerBasicSTU *OSlwToolBPnnAt(OSlwToolBPnnSTU *pBPnn, lw_32 i, lw_32 j)
 {
 
 	OSlwToolDListNodeSTU *pln;
 	OSlwToolNNSubLayerBasicSTU **ppNNL;
 
-	i = i < 0 ? i + pBPNN->Net.NowLen : i;
+	i = i < 0 ? i + pBPnn->Net.NowLen : i;
 
 	if (i < 0 )//彻底超出维度
 	{
 		return NULL;
 	}
 
-	pln = pBPNN->Net.IndexOfFUN(&(pBPNN->Net), OSlwToolDListCmpCount, i, NULL);
+	pln = pBPnn->Net.IndexOfFUN(&(pBPnn->Net), OSlwToolDListCmpCount, i, NULL);
 	
 	j = j < 0 ? j + pln->Data.uData : j;
 
@@ -5591,8 +5603,7 @@ OSlwToolNNSubLayerBasicSTU *OSlwToolBPNNAt(OSlwToolBPNNSTU *pBPNN, lw_32 i, lw_3
 }
 
 
-
-#endif // OSLW_TOOL_IMPORT_NN_BPNN || OSLW_TOOL_IMPORT_ALL
+#endif // OSLW_TOOL_IMPORT_NN_BPnn || OSLW_TOOL_IMPORT_ALL
 
 #endif // OSLW_TOOL_IMPORT_NN || OSLW_TOOL_IMPORT_ALL
 

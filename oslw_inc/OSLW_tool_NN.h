@@ -163,7 +163,7 @@ typedef struct OSLW_TOOL_NN_LAYER_FULL_CONNECTION_STRUCT{
 	OSlwToolNNDropOutSTU *pDropOut;
 }OSlwToolNNLayerFullConSTU;
 
-void OSlwToolBPNNLayerInitial(
+void OSlwToolBPnnLayerInitial(
 	OSlwToolNNLayerFullConSTU *pNNL,
 	OSlwToolNNLayerActFunSTU *pAF,
 	lw_u16 size_row,lw_u16 size_col,
@@ -173,10 +173,10 @@ void OSlwToolBPNNLayerInitial(
 	ParaType rmax,ParaType rmin,
 	ParaType nl);
 
-void OSlwToolBPNNLayerForwardInitial(OSlwToolNNLayerFullConSTU *pNNL, ParaType *pIN, ParaType *pOUT, ParaType *pOUT_X);
-void OSlwToolBPNNLayerBackwardInitial(OSlwToolNNLayerFullConSTU *pNNL,ParaType *pINerr,ParaType *pdelt,ParaType *pOuterr);
-//void OSlwToolBPNNLayerReSize(OSlwToolNNLayerFullConSTU *pNNL,lw_u16 r,lw_u16 c);
-//void  OSlwToolBPNNDropOutInitial(OSlwToolNNLayerFullConSTU *pNNL,ParaType P ,ParaType *pWBuf,ParaType *pBiasBuf,lw_u16 *pList1,lw_u16 *pList2);
+void OSlwToolBPnnLayerForwardInitial(OSlwToolNNLayerFullConSTU *pNNL, ParaType *pIN, ParaType *pOUT, ParaType *pOUT_X);
+void OSlwToolBPnnLayerBackwardInitial(OSlwToolNNLayerFullConSTU *pNNL,ParaType *pINerr,ParaType *pdelt,ParaType *pOuterr);
+//void OSlwToolBPnnLayerReSize(OSlwToolNNLayerFullConSTU *pNNL,lw_u16 r,lw_u16 c);
+//void  OSlwToolBPnnDropOutInitial(OSlwToolNNLayerFullConSTU *pNNL,ParaType P ,ParaType *pWBuf,ParaType *pBiasBuf,lw_u16 *pList1,lw_u16 *pList2);
 
 
 
@@ -265,16 +265,16 @@ typedef struct OSLW_TOOL_BP_NN_STRUCT{
 	lw_u32 WeightParaNum;
 	lw_u32 BiasParaNum;
 
-}OSlwToolBPNNSTU;
+}OSlwToolBPnnSTU;
 
 
 
 
-void OSlwToolBPNNInitial(OSlwToolBPNNSTU *pBPNN);
+void OSlwToolBPnnInitial(OSlwToolBPnnSTU *pBPnn);
 void*
-OSlwToolBPNNLayerAppend_Dynamic
+OSlwToolBPnnLayerAppend_Dynamic
 (
-	OSlwToolBPNNSTU *pBPNN,
+	OSlwToolBPnnSTU *pBPnn,
 	OSlwToolNNLayerActFunSTU *pAF,
 	lw_u16 row,
 	lw_u16 col,
@@ -287,8 +287,8 @@ OSlwToolBPNNLayerAppend_Dynamic
 );
 
 //损失层
-void OSlwToolBPNNLossInitial(
-	OSlwToolBPNNSTU *pBPNN,//this
+void OSlwToolBPnnLossInitial(
+	OSlwToolBPnnSTU *pBPnn,//this
 	ParaType *pRef,//ref 地址（可为NULL）
 	OSlwToolRandomBasicSTU *pRand,//随机数指针
 	OSlwMemoryBasicSTU *pMem,//内存分配指针
@@ -298,25 +298,25 @@ void OSlwToolBPNNLossInitial(
 	OSlwToolNNTrainSaveMethodNum savem,//存储模式
 	OSlwToolNNTrainUpdateMethodNum updatem//更新模式
 );
-void OSlwToolBPNNReguInitial(
-	OSlwToolBPNNSTU *pBPNN, 
+void OSlwToolBPnnReguInitial(
+	OSlwToolBPnnSTU *pBPnn, 
 	OSlwToolNNReguTypeNUM ReguType, 
 	ParaType lambda
 );
 
-OSlwToolBPNNSTU *OSlwToolBPNNAppend(OSlwToolBPNNSTU *pBPNN,OSlwToolDListNodeSTU *pDLN,OSlwToolNNLayerFullConSTU *pNNL);
+OSlwToolBPnnSTU *OSlwToolBPnnAppend(OSlwToolBPnnSTU *pBPnn,OSlwToolDListNodeSTU *pDLN,OSlwToolNNLayerFullConSTU *pNNL);
 
 
-OSlwToolBPNNSTU *OSlwToolBPNNRunning(OSlwToolBPNNSTU *_pBPNN);
-OSlwToolBPNNSTU *OSlwToolBPNNErrCalu(OSlwToolBPNNSTU *pBPNN);//误差计算
-OSlwToolBPNNSTU *OSlwToolBPNNDeltCalu(OSlwToolBPNNSTU *_pBPNN, lw_u16 _batch_index);//增量计算
-ParaType *OSlwToolBPNNGradForInput(OSlwToolBPNNSTU *_pBPNN);//对输入求导
-OSlwToolBPNNSTU *_OSlwToolBPNNReviewOnce(OSlwToolBPNNSTU *_pBPNN, lw_u16 batch_num, OSlwToolMatrixSTU *pmat_k);
-OSlwToolBPNNSTU *OSlwToolBPNNReview(OSlwToolBPNNSTU *_pBPNN);//复习
-OSlwToolBPNNSTU *OSlwToolBPNNTrain(OSlwToolBPNNSTU *_pBPNN);//训练
+OSlwToolBPnnSTU *OSlwToolBPnnRunning(OSlwToolBPnnSTU *_pBPnn);
+OSlwToolBPnnSTU *OSlwToolBPnnErrCalu(OSlwToolBPnnSTU *pBPnn);//误差计算
+OSlwToolBPnnSTU *OSlwToolBPnnDeltCalu(OSlwToolBPnnSTU *_pBPnn, lw_u16 _batch_index);//增量计算
+ParaType *OSlwToolBPnnGradForInput(OSlwToolBPnnSTU *_pBPnn);//对输入求导
+OSlwToolBPnnSTU *_OSlwToolBPnnReviewOnce(OSlwToolBPnnSTU *_pBPnn, lw_u16 batch_num, OSlwToolMatrixSTU *pmat_k);
+OSlwToolBPnnSTU *OSlwToolBPnnReview(OSlwToolBPnnSTU *_pBPnn);//复习
+OSlwToolBPnnSTU *OSlwToolBPnnTrain(OSlwToolBPnnSTU *_pBPnn);//训练
 
-OSlwToolBPNNSTU *OSlwToolBPNNCopy(OSlwToolBPNNSTU *pBPNN1, OSlwToolBPNNSTU *pBPNN2);
-OSlwToolBPNNSTU *OSlwToolBPNNSoftReplace(OSlwToolBPNNSTU *pBPNN1, OSlwToolBPNNSTU *pBPNN2, ParaType tu);
+OSlwToolBPnnSTU *OSlwToolBPnnCopy(OSlwToolBPnnSTU *pBPnn1, OSlwToolBPnnSTU *pBPnn2);
+OSlwToolBPnnSTU *OSlwToolBPnnSoftReplace(OSlwToolBPnnSTU *pBPnn1, OSlwToolBPnnSTU *pBPnn2, ParaType tu);
 
 #endif
 
@@ -347,12 +347,13 @@ typedef struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT {
 
 	OSlwMat in, out;//输入矩阵与输出矩阵
 	ParaType nl;//学习速率
+	ParaType LamdaL2;//L2正则化系数
 
 	struct OSLW_TOOL_BP_NN_STRUCT *pNN;//指向本网络指针
 
 }OSlwToolNNSubLayerBasicSTU;
 
-#define _OSLW_TOOL_NN_SUB_BASIC_DEFAULT OSlwToolBPNNLayerForwardDefault,OSlwToolBPNNLayerBackwardDefault,OSlwToolBPNNLayerUpdateDefault,OSlwToolBPNNLayerNNmallocDefault,OSlwToolBPNNLayerTrainCompleteCallBackDefault,\
+#define _OSLW_TOOL_NN_SUB_BASIC_DEFAULT OSlwToolBPnnLayerForwardDefault,OSlwToolBPnnLayerBackwardDefault,OSlwToolBPnnLayerUpdateDefault,OSlwToolBPnnLayerNNmallocDefault,OSlwToolBPnnLayerTrainCompleteCallBackDefault,\
 0,\
 0,0,0,NULL,\
 0,0,0,NULL,\
@@ -386,6 +387,7 @@ typedef struct OSLW_TOOL_NN_LAYER_FULL_CONNECTION_STRUCT
 
 	//数据恢复区指针
 	ParaType *pRecover;
+
 	
 }OSlwToolNNLayerFullConSTU;
 
@@ -529,13 +531,13 @@ typedef struct OSLW_TOOL_NN_LAYER_ACT_FUN_STRUCT {
 
 }OSlwToolNNLayerActFunSTU;
 
-#define _OSLW_TOOL_NN_ACT_FUN_DEFAULT(NAME,KIND) OSlwToolBPNNLayer##NAME##Forward,OSlwToolBPNNLayer##NAME##Backward,OSlwToolBPNNLayerUpdateDefault,OSlwToolBPNNLayerNNmallocDefault,\
-OSlwToolBPNNLayerTrainCompleteCallBackDefault,OSlwToolBPNNLayerDataInitDefault,OSlwToolBPNNLayerCopyDefault,OSlwToolBPNNLayerSoftReplaceDefault,\
+#define _OSLW_TOOL_NN_ACT_FUN_DEFAULT(NAME,KIND) OSlwToolBPnnLayer##NAME##Forward,OSlwToolBPnnLayer##NAME##Backward,OSlwToolBPnnLayerUpdateDefault,OSlwToolBPnnLayerNNmallocDefault,\
+OSlwToolBPnnLayerTrainCompleteCallBackDefault,OSlwToolBPnnLayerDataInitDefault,OSlwToolBPnnLayerCopyDefault,OSlwToolBPnnLayerSoftReplaceDefault,\
 OSlwToolNNSubLayerKind_ActFun,0,\
 NULL,0,\
 0,0,0,NULL,\
 0,0,0,NULL,\
-_ParaFint(0),\
+_ParaFint(0),_ParaFint(0),\
 NULL,\
 sizeof(KIND),NULL
 
@@ -569,71 +571,71 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerActFunNew(
 
 
 //层缺省函数
-lw_ptr OSlwToolBPNNLayerForwardDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
-lw_ptr OSlwToolBPNNLayerBackwardDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
-lw_ptr OSlwToolBPNNLayerUpdateDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB);
-lw_ptr OSlwToolBPNNLayerNNmallocDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, void *pmemForward, void *pmemBackward);
-lw_ptr OSlwToolBPNNLayerTrainCompleteCallBackDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB);
-lw_ptr OSlwToolBPNNLayerDataInitDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB);
-lw_ptr OSlwToolBPNNLayerCopyDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB1, struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB2);
-lw_ptr OSlwToolBPNNLayerSoftReplaceDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB1, struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB2, ParaType Raido);
+lw_ptr OSlwToolBPnnLayerForwardDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolBPnnLayerBackwardDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolBPnnLayerUpdateDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB);
+lw_ptr OSlwToolBPnnLayerNNmallocDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, void *pmemForward, void *pmemBackward);
+lw_ptr OSlwToolBPnnLayerTrainCompleteCallBackDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB);
+lw_ptr OSlwToolBPnnLayerDataInitDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB);
+lw_ptr OSlwToolBPnnLayerCopyDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB1, struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB2);
+lw_ptr OSlwToolBPnnLayerSoftReplaceDefault(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB1, struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB2, ParaType Raido);
 
 
 //全连接层函数
-lw_ptr OSlwToolBPNNLayerFullConForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
-lw_ptr OSlwToolBPNNLayerFullConBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
-lw_ptr OSlwToolBPNNLayerFullConUpdate(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB);
-lw_ptr OSlwToolBPNNLayerFullConNNmalloc(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, void *pmemForward, void *pmemBackward);
-lw_ptr OSlwToolBPNNLayerFullConTrainCompleteCallBack(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB);
-lw_ptr OSlwToolBPNNLayerFullConDataInit(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB);
-lw_ptr OSlwToolBPNNLayerFullConCopy(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB1, struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB2);
-lw_ptr OSlwToolBPNNLayerFullConSoftReplace(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB1, struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB2, ParaType Raido);
+lw_ptr OSlwToolBPnnLayerFullConForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolBPnnLayerFullConBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolBPnnLayerFullConUpdate(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB);
+lw_ptr OSlwToolBPnnLayerFullConNNmalloc(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, void *pmemForward, void *pmemBackward);
+lw_ptr OSlwToolBPnnLayerFullConTrainCompleteCallBack(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB);
+lw_ptr OSlwToolBPnnLayerFullConDataInit(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB);
+lw_ptr OSlwToolBPnnLayerFullConCopy(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB1, struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB2);
+lw_ptr OSlwToolBPnnLayerFullConSoftReplace(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB1, struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB2, ParaType Raido);
 
 //卷积层函数
-lw_ptr OSlwToolBPNNLayerConvForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
-lw_ptr OSlwToolBPNNLayerConvBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolBPnnLayerConvForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolBPnnLayerConvBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
 
 //池化层函数
-lw_ptr OSlwToolBPNNLayerPoolForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
-lw_ptr OSlwToolBPNNLayerPoolBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolBPnnLayerPoolForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolBPnnLayerPoolBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
 
 
 
 extern OSlwToolNNLayerActFunSTU _OSlwToolNNSigmoid;
 extern OSlwToolNNLayerActFunSTU *LwSigmoid;
-lw_ptr OSlwToolBPNNLayerSigmoidForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
-lw_ptr OSlwToolBPNNLayerSigmoidBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolBPnnLayerSigmoidForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolBPnnLayerSigmoidBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
 
 
 extern OSlwToolNNLayerActFunSTU _OSlwToolNNTanh;
 extern OSlwToolNNLayerActFunSTU *LwTanh;
-lw_ptr OSlwToolBPNNLayerTanhForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
-lw_ptr OSlwToolBPNNLayerTanhBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolBPnnLayerTanhForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolBPnnLayerTanhBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
 
 extern OSlwToolNNLayerActFunSTU _OSlwToolNNReLU;
 extern OSlwToolNNLayerActFunSTU *LwReLU;
-lw_ptr OSlwToolBPNNLayerReLUForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
-lw_ptr OSlwToolBPNNLayerReLUBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolBPnnLayerReLUForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolBPnnLayerReLUBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
 
 extern OSlwToolNNLayerActFunSTU _OSlwToolNNReLU6;
 extern OSlwToolNNLayerActFunSTU *LwReLU6;
-lw_ptr OSlwToolBPNNLayerReLU6Forward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
-lw_ptr OSlwToolBPNNLayerReLU6Backward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolBPnnLayerReLU6Forward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolBPnnLayerReLU6Backward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
 
 extern OSlwToolNNLayerActFunSTU _OSlwToolNNSwish;
 extern OSlwToolNNLayerActFunSTU *LwSwish;
-lw_ptr OSlwToolBPNNLayerSwishForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
-lw_ptr OSlwToolBPNNLayerSwishBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolBPnnLayerSwishForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolBPnnLayerSwishBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
 
 extern OSlwToolNNLayerActFunSeLUSTU _OSlwToolNNSeLU;
 extern OSlwToolNNLayerActFunSTU *LwSeLU;
-lw_ptr OSlwToolBPNNLayerSeLUForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
-lw_ptr OSlwToolBPNNLayerSeLUBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolBPnnLayerSeLUForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolBPnnLayerSeLUBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
 
 extern OSlwToolNNLayerActFunSTU _OSlwToolNNSoftMax;
 extern OSlwToolNNLayerActFunSTU *LwSoftMax;
-lw_ptr OSlwToolBPNNLayerSoftMaxForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
-lw_ptr OSlwToolBPNNLayerSoftMaxBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolBPnnLayerSoftMaxForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolBPnnLayerSoftMaxBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
 
 #if OSLW_TOOL_NN_DATA_FRAME==OSLW_TOOL_NN_D_FRAME_C
 
@@ -691,14 +693,14 @@ typedef enum
 }OSlwToolNNReguTypeNUM;
 
 
-typedef struct OSLW_TOOL_NN_REGU_STRUCT {
-	ParaType Lambda;
-	ParaType WeSum;
-
-	OSlwToolNNReguTypeNUM ReguType : 8;
-	lw_u16 ReguSumFlag : 8;
-
-}OSlwToolNNReguSTU;
+//typedef struct OSLW_TOOL_NN_REGU_STRUCT {
+//	ParaType Lambda;
+//	ParaType WeSum;
+//
+//	OSlwToolNNReguTypeNUM ReguType : 8;
+//	lw_u16 ReguSumFlag : 8;
+//
+//}OSlwToolNNReguSTU;
 
 typedef ParaType(*LossFunTYPE)(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *ref, OSlwToolMatrixSTU *pre);
 
@@ -749,7 +751,11 @@ typedef struct OSLW_TOOL_NN_TRAIN_STRUCT {
 	
 	OSlwToolTableSTU DataTable;
 	LossFunTYPE LossFun;
+	//学习速率
 	ParaType nl;
+	
+	//L2正则化
+	ParaType L2Regu;
 
 	ParaType Beta1, Beta1T;
 	ParaType Beta2, Beta2T;
@@ -782,9 +788,6 @@ typedef struct OSLW_TOOL_BP_NN_STRUCT {
 	OSlwToolDListSTU Net;
 
 	OSlwToolNNTrainSTU Train;
-	OSlwToolNNReguSTU Regu;
-	
-
 	OSlwMat x, y, ref;
 
 	ParaType Error;
@@ -793,7 +796,7 @@ typedef struct OSLW_TOOL_BP_NN_STRUCT {
 	OSlwMemoryBasicSTU *pmem;
 
 	lw_u16 ParaGroupNum;
-}OSlwToolBPNNSTU;
+}OSlwToolBPnnSTU;
 
 
 #define NN_LAYER_S_BAK_ARR_LEN 6
@@ -812,20 +815,20 @@ typedef struct OSLW_TOOL_NN_LAYER_SIMPLE_BACK_UP_STRUCT{
 
 
 
-void OSlwToolBPNNInit(OSlwToolBPNNSTU *pBPNN, lw_u16 max_mini_batch);
+void OSlwToolBPnnInit(OSlwToolBPnnSTU *pBPnn, lw_u16 max_mini_batch);
 
-void OSlwToolBPNNLayerAppend
+void OSlwToolBPnnLayerAppend
 (
-	OSlwToolBPNNSTU *pBPNN,
+	OSlwToolBPnnSTU *pBPnn,
 	OSlwToolDListNodeSTU *pnode,
 	lw_u32 len,
 	void *LayerList
 );
 
 
-void* OSlwToolBPNNFullConAppend
+void* OSlwToolBPnnFullConAppend
 (
-	OSlwToolBPNNSTU *pBPNN,
+	OSlwToolBPnnSTU *pBPnn,
 	lw_u16 in_col, lw_u16 out_col,
 	ParaType *pin, ParaType *pout,
 	ParaType *pWe, ParaType *pBi,
@@ -836,9 +839,9 @@ void* OSlwToolBPNNFullConAppend
 	OSlwMemoryBasicSTU *pmem
 );
 
-void* OSlwToolBPNNConvAppend
+void* OSlwToolBPnnConvAppend
 (
-	OSlwToolBPNNSTU *pBPNN,
+	OSlwToolBPnnSTU *pBPnn,
 	lw_u16 in_x, lw_u16 in_y, lw_u16 in_z,
 	lw_u16 kern_x, lw_u16 kern_y, lw_u16 kern_num,
 	ParaType *pin, ParaType *pout,
@@ -851,9 +854,9 @@ void* OSlwToolBPNNConvAppend
 	lw_u32 info[4]
 );
 
-void* OSlwToolBPNNPoolAppend
+void* OSlwToolBPnnPoolAppend
 (
-	OSlwToolBPNNSTU *pBPNN,
+	OSlwToolBPnnSTU *pBPnn,
 	lw_u16 in_x, lw_u16 in_y, lw_u16 in_z,
 	lw_u16 pool_x, lw_u16 pool_y,
 	ParaType *pin, ParaType *pout,
@@ -863,16 +866,16 @@ void* OSlwToolBPNNPoolAppend
 );
 
 
-void OSlwToolBPNNTrainInit(
-	OSlwToolBPNNSTU *pBPNN,
+void OSlwToolBPnnTrainInit(
+	OSlwToolBPnnSTU *pBPnn,
 	ParaType *pRef,
 	OSlwMemoryBasicSTU *pmem,
 	LossFunTYPE loss,
 	ParaType nl
 );
 
-void OSlwToolBPNNOptimInit(
-	OSlwToolBPNNSTU *pBPNN,
+void OSlwToolBPnnOptimInit(
+	OSlwToolBPnnSTU *pBPnn,
 	OSlwToolNNOptimNum optim,
 	ParaType beta1,
 	ParaType beta2
@@ -880,15 +883,15 @@ void OSlwToolBPNNOptimInit(
 
 void* OSlwToolNNLayerSimpleRecover
 (
-	OSlwToolBPNNSTU *pBPNN,
+	OSlwToolBPnnSTU *pBPnn,
 	ParaType *in,ParaType *out,
 	OSlwToolNNLayerSimpleBakSTU *pSimpleBak,
 	OSlwMemoryBasicSTU *pmem
 );
 
-void* OSlwToolBPNNSimpleRecover
+void* OSlwToolBPnnSimpleRecover
 (
-	OSlwToolBPNNSTU *pBPNN,
+	OSlwToolBPnnSTU *pBPnn,
 	ParaType *in,ParaType *out,
 	OSlwToolNNLayerSimpleBakSTU *pSimpleBak,
 	lw_u16 simple_layer_len,
@@ -897,18 +900,20 @@ void* OSlwToolBPNNSimpleRecover
 
 
 
-void OSlwToolBPNNAllDataInit(OSlwToolBPNNSTU *pBPNN, OSlwMemoryBasicSTU *pMem);
-void OSlwToolBPNNForward(OSlwToolBPNNSTU *pBPNN);
-void OSlwToolBPNNBackward(OSlwToolBPNNSTU *pBPNN);
-void OSlwToolBPNNLoadX(OSlwToolBPNNSTU *pBPNN, OSlwMat *xs);
-void OSlwToolBPNNLoadY(OSlwToolBPNNSTU *pBPNN, OSlwMat *ys);
-void OSlwToolBPNNRun(OSlwToolBPNNSTU *pBPNN, OSlwMat *xs);
-void OSlwToolBPNNCalErr(OSlwToolBPNNSTU *pBPNN);
-void OSlwToolBPNNTrain(OSlwToolBPNNSTU *pBPNN, OSlwMat *ys);
-void OSlwToolBPNNReview(OSlwToolBPNNSTU *pBPNN);
-void OSlwToolBPNNCopy(OSlwToolBPNNSTU *pBPNN1, OSlwToolBPNNSTU *pBPNN2);
-void OSlwToolBPNNSoftReplace(OSlwToolBPNNSTU *pBPNN1, OSlwToolBPNNSTU *pBPNN2, ParaType Tau);
-OSlwToolNNSubLayerBasicSTU *OSlwToolBPNNAt(OSlwToolBPNNSTU *pBPNN, lw_32 i, lw_32 j);
+void OSlwToolBPnnAllDataInit(OSlwToolBPnnSTU *pBPnn, OSlwMemoryBasicSTU *pMem);
+void OSlwToolBPnnForward(OSlwToolBPnnSTU *pBPnn);
+void OSlwToolBPnnBackward(OSlwToolBPnnSTU *pBPnn);
+void OSlwToolBPnnLoadX(OSlwToolBPnnSTU *pBPnn, OSlwMat *xs);
+void OSlwToolBPnnLoadY(OSlwToolBPnnSTU *pBPnn, OSlwMat *ys);
+void OSlwToolBPnnRun(OSlwToolBPnnSTU *pBPnn, OSlwMat *xs);
+void OSlwToolBPnnCalErr(OSlwToolBPnnSTU *pBPnn);
+void OSlwToolBPnnTrain(OSlwToolBPnnSTU *pBPnn, OSlwMat *ys);
+void OSlwToolBPnnReview(OSlwToolBPnnSTU *pBPnn);
+void OSlwToolBPnnCopy(OSlwToolBPnnSTU *pBPnn1, OSlwToolBPnnSTU *pBPnn2);
+void OSlwToolBPnnSoftReplace(OSlwToolBPnnSTU *pBPnn1, OSlwToolBPnnSTU *pBPnn2, ParaType Tau);
+OSlwToolNNSubLayerBasicSTU *OSlwToolBPnnAt(OSlwToolBPnnSTU *pBPnn, lw_32 i, lw_32 j);
+
+#define OSlwToolBPnnL2ReguInit(A, B) do{(A)->Train.L2Regu=B;}while(0)
 
 #endif // !(OSLW_SIMPLE_LEVEL >= 2)
 

@@ -387,8 +387,8 @@ typedef enum {
 typedef struct OSLW_TOOL_DEEP_Q_NET_STRUCT
 {
 	OSlwToolQRLBasicSTU basic;//基类
-	OSlwToolBPNNSTU MainNet;//Q现实
-	OSlwToolBPNNSTU TargetNet;//Q目标 异步更新
+	OSlwToolBPnnSTU MainNet;//Q现实
+	OSlwToolBPnnSTU TargetNet;//Q目标 异步更新
 
 	OSlwToolDQNetExpReplaySTU ExpReplay;//experience replay
 	OSlwToolMatrixSTU StateFactor; 
@@ -516,8 +516,8 @@ typedef struct OSLW_TOOL_DEEP_DETE_POLICY_GRAD_STRUCT{
 
 	OSlwToolPGradSTU PGradBasic;
 
-	OSlwToolBPNNSTU ActorMainNet, ActorTargetNet;
-	OSlwToolBPNNSTU CriticMainNet, CriticTargetNet;
+	OSlwToolBPnnSTU ActorMainNet, ActorTargetNet;
+	OSlwToolBPnnSTU CriticMainNet, CriticTargetNet;
 
 	ParaType ActionVar;
 
@@ -615,8 +615,8 @@ void OSlwToolDDPGradAllDataInit(OSlwToolDDPGradSTU *pDDPG);
 //------------------------------------------------------
 typedef struct OSLW_TOOL_PEOXIMAL_POLICY_OPTIM_STRUCT {
 	OSlwToolPGradSTU PGradBasic;
-	OSlwToolBPNNSTU ActorNewNet, ActorOldNet;
-	OSlwToolBPNNSTU CriticNet;
+	OSlwToolBPnnSTU ActorNewNet, ActorOldNet;
+	OSlwToolBPnnSTU CriticNet;
 
 	ParaType ClipE;
 	ParaType GAE_tau;

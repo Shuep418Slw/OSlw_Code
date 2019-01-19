@@ -65,7 +65,7 @@ lw_u8 *_StringDebugSelectInfo(lw_8 c);
 lw_u8 * _StringDebugFindChar(lw_8 *name, lw_8 c);
 lw_u8 _StringDebugFindCharNum(lw_8 *name, lw_8 c);
 lw_u32 _StringDebugMemCalSq(lw_u8 *data, lw_u8 *info, lw_u8 *pNum);
-lw_u32 _StringDebugMemLengthPl(lw_u8 *data, lw_u8 *info, ParaType *pstart, ParaType *pdelt, lw_u8 *pNum);
+lw_u32 _StringDebugMemLengthPl(lw_u8 *data, lw_u8 *info, lw_sf *pstart, lw_sf *pdelt, lw_u8 *pNum);
 void * _StringDebugFind(OSlwToolHashSTU *ph, lw_8 *name, lw_8 *pkind, lw_u8 *pindex, OSlwToolDListNodeSTU **ppdln, lw_u8 *pdata_sel_kind);
 void *_StringDebugString2Number(OSlwMemoryBasicSTU *pmem, lw_u8 *str, lw_u8 *info, lw_u8 *outstr, lw_u32 *pdsize, lw_u8 *pdlen, lw_u8 *pstatus);
 lw_u8 _StringDebugSliceDEF(lw_u8 *instr, lw_u8 *name, lw_u8 *pkind, lw_u8 *data);

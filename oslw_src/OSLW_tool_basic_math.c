@@ -697,16 +697,32 @@ OSlwToolMatrixLossCrossEntropyForSoftMax
 	ParaType *_s, *_ref, *_pre, *_s_b, *_ref_b, *_pre_b;
 	OSLW_assert(!(ref));
 	OSLW_assert(!(pre));
+	OSLW_assert(!(s));
 	if (ref->length == pre->length)
 	{
-		if (!s)
-		{
-
-		}
-		else
-		{
 			if (s->length == ref->length)
 			{
+
+#if OSLW_TOOL_NN_DATA_FRAME==OSLW_TOOL_NN_D_FRAME_C
+				_s_b = s->a;
+				_ref_b = ref->a;
+				_pre = pre->a;
+				for (i = 0; i < s->length; i++, _s_b++,_ref_b++,_pre++)
+				{
+					if (*_ref_b >= _ParaFrom(0.99))
+					{
+						*_s_b = _ParaMpy(_ParaFrom(-1), _ParaLn(*_pre));
+						sum += *_s_b;
+					}
+					else
+					{
+						*_s_b = _ParaFint(0);
+					}
+
+				}
+
+				sum = -sum;
+#elif OSLW_TOOL_NN_DATA_FRAME == OSLW_TOOL_NN_D_FRAME_F
 				_s_b = s->a;
 				_ref_b = ref->a;
 				_pre = pre->a;
@@ -734,16 +750,17 @@ OSlwToolMatrixLossCrossEntropyForSoftMax
 					}
 
 					*(_s_b + col*_i_max) = _ParaSub(*(_s_b + col*_i_max), _ParaFint(1));
-					
+
 					_s_b++;
 					_ref_b++;
 					_pre_b++;
 				}
+#endif
+
 			}
 		}
 
-
-	}
+	
 
 	return sum;
 }

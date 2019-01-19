@@ -100,7 +100,7 @@ typedef lw_32 fixpoint;
 #define OSLW_GLOBAL_MATH_TYPE OSLW_GLOBAL_MATH_FLOAT
 
 #define   FP_A_TO_FP_B(A,B,X)  ((A >= B) ? ((fixpoint) X >> (A - B)):((fixpoint) X << (B - A)))
-#define OSLW_GLOBAL_MATH_Q_FORM 15
+#define OSLW_GLOBAL_MATH_Q_FORM 24
 #define OSLW_PARA_NAME_LENGTH 5
 
 #define OSLW_PARA_NORMAL_LENGTH 2
@@ -146,13 +146,22 @@ typedef enum{
 #if OSLW_GLOBAL_MATH_TYPE==OSLW_GLOBAL_MATH_Q
 	 typedef fixpoint ParaType;
 	 #include "IQmathLib.h"
+    #define OSLW_GLOBAL_MATH_MAX 0X7FFFFFFFUL
+    #define OSLW_GLOBAL_MATH_MIN 0X80000000UL
+    #define OSLW_GLOBAL_MATH_DELT 1UL
 #elif OSLW_GLOBAL_MATH_TYPE==OSLW_GLOBAL_MATH_FLOAT
 	 typedef float ParaType;
 		//#include "arm_math.h"
 		#include "math.h"
+        #define OSLW_GLOBAL_MATH_MAX 3.2E38
+        #define OSLW_GLOBAL_MATH_MIN -3.2E38
+        #define OSLW_GLOBAL_MATH_DELT 1.2E-38
 #elif OSLW_GLOBAL_MATH_TYPE==OSLW_GLOBAL_MATH_DOUBLE
 	 typedef double ParaType;
 		#include "math.h"
+    #define OSLW_GLOBAL_MATH_MAX 1.7E308
+    #define OSLW_GLOBAL_MATH_MIN -1.7E308
+    #define OSLW_GLOBAL_MATH_DELT 2.2E-308
 #else
 	#error "MATH TYPE IS NOT DEFINED"
 #endif
@@ -160,18 +169,23 @@ typedef enum{
 #if OSLW_GLOBAL_MATH_TYPE==OSLW_GLOBAL_MATH_Q
 	#define _ParaAdd(A,B) ((A)+(B))
 	#define _ParaSub(A,B) ((A)-(B))
-	#define _ParaMpy(A,B) (_IQmpy(A,B))
-	#define _ParaDiv(A,B) (_IQdiv(A,B))
-	#define _ParaInt(A) (_IQint(A))
-	#define _ParaFrac(A) (_IQfrac(A))
+	#define _ParaMpy(A,B) (_IQ24mpy(A,B))
+	#define _ParaDiv(A,B) (_IQ24div(A,B))
+	#define _ParaInt(A) (_IQ24int(A))
+	#define _ParaFrac(A) (_IQ24frac(A))
 	#define _ParaFint(A) (((ParaType)(A))<<OSLW_GLOBAL_MATH_Q_FORM)
-	#define _ParaToF(A) ((float)((double)(A)/(float)(1<<OSLW_GLOBAL_MATH_Q_FORM)))
-	#define _ParaFrom(A) (_IQ(A))
-	#define _ParaSin(A) (_IQsin(A))
-	#define _ParaCos(A) (_IQcos(A))
-	#define _ParaTan(A) (_IQtan(A))	
-	#define _ParaSqrt(A) (_IQsqrt(A))		
-	#define _ParaAbs(A) (_IQabs(A))
+	#define _ParaToF(A) (_IQ24toF(A))
+	#define _ParaFrom(A) (_IQ24(A))
+	#define _ParaSin(A) (_IQ24sin(A))
+	#define _ParaCos(A) (_IQ24cos(A))
+	#define _ParaTan(A) (_IQ24tan(A))
+	#define _ParaSqrt(A) (_IQ24sqrt(A))
+	#define _ParaAbs(A) (_IQ24abs(A))
+    #define _ParaPow(A,B) (A==0?0:(_IQ24exp(_IQ24mpy((B),_IQ24log(A)))))
+    #define _ParaCeil(A) (_ParaInt((A))+1)
+    #define _ParaLn(A) (_IQ24log((A)))
+    #define _ParaLog(A) (_IQ24div(_IQ24log(A),_IQ24log(_IQ24(10))))
+    #define _ParaExp(A) (_IQ24exp(A))
 	#define PARA_LEN 4
 #elif OSLW_GLOBAL_MATH_TYPE==OSLW_GLOBAL_MATH_FLOAT
 /*(Ver.=0.9~)(Beg.=0.9)

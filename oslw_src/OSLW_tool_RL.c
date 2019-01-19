@@ -1009,7 +1009,7 @@ lw_u16 OSlwToolDQNetExpReplaySample(OSlwToolDQNetExpReplaySTU *pExpRe)
 #endif // OSLW_TOOL_IMPORT_ALL || (OSLW_TOOL_IMPORT_RL_EXP_RE)
 
 
-#if OSLW_TOOL_IMPORT_ALL || (OSLW_TOOL_IMPORT_RL_DQN && OSLW_TOOL_IMPORT_NN && OSLW_TOOL_IMPORT_NN_BPNN && OSLW_TOOL_IMPORT_RL_EXP_RE)
+#if OSLW_TOOL_IMPORT_ALL || (OSLW_TOOL_IMPORT_RL_DQN && OSLW_TOOL_IMPORT_NN && OSLW_TOOL_IMPORT_NN_BPnn && OSLW_TOOL_IMPORT_RL_EXP_RE)
 
 void OSlwToolDQNetInitial(OSlwToolDQNetSTU *pDQN)
 {
@@ -1017,8 +1017,8 @@ void OSlwToolDQNetInitial(OSlwToolDQNetSTU *pDQN)
 
     memset(pDQN, 0, sizeof(OSlwToolDQNetSTU));
 
-	OSlwToolBPNNInit(&(pDQN->MainNet),1);
-	OSlwToolBPNNInit(&(pDQN->TargetNet),1);
+	OSlwToolBPnnInit(&(pDQN->MainNet),1);
+	OSlwToolBPnnInit(&(pDQN->TargetNet),1);
 	pDQN->TargetNet.Train.Flag.NeedTrain = 1;
 
     pDQN->StoreMemFun = OSlwToolDQNetStoreMem;
@@ -1208,7 +1208,7 @@ void OSlwToolDQNetAppendInitial
 
     pmem = (pDQN->basic.basic.pmem);
 
-	OSlwToolBPNNFullConAppend(
+	OSlwToolBPnnFullConAppend(
 		&(pDQN->MainNet),
 		row, col,
 		NULL, NULL,
@@ -1217,7 +1217,7 @@ void OSlwToolDQNetAppendInitial
 		pTemplet, pmem
 	);
 
-	OSlwToolBPNNFullConAppend(
+	OSlwToolBPnnFullConAppend(
 		&(pDQN->TargetNet),
 		row, col,
 		NULL, NULL,
@@ -1239,7 +1239,7 @@ void OSlwToolDQNetTarinInitial(
 {
     OSLW_assert(!(pDQN));
     OSLW_assert(!(loss));
-	OSlwToolBPNNTrainInit
+	OSlwToolBPnnTrainInit
     (
         &(pDQN->MainNet),
         qref,
@@ -1254,9 +1254,9 @@ void OSlwToolDQNetAllDataInit(OSlwToolDQNetSTU *pDQN)
 {
 
 	OSLW_assert(!(pDQN));
-	OSlwToolBPNNAllDataInit(&(pDQN->MainNet), pDQN->basic.basic.pmem);
-	OSlwToolBPNNAllDataInit(&(pDQN->TargetNet), pDQN->basic.basic.pmem);
-	OSlwToolBPNNCopy(&(pDQN->TargetNet), &(pDQN->MainNet));
+	OSlwToolBPnnAllDataInit(&(pDQN->MainNet), pDQN->basic.basic.pmem);
+	OSlwToolBPnnAllDataInit(&(pDQN->TargetNet), pDQN->basic.basic.pmem);
+	OSlwToolBPnnCopy(&(pDQN->TargetNet), &(pDQN->MainNet));
 }
 
 OSlwToolDQNetSTU* OSlwToolDQNetStoreMem(OSlwToolDQNetSTU *pDQN)
@@ -1312,7 +1312,7 @@ OSlwToolDQNetSTU* OSlwToolDQNetLearning(OSlwToolDQNetSTU *pDQN)
     if ((pDQN->Count_Copy >= pDQN->NetCopyThreshold))//判断是否满足阈值
     {
         pDQN->Count_Copy = 0;
-        OSlwToolBPNNCopy(&(pDQN->TargetNet), &(pDQN->MainNet));//复制神经网络
+        OSlwToolBPnnCopy(&(pDQN->TargetNet), &(pDQN->MainNet));//复制神经网络
     }
     else
     {
@@ -1347,10 +1347,10 @@ OSlwToolDQNetSTU* OSlwToolDQNetLearning(OSlwToolDQNetSTU *pDQN)
         pOSlwToolMatrixDot(&(pDQN->TargetNet.x), &(mat), &(pDQN->StateFactor));//乘以归一化因子
 
 		pDQN->TargetNet.Train.mini_batch_now = 1;
-		OSlwToolBPNNForward(&(pDQN->TargetNet));
+		OSlwToolBPnnForward(&(pDQN->TargetNet));
 
 		pDQN->MainNet.Train.mini_batch_now = 1;
-		OSlwToolBPNNForward(&(pDQN->MainNet));
+		OSlwToolBPnnForward(&(pDQN->MainNet));
 
 
         switch (pDQN->Optim)
@@ -1384,8 +1384,8 @@ OSlwToolDQNetSTU* OSlwToolDQNetLearning(OSlwToolDQNetSTU *pDQN)
         }
 		*/
 		pDQN->MainNet.ref.a[actindex] = (*pReward) + _ParaMpy(pQRLB->basic.Gamma, dmax);
-        //OSlwToolBPNNCalErr(&(pDQN->MainNet));
-        //OSlwToolBPNNUpdate(&(pDQN->MainNet));
+        //OSlwToolBPnnCalErr(&(pDQN->MainNet));
+        //OSlwToolBPnnUpdate(&(pDQN->MainNet));
 
 
         if (pDQN->ExpReplay.PriorType == OSlwToolDQNetExpReplay_PER)
@@ -1394,7 +1394,7 @@ OSlwToolDQNetSTU* OSlwToolDQNetLearning(OSlwToolDQNetSTU *pDQN)
             ISweight = _ParaPow(_ParaDiv(pDQN->ExpReplay.Min, pbase->Importance), pDQN->ExpReplay.Beta);
             pDQN->MainNet._nl_factor = ISweight * 1.5;
 
-            OSlwToolBPNNCalErr(&(pDQN->MainNet));
+            OSlwToolBPnnCalErr(&(pDQN->MainNet));
 
             ISweight = _ParaPow(_ParaAdd(pDQN->MainNet.Error, pDQN->ExpReplay.Epsi),pDQN->ExpReplay.Alpha);
 
@@ -1406,12 +1406,12 @@ OSlwToolDQNetSTU* OSlwToolDQNetLearning(OSlwToolDQNetSTU *pDQN)
         }
         else
         {
-			OSlwToolBPNNCalErr(&(pDQN->MainNet));//训练神经网络 但不更新数据
+			OSlwToolBPnnCalErr(&(pDQN->MainNet));//训练神经网络 但不更新数据
         }
 
     }
 
-    OSlwToolBPNNReview(&(pDQN->MainNet));
+    OSlwToolBPnnReview(&(pDQN->MainNet));
 
     pDQN->ExpReplay.UpdateFun(&(pDQN->ExpReplay), sample_len);
 
@@ -1431,8 +1431,8 @@ OSlwToolDQNetSTU* OSlwToolDQNetLearning(OSlwToolDQNetSTU *pDQN)
         pDQN->TargetNet.x.a[0] = pdata[3];//qtarget网络 输出 qnext
         pDQN->MainNet.x.a[0] = pdata[0];//qeval网络输出qnow
 
-        OSlwToolBPNNRunning(&(pDQN->TargetNet));
-        OSlwToolBPNNRunning(&(pDQN->MainNet));
+        OSlwToolBPnnRunning(&(pDQN->TargetNet));
+        OSlwToolBPnnRunning(&(pDQN->MainNet));
 
         pOSlwToolMatrixMaxMin(&(pDQN->TargetNet.y), &dmax, &maxindex, NULL, NULL);
 
@@ -1449,8 +1449,8 @@ OSlwToolDQNetSTU* OSlwToolDQNetLearning(OSlwToolDQNetSTU *pDQN)
             pDQN->MainNet.ref.a[actindex] = reward;
         }
 
-        OSlwToolBPNNCalErr(&(pDQN->MainNet));
-        OSlwToolBPNNUpdate(&(pDQN->MainNet));
+        OSlwToolBPnnCalErr(&(pDQN->MainNet));
+        OSlwToolBPnnUpdate(&(pDQN->MainNet));
     }
 
 
@@ -1492,7 +1492,7 @@ OSlwToolDQNetSTU* OSlwToolDQNetChoose(OSlwToolDQNetSTU *pDQN)
         pOSlwToolMatrixDot(&(pDQN->MainNet.x), &(pRL->StateNow), &(pDQN->StateFactor));//乘以归一化因子
         //运行网络
 		pDQN->MainNet.Train.mini_batch_now = 1;
-        OSlwToolBPNNForward(&(pDQN->MainNet));
+        OSlwToolBPnnForward(&(pDQN->MainNet));
 		pDQN->MainNet.Train.AllBatchCount = 0;
 		pDQN->MainNet.Train._batch_stream_count = 0;
         //查询Q最大的行为
@@ -1520,10 +1520,10 @@ OSlwToolDQNetSTU* OSlwToolDQNetChoose(OSlwToolDQNetSTU *pDQN)
 
     return pDQN;
 }
-#endif // OSLW_TOOL_IMPORT_ALL || (OSLW_TOOL_IMPORT_RL_DQN && OSLW_TOOL_IMPORT_NN && OSLW_TOOL_IMPORT_NN_BPNN)
+#endif // OSLW_TOOL_IMPORT_ALL || (OSLW_TOOL_IMPORT_RL_DQN && OSLW_TOOL_IMPORT_NN && OSLW_TOOL_IMPORT_NN_BPnn)
 
 
-#if OSLW_TOOL_IMPORT_ALL || (OSLW_TOOL_IMPORT_RL_DDPG && OSLW_TOOL_IMPORT_NN && OSLW_TOOL_IMPORT_NN_BPNN && OSLW_TOOL_IMPORT_RL_EXP_RE)
+#if OSLW_TOOL_IMPORT_ALL || (OSLW_TOOL_IMPORT_RL_DDPG && OSLW_TOOL_IMPORT_NN && OSLW_TOOL_IMPORT_NN_BPnn && OSLW_TOOL_IMPORT_RL_EXP_RE)
 
 
 void OSlwToolDDPGradInitial(OSlwToolDDPGradSTU *pDDPG)//DDPG初始化函数，最先被调用
@@ -1532,10 +1532,10 @@ void OSlwToolDDPGradInitial(OSlwToolDDPGradSTU *pDDPG)//DDPG初始化函数，最先被调
 
 	memset(pDDPG, 0, sizeof(OSlwToolDDPGradSTU));
 
-	OSlwToolBPNNInit(&(pDDPG->CriticMainNet),1);
-	OSlwToolBPNNInit(&(pDDPG->CriticTargetNet),1);
-	OSlwToolBPNNInit(&(pDDPG->ActorMainNet),1);
-	OSlwToolBPNNInit(&(pDDPG->ActorTargetNet),1);
+	OSlwToolBPnnInit(&(pDDPG->CriticMainNet),1);
+	OSlwToolBPnnInit(&(pDDPG->CriticTargetNet),1);
+	OSlwToolBPnnInit(&(pDDPG->ActorMainNet),1);
+	OSlwToolBPnnInit(&(pDDPG->ActorTargetNet),1);
 
 	pDDPG->CriticTargetNet.Train.Flag.NeedTrain = 1;
 	pDDPG->ActorTargetNet.Train.Flag.NeedTrain = 1;
@@ -1713,7 +1713,7 @@ void OSlwToolDDPGradAppendInitial//DDPG神经网络追加,一次会追加两个神经网络
 	OSlwMemoryBasicSTU *pmem;
 	OSlwToolRandomBasicSTU *pTRB;
 	OSlwToolNNLayerFullConSTU *p1, *p2;
-	OSlwToolBPNNSTU *mn, *tn;
+	OSlwToolBPnnSTU *mn, *tn;
 
 	OSLW_assert(!(pDDPG));
 	OSLW_assert(!(layer_list));
@@ -1749,7 +1749,7 @@ void OSlwToolDDPGradAppendInitial//DDPG神经网络追加,一次会追加两个神经网络
 	{
 		col = layer_list[i];
 
-		p1 = OSlwToolBPNNLayerAppend_Dynamic(
+		p1 = OSlwToolBPnnLayerAppend_Dynamic(
 			mn
 			, AFlist[i]
 			, row, col
@@ -1760,7 +1760,7 @@ void OSlwToolDDPGradAppendInitial//DDPG神经网络追加,一次会追加两个神经网络
 			, _ParaFrom(0)
 		);
 
-		p2 = OSlwToolBPNNLayerAppend_Dynamic(
+		p2 = OSlwToolBPnnLayerAppend_Dynamic(
 			tn
 			, AFlist[i]
 			, row, col
@@ -1795,7 +1795,7 @@ void OSlwToolDDPGradLossInitial(
 	pmem = pDDPG->PGradBasic.basic.pmem;
 	pref = pmem->Malloc(pmem, PARA_MEM_CAL(pDDPG->PGradBasic.basic.ActNow.length));
 
-	OSlwToolBPNNLossInitial
+	OSlwToolBPnnLossInitial
 	(
 		&(pDDPG->ActorMainNet),
 		pref,
@@ -1811,7 +1811,7 @@ void OSlwToolDDPGradLossInitial(
 
 	pref = pmem->Malloc(pmem, PARA_MEM_CAL(pDDPG->PGradBasic.basic.ActNow.length));
 
-	OSlwToolBPNNLossInitial
+	OSlwToolBPnnLossInitial
 	(
 		&(pDDPG->CriticMainNet),
 		pref,
@@ -1851,7 +1851,7 @@ void OSlwToolDDPGradAppendInitial
 
 	if (Kind== OSlwToolACtoActor)
 	{
-		OSlwToolBPNNFullConAppend(
+		OSlwToolBPnnFullConAppend(
 			&(pDDPG->ActorMainNet),
 			row, col,
 			NULL, NULL,
@@ -1860,7 +1860,7 @@ void OSlwToolDDPGradAppendInitial
 			pTemplet, pmem
 		);
 
-		OSlwToolBPNNFullConAppend(
+		OSlwToolBPnnFullConAppend(
 			&(pDDPG->ActorTargetNet),
 			row, col,
 			NULL, NULL,
@@ -1871,7 +1871,7 @@ void OSlwToolDDPGradAppendInitial
 	}
 	else
 	{
-		OSlwToolBPNNFullConAppend(
+		OSlwToolBPnnFullConAppend(
 			&(pDDPG->CriticMainNet),
 			row, col,
 			NULL, NULL,
@@ -1880,7 +1880,7 @@ void OSlwToolDDPGradAppendInitial
 			pTemplet, pmem
 		);
 
-		OSlwToolBPNNFullConAppend(
+		OSlwToolBPnnFullConAppend(
 			&(pDDPG->CriticTargetNet),
 			row, col,
 			NULL, NULL,
@@ -1905,7 +1905,7 @@ void OSlwToolDDPGradTarinInitial(
 {
 	OSLW_assert(!(pDDPG));
 	OSLW_assert(!(loss));
-	OSlwToolBPNNTrainInit
+	OSlwToolBPnnTrainInit
 	(
 		&(pDDPG->ActorMainNet),
 		qref,
@@ -1914,7 +1914,7 @@ void OSlwToolDDPGradTarinInitial(
 		nl
 	);
 
-	OSlwToolBPNNTrainInit
+	OSlwToolBPnnTrainInit
 	(
 		&(pDDPG->CriticMainNet),
 		qref,
@@ -1929,13 +1929,13 @@ void OSlwToolDDPGradAllDataInit(OSlwToolDDPGradSTU *pDDPG)
 {
 
 	OSLW_assert(!(pDDPG));
-	OSlwToolBPNNAllDataInit(&(pDDPG->ActorMainNet), pDDPG->PGradBasic.basic.pmem);
-	OSlwToolBPNNAllDataInit(&(pDDPG->ActorTargetNet), pDDPG->PGradBasic.basic.pmem);
-	OSlwToolBPNNAllDataInit(&(pDDPG->CriticMainNet), pDDPG->PGradBasic.basic.pmem);
-	OSlwToolBPNNAllDataInit(&(pDDPG->CriticTargetNet), pDDPG->PGradBasic.basic.pmem);
+	OSlwToolBPnnAllDataInit(&(pDDPG->ActorMainNet), pDDPG->PGradBasic.basic.pmem);
+	OSlwToolBPnnAllDataInit(&(pDDPG->ActorTargetNet), pDDPG->PGradBasic.basic.pmem);
+	OSlwToolBPnnAllDataInit(&(pDDPG->CriticMainNet), pDDPG->PGradBasic.basic.pmem);
+	OSlwToolBPnnAllDataInit(&(pDDPG->CriticTargetNet), pDDPG->PGradBasic.basic.pmem);
 
-	OSlwToolBPNNCopy(&(pDDPG->ActorTargetNet), &(pDDPG->ActorMainNet));
-	OSlwToolBPNNCopy(&(pDDPG->CriticTargetNet), &(pDDPG->CriticMainNet));
+	OSlwToolBPnnCopy(&(pDDPG->ActorTargetNet), &(pDDPG->ActorMainNet));
+	OSlwToolBPnnCopy(&(pDDPG->CriticTargetNet), &(pDDPG->CriticMainNet));
 }
 
 
@@ -1946,7 +1946,7 @@ OSlwToolDDPGradSTU* OSlwToolDDPGradChoose(OSlwToolDDPGradSTU *pDDPG)
 
 	//运行网络
 	pDDPG->ActorMainNet.Train.mini_batch_now = 1;
-	OSlwToolBPNNForward(&(pDDPG->ActorMainNet));
+	OSlwToolBPnnForward(&(pDDPG->ActorMainNet));
 	pDDPG->ActorMainNet.Train.AllBatchCount = 0;
 	pDDPG->ActorMainNet.Train._batch_stream_count = 0;
 
@@ -1988,15 +1988,15 @@ OSlwToolDDPGradSTU* OSlwToolDDPGradChoose(OSlwToolDDPGradSTU *pDDPG)
 
 
 
-	_OSlwToolBPNNReviewOnce(&(pDDPG->ActorMainNet), 0, &m_k);
+	_OSlwToolBPnnReviewOnce(&(pDDPG->ActorMainNet), 0, &m_k);
 
 	pOSlwToolMatrixDot(&(pDDPG->ActorMainNet.x), &(pDDPG->basic.StateNow), &(pDDPG->StateFactor));//乘以归一化因子
 																								  
-	OSlwToolBPNNRunning(&(pDDPG->ActorMainNet));//运行网络
+	OSlwToolBPnnRunning(&(pDDPG->ActorMainNet));//运行网络
 
 	temp = -1;
 
-	_OSlwToolBPNNReviewOnce(&(pDDPG->ActorMainNet), 0, &m_k);//变回来
+	_OSlwToolBPnnReviewOnce(&(pDDPG->ActorMainNet), 0, &m_k);//变回来
 
 	memset(ptable->Row.pData, 0, ptable->Row.uData * ptable->ColSize);
 
@@ -2083,14 +2083,14 @@ OSlwToolDDPGradSTU* OSlwToolDDPGradLearning(OSlwToolDDPGradSTU *pDDPG)
 		mat1.a = pStateNow;
 		pOSlwToolMatrixDot(&(pDDPG->ActorTargetNet.x), &(mat1), &(pDDPG->PGradBasic.StateFactor));//乘以归一化因子
 		pDDPG->ActorTargetNet.Train.mini_batch_now = 1;
-		OSlwToolBPNNForward(&(pDDPG->ActorTargetNet));//运行网络
+		OSlwToolBPnnForward(&(pDDPG->ActorTargetNet));//运行网络
 
 
 		//第二步 根据ActionNext 与 stateNow 运行 CrticTarget 计算 qtarget=R+GAMMA*CrticTarget.yout
 
 		pOSlwToolMatrixJoin(&(pDDPG->CriticTargetNet.x), &(pDDPG->ActorTargetNet.x), &(pDDPG->ActorTargetNet.y));//状态拼接动作
 		pDDPG->CriticTargetNet.Train.mini_batch_now = 1;
-		OSlwToolBPNNForward(&(pDDPG->CriticTargetNet));//运行网络
+		OSlwToolBPnnForward(&(pDDPG->CriticTargetNet));//运行网络
 		
 		mat1.length = 1;
 		mat1.a = &(pRL->Gamma);
@@ -2113,17 +2113,17 @@ OSlwToolDDPGradSTU* OSlwToolDDPGradLearning(OSlwToolDDPGradSTU *pDDPG)
 		pOSlwToolMatrixJoin(&(pDDPG->CriticMainNet.x), &(pDDPG->ActorMainNet.x), &(mat2));//状态拼接动作
 	
 		pDDPG->CriticMainNet.Train.mini_batch_now = 1;
-		OSlwToolBPNNForward(&(pDDPG->CriticMainNet));//运行网络
+		OSlwToolBPnnForward(&(pDDPG->CriticMainNet));//运行网络
 
 		qbuf = pDDPG->CriticMainNet.y.a[0];
 
-		OSlwToolBPNNCalErr(&(pDDPG->CriticMainNet));//反向传播误差
+		OSlwToolBPnnCalErr(&(pDDPG->CriticMainNet));//反向传播误差
 
 		/*
 		理解错误
 		第四步 直接将-qmain作为actormain的误差 反向传播
 
-		OSlwToolBPNNRunning(&(pDDPG->ActorMainNet));//运行actormain网络
+		OSlwToolBPnnRunning(&(pDDPG->ActorMainNet));//运行actormain网络
 
 		mat3.length = 1;
 		mat3.a = &negbuf;
@@ -2133,24 +2133,24 @@ OSlwToolDDPGradSTU* OSlwToolDDPGradLearning(OSlwToolDDPGradSTU *pDDPG)
 
 		pOSlwToolMatrixSet(&(pTNL->outErr),qbuf, NULL);//直接设置误差为-qmain
 		
-		OSlwToolBPNNTrain(&(pDDPG->ActorMainNet));//反向传播
+		OSlwToolBPnnTrain(&(pDDPG->ActorMainNet));//反向传播
 		*/
 		
 		//第四步 
 		//运行 actor网络 并且将A网络的输出作为C网络的输入
 		pDDPG->ActorMainNet.Train.mini_batch_now = 1;
-		OSlwToolBPNNForward(&(pDDPG->ActorMainNet));//运行actormain网络
+		OSlwToolBPnnForward(&(pDDPG->ActorMainNet));//运行actormain网络
 
 		pOSlwToolMatrixJoin(&(pDDPG->CriticMainNet.x), &(pDDPG->ActorMainNet.x), &(pDDPG->ActorMainNet.y));//状态拼接动作
 
 		//第五步
 		//运行C网络 进行qmain估计 
 		pDDPG->CriticMainNet.Train.mini_batch_now = 1;
-		OSlwToolBPNNForward(&(pDDPG->CriticMainNet));
+		OSlwToolBPnnForward(&(pDDPG->CriticMainNet));
 
 		//第六步
 		//计算dq/da 取出dq/da
-		//mat3.a=OSlwToolBPNNGradForInput(&(pDDPG->CriticMainNet));
+		//mat3.a=OSlwToolBPnnGradForInput(&(pDDPG->CriticMainNet));
 		mat3.length = mat2.length;
 		mat3.a += mat1.length;
 
@@ -2162,14 +2162,14 @@ OSlwToolDDPGradSTU* OSlwToolDDPGradLearning(OSlwToolDDPGradSTU *pDDPG)
 		
 		pOSlwToolMatrixDot(&(pDDPG->ActorMainNet.y), &mat3, &mat1);//得到负的梯度
 
-		OSlwToolBPNNCalErr(&(pDDPG->ActorMainNet));//反向传播
+		OSlwToolBPnnCalErr(&(pDDPG->ActorMainNet));//反向传播
 
 
 	}
 
 	//第8步 更新所有网络
-	OSlwToolBPNNReview(&(pDDPG->ActorMainNet));
-	OSlwToolBPNNReview(&(pDDPG->CriticMainNet));
+	OSlwToolBPnnReview(&(pDDPG->ActorMainNet));
+	OSlwToolBPnnReview(&(pDDPG->CriticMainNet));
 
 	//第9步 网络替换
 
@@ -2178,8 +2178,8 @@ OSlwToolDDPGradSTU* OSlwToolDDPGradLearning(OSlwToolDDPGradSTU *pDDPG)
 		if ((pDDPG->Copy.HardReplace.Count_Copy >= pDDPG->Copy.HardReplace.NetCopyThreshold))//判断是否满足阈值
 		{
 			pDDPG->Copy.HardReplace.Count_Copy = 0;
-			OSlwToolBPNNCopy(&(pDDPG->ActorTargetNet), &(pDDPG->ActorMainNet));//复制神经网络
-			OSlwToolBPNNCopy(&(pDDPG->CriticTargetNet), &(pDDPG->CriticMainNet));//复制神经网络
+			OSlwToolBPnnCopy(&(pDDPG->ActorTargetNet), &(pDDPG->ActorMainNet));//复制神经网络
+			OSlwToolBPnnCopy(&(pDDPG->CriticTargetNet), &(pDDPG->CriticMainNet));//复制神经网络
 		}
 		else
 		{
@@ -2188,8 +2188,8 @@ OSlwToolDDPGradSTU* OSlwToolDDPGradLearning(OSlwToolDDPGradSTU *pDDPG)
 	}
 	else if (pDDPG->CopyMethod == OSlwToolDDPG_CopyMethod_Soft)
 	{
-		OSlwToolBPNNSoftReplace(&(pDDPG->ActorTargetNet), &(pDDPG->ActorMainNet), pDDPG->Copy.tSoftReplace);
-		OSlwToolBPNNSoftReplace(&(pDDPG->CriticTargetNet), &(pDDPG->CriticMainNet), pDDPG->Copy.tSoftReplace);
+		OSlwToolBPnnSoftReplace(&(pDDPG->ActorTargetNet), &(pDDPG->ActorMainNet), pDDPG->Copy.tSoftReplace);
+		OSlwToolBPnnSoftReplace(&(pDDPG->CriticTargetNet), &(pDDPG->CriticMainNet), pDDPG->Copy.tSoftReplace);
 	}
 	else
 	{
@@ -2199,7 +2199,7 @@ OSlwToolDDPGradSTU* OSlwToolDDPGradLearning(OSlwToolDDPGradSTU *pDDPG)
 
 	return pDDPG;
 }
-#endif // OSLW_TOOL_IMPORT_ALL || (OSLW_TOOL_IMPORT_RL_DDPG && OSLW_TOOL_IMPORT_NN && OSLW_TOOL_IMPORT_NN_BPNN && OSLW_TOOL_IMPORT_RL_EXP_RE)
+#endif // OSLW_TOOL_IMPORT_ALL || (OSLW_TOOL_IMPORT_RL_DDPG && OSLW_TOOL_IMPORT_NN && OSLW_TOOL_IMPORT_NN_BPnn && OSLW_TOOL_IMPORT_RL_EXP_RE)
 
 //
 //
@@ -2210,9 +2210,9 @@ OSlwToolDDPGradSTU* OSlwToolDDPGradLearning(OSlwToolDDPGradSTU *pDDPG)
 //	OSLW_assert(!(pPPO));
 //	memset(pPPO, 0, sizeof(OSlwToolPPOptimSTU));
 //
-//	OSlwToolBPNNInitial(&(pPPO->CriticNet));
-//	OSlwToolBPNNInitial(&(pPPO->ActorNewNet));
-//	OSlwToolBPNNInitial(&(pPPO->ActorOldNet));
+//	OSlwToolBPnnInitial(&(pPPO->CriticNet));
+//	OSlwToolBPnnInitial(&(pPPO->ActorNewNet));
+//	OSlwToolBPnnInitial(&(pPPO->ActorOldNet));
 //
 //
 //
@@ -2376,7 +2376,7 @@ void OSlwToolPPOptimAppendInitial//PPO神经网络追加,一次会追加两个神经网络
 	//OSlwMemoryBasicSTU *pmem;
 	//OSlwToolRandomBasicSTU *pTRB;
 	//OSlwToolNNLayerFullConSTU *p1, *p2;
-	//OSlwToolBPNNSTU *mn, *tn;
+	//OSlwToolBPnnSTU *mn, *tn;
 
 	//OSLW_assert(!(pPPO));
 	//OSLW_assert(!(layer_list));
@@ -2399,7 +2399,7 @@ void OSlwToolPPOptimAppendInitial//PPO神经网络追加,一次会追加两个神经网络
 	//	{
 	//		col = layer_list[i];
 
-	//		p1 = OSlwToolBPNNLayerAppend_Dynamic(
+	//		p1 = OSlwToolBPnnLayerAppend_Dynamic(
 	//			mn
 	//			, AFlist[i]
 	//			, row, col
@@ -2410,7 +2410,7 @@ void OSlwToolPPOptimAppendInitial//PPO神经网络追加,一次会追加两个神经网络
 	//			, _ParaFrom(0)
 	//		);
 
-	//		p2 = OSlwToolBPNNLayerAppend_Dynamic(
+	//		p2 = OSlwToolBPnnLayerAppend_Dynamic(
 	//			tn
 	//			, AFlist[i]
 	//			, row, col
@@ -2440,7 +2440,7 @@ void OSlwToolPPOptimAppendInitial//PPO神经网络追加,一次会追加两个神经网络
 	//	{
 	//		col = layer_list[i];
 
-	//		p1 = OSlwToolBPNNLayerAppend_Dynamic(
+	//		p1 = OSlwToolBPnnLayerAppend_Dynamic(
 	//			mn
 	//			, AFlist[i]
 	//			, row, col

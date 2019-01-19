@@ -6,6 +6,7 @@
  */
 #include "OSLW_include.h"
 
+#if 0
 
 const pOSlwExeFun OSlwRealGetFunList[]= {OSlwParameter_GetNormal,OSlwParameter_GetPrecision,OSlwParameter_GetData};
 const pOSlwExeFun OSlwRealSetFunList[]= {OSlwParameter_SetNormal,OSlwParameter_SetPrecision,OSlwParameter_SetData,OSlwParameter_SelfUp,OSlwParameter_SelfDown,OSlwParameter_Lock,OSlwParameter_Unlock};
@@ -562,3 +563,4 @@ lw_u8 OSlwRealParaListInitial(OSlwParaListCtrlSTU *pPLC,lw_8 *str)
     return 1;
 }
 
+#endif

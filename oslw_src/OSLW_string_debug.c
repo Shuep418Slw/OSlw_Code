@@ -3,7 +3,7 @@
 
 
 
-static const lw_u8 _kind_info[][4] = { {'c','c',sizeof(lw_u8),0},{ 'i','d',sizeof(lw_u16),0 },{ 'l','d',sizeof(lw_u32),0 },{ 'f','f',sizeof(ParaType),0 },{ 'F','s',0,0 } };
+static const lw_u8 _kind_info[][4] = { {'c','c',sizeof(lw_u8),0},{ 'i','d',sizeof(lw_u16),0 },{ 'l','d',sizeof(lw_u32),0 },{ 'f','f',sizeof(lw_sf),0 },{ 'F','s',0,0 } };
 
 
 lw_u8 *_StringDebugSelectInfo(lw_8 c)
@@ -58,7 +58,7 @@ lw_u8 *_SD_Data2Str(lw_u8 *str, void *data, lw_u8 *form,lw_u8 *buf,lw_u8 *info)
 		str = SD_Sprintf(str, form, (lw_32)(*((lw_32*)data)));
 		break;
 	case 'f':
-		str = SD_Sprintf(str, form, (ParaType)(*((ParaType *)data)));
+		str = SD_Sprintf(str, form, (lw_sf)(*((lw_sf *)data)));
 		break;
 
 	default:
@@ -274,10 +274,10 @@ lw_u32 _StringDebugMemCalSq(lw_u8 *data, lw_u8 *info, lw_u8 *pNum)
 	return (lw_u32)_len * (lw_u32)info[2];
 }
 
-lw_u32 _StringDebugMemLengthPl(lw_u8 *data, lw_u8 *info,ParaType *pstart, ParaType *pdelt,lw_u8 *pNum)
+lw_u32 _StringDebugMemLengthPl(lw_u8 *data, lw_u8 *info,lw_sf *pstart, lw_sf *pdelt,lw_u8 *pNum)
 {
 	lw_u8 num = 0;
-	ParaType _start, _delt, _end;
+	lw_sf _start, _delt, _end;
 	lw_u8 *s_s, *s_e, *s_d;
 	
 	data++;
@@ -371,9 +371,9 @@ void *_StringDebugString2Number(OSlwMemoryBasicSTU *pmem, lw_u8 *str, lw_u8 *inf
 	lw_u8 *d8;
 	lw_u16 *d16;
 	lw_u32 *d32;
-	ParaType *df;
+	lw_sf *df;
 
-	ParaType startn, deltn;
+	lw_sf startn, deltn;
 
 	switch (str[0])
 	{
@@ -1075,7 +1075,7 @@ void *_StringDebugString2NumberSimple(void *pmem, lw_u8 *str, lw_u8 *info,lw_u8 
 	lw_u8 *d8;
 	lw_u16 *d16;
 	lw_u32 *d32;
-	ParaType *df;
+	lw_sf *df;
 	
 	//对应不同类型
 	switch (info[0])
