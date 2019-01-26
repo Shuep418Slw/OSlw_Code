@@ -415,7 +415,7 @@ void* OSlwToolBPnnBasicRnnAppend
 	else
 	{
 		pptail = pBPnn->Net.pTail->Data.pData;
-		pin = pptail[0]->out.a;
+		pin = pptail[pBPnn->Net.pTail->Data.uData-1]->out.a;
 	}
 
 	//初始化节点
@@ -1112,7 +1112,7 @@ void* OSlwToolBPnnGruRnnAppend
 	else
 	{
 		pptail = pBPnn->Net.pTail->Data.pData;
-		pin = pptail[0]->out.a;
+		pin = pptail[pBPnn->Net.pTail->Data.uData-1]->out.a;
 	}
 
 	//初始化节点

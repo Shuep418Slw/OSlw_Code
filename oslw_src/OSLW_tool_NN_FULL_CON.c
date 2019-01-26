@@ -902,7 +902,7 @@ void* OSlwToolBPnnFullConAppend
 		else
 		{
 			pptail = pBPnn->Net.pTail->Data.pData;
-			pin = pptail[0]->out.a;
+			pin = pptail[pBPnn->Net.pTail->Data.uData-1]->out.a;
 		}
 
 		pnode1 = OSlwToolNNLayerFullConNew(
@@ -958,7 +958,7 @@ void* OSlwToolBPnnFullConAppend
 		else
 		{
 			pptail = pBPnn->Net.pTail->Data.pData;
-			pin = pptail[0]->out.a;
+			pin = pptail[pBPnn->Net.pTail->Data.uData-1]->out.a;
 		}
 
 		pnode1 = OSlwToolNNLayerFullConNew(

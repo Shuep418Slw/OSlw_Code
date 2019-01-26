@@ -1642,7 +1642,7 @@ void* OSlwToolBPnnConvAppend
 		else
 		{
 			pptail = pBPnn->Net.pTail->Data.pData;
-			pin = pptail[0]->out.a;
+			pin = pptail[pBPnn->Net.pTail->Data.uData-1]->out.a;
 		}
 
 		pnode1 = OSlwToolNNLayerConvNew(
@@ -1704,7 +1704,7 @@ void* OSlwToolBPnnConvAppend
 		else
 		{
 			pptail = pBPnn->Net.pTail->Data.pData;
-			pin = pptail[0]->out.a;
+			pin = pptail[pBPnn->Net.pTail->Data.uData-1]->out.a;
 		}
 
 		pnode1 = OSlwToolNNLayerConvNew(
@@ -1832,7 +1832,7 @@ void* OSlwToolBPnnPoolAppend
 	else
 	{
 		pptail = pBPnn->Net.pTail->Data.pData;
-		pin = pptail[0]->out.a;
+		pin = pptail[pBPnn->Net.pTail->Data.uData-1]->out.a;
 	}
 
 	pnode1 = OSlwToolNNLayerPoolNew(
