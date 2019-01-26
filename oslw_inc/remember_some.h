@@ -21,4 +21,12 @@ random部分修改了RMIN与RMAX位置 现在使用前小后大
 0.92版本 2018/09/01
 增加strdbg功能
 增加CNN
+
+0.93版本 2019/01/26
+修改了层APPEND函数的return
+修改了神经网络输入输出数据模式
+增加了RNN GRURNN
+修改了IQ类型运算的bug
+
+
 */

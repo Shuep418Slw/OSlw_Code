@@ -1,4 +1,4 @@
-/*(Ver.=0.9~)(Beg.=0.9)
+/*(Ver.=0.93)
 * OSLW_tool.h
 *
 *  Created on: 2017-7-25
@@ -181,6 +181,18 @@ OSLW_TOOL_FUN_STATEMENT(
 	while (_CLR_len--) *_pCLR_D1++=*_pCLR_D2++;\
 }while(0)
 
+#define LW_PARA_JOIN(PD,PS1,L1,PS2,L2) do{\
+	register lw_u32 *_p_D=(void *)(PD);\
+	register lw_u32 *_p_S1=(void *)(PS1);\
+	register lw_u32 *_p_S2=(void *)(PS2);\
+	register lw_u32 _L_1=(L1)<<1;\
+	register lw_u32 _L_2=(L2)<<1;\
+	if(_p_S1){while(_L_1--) *_p_D++=*_p_S1++;}\
+	else {while (_L_1--) *_p_D++=0;}\
+	if(_p_S2){while (_L_2--) *_p_D++=*_p_S2++;}\
+	else {while (_L_2--) *_p_D++=0;}\
+}while(0)
+
 #elif PARA_LEN==4
 #define LW_MAT_CLR(A) do{\
 	register lw_u32 *_pCLR_D=(void *)((A)->a);\
@@ -195,6 +207,17 @@ OSLW_TOOL_FUN_STATEMENT(
 	while (_CLR_len--) *_pCLR_D1++=*_pCLR_D2++;\
 }while(0)
 
+#define LW_PARA_JOIN(PD,PS1,L1,PS2,L2) do{\
+	register lw_u32 *_p_D=(void *)(PD);\
+	register lw_u32 *_p_S1=(void *)(PS1);\
+	register lw_u32 *_p_S2=(void *)(PS2);\
+	register lw_u32 _L_1=(L1);\
+	register lw_u32 _L_2=(L2);\
+	if(_p_S1){while(_L_1--) *_p_D++=*_p_S1++;}\
+	else {while (_L_1--) *_p_D++=0;}\
+	if(_p_S2){while (_L_2--) *_p_D++=*_p_S2++;}\
+	else {while (_L_2--) *_p_D++=0;}\
+}while(0)
 
 #endif
 

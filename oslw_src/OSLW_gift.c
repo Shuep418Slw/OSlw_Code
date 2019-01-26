@@ -1,4 +1,4 @@
-/*(Ver.=0.9~)(Beg.=0.9)
+/*(Ver.=0.93)
  * OSLW_gift.c
  *
  *  Created on: 2017-7-14
@@ -202,7 +202,7 @@ OSlwGiftPostmanSTU * OSlwGiftReceiveSlipNext(OSlwGiftReceiveSTU *pgr,OSlwGiftPos
 
     p=(OSlwGiftPostmanSTU *)((*ppGP)->node.con.pNext);
 
-    /*(Ver.=0.9~)(Beg.=0.9)
+    /*(Ver.=0.93)
     if(_OSlwToolDListRemoveNode(&(pgr->List),(OSlwToolDListNodeSTU *)(*ppGP)))
     {
     	return NULL;

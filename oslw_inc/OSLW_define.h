@@ -1,4 +1,4 @@
-/*(Ver.=0.9~)(Beg.=0.9)
+/*(Ver.=0.93)
  * OSLW_define.h
  *
  *  Created on: 2017-7-14
@@ -188,7 +188,7 @@ typedef enum{
     #define _ParaExp(A) (_IQ24exp(A))
 	#define PARA_LEN 4
 #elif OSLW_GLOBAL_MATH_TYPE==OSLW_GLOBAL_MATH_FLOAT
-/*(Ver.=0.9~)(Beg.=0.9)
+/*(Ver.=0.93)
 	#define _ParaAdd(A,B) ((lw_sf)(A)+(lw_sf)(B))
 	#define _ParaSub(A,B) ((lw_sf)(A)-(lw_sf)(B))
 	#define _ParaMpy(A,B) ((lw_sf)(A)*(lw_sf)(B))
@@ -213,7 +213,7 @@ typedef enum{
 	#define _ParaFrac(A) ((A)-long(A))
 	#define _ParaFint(A)	((lw_sf)A)
 	#define _ParaToF(A) ((lw_sf)(A))
-	#define _ParaFrom(A) ((lw_sf)A)
+	#define _ParaFrom(A) ((lw_sf)(A))
 	#define _ParaSin(A) (sinf(A))
 	#define _ParaCos(A) (cosf(A))
 	#define _ParaTan(A) (sinf(A)/cosf(A))		
@@ -234,7 +234,7 @@ typedef enum{
 	#define _ParaFrac(A) ((A)-long(A))
 	#define _ParaFint(A)	((lw_df)(A))
 	#define _ParaToF(A) ((lw_df)(A))	
-	#define _ParaFrom(A)	((lw_df)A)	
+	#define _ParaFrom(A)	((lw_df)(A))	
 	#define _ParaSin(A) (sin(A))
 	#define _ParaCos(A) (cos(A))
 	#define _ParaTan(A) (tan(A))	
@@ -593,6 +593,6 @@ typedef union OSLW_CORE_GROUP_UNION{
 }OSlwCoreGroupUN;
 
 
-#endif /*(Ver.=0.9~)(Beg.=0.9) OSLW_DEFINE_H_ */
+#endif /*(Ver.=0.93) OSLW_DEFINE_H_ */
 
 

@@ -1,4 +1,4 @@
-/*(Ver.=0.9~)(Beg.=0.9)
+/*(Ver.=0.93)
  * OSLW_parameter.c
  *
  *  Created on: 2017-7-14
@@ -11,7 +11,7 @@
 const pOSlwExeFun OSlwRealGetFunList[]= {OSlwParameter_GetNormal,OSlwParameter_GetPrecision,OSlwParameter_GetData};
 const pOSlwExeFun OSlwRealSetFunList[]= {OSlwParameter_SetNormal,OSlwParameter_SetPrecision,OSlwParameter_SetData,OSlwParameter_SelfUp,OSlwParameter_SelfDown,OSlwParameter_Lock,OSlwParameter_Unlock};
 
-/*(Ver.=0.9~)(Beg.=0.9)
+/*(Ver.=0.93)
 //------------------------------------------
 //<函数名>OSlwParameter_GetPrecision</函数名>
 //<功能说明>将parameter转换成高精度格式 采用定点数进行存储 一共5字节 实际数值=(arr[1]*2^24+arr[2]*2^16+arr[3]*2^8+arr[4])/(2^arr[0])</功能说明>

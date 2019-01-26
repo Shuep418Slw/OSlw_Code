@@ -1,4 +1,4 @@
-/*(Ver.=0.9~)(Beg.=0.9)
+/*(Ver.=0.93)
 * OSLW_tool.c
 *
 *  Created on: 2017-7-14
@@ -12,19 +12,13 @@
 
 void OSlwToolMatrixInitial(OSlwToolMatrixSTU *m, LwMatRowType row, LwMatColType col, ParaType *a)
 {
-
     OSLW_assert(!(m));
-    OSLW_assert(!(row));
-    OSLW_assert(!(col));
-    OSLW_assert(!(a));
 
     m->a = a;
     m->row = row;
     m->col = col;
 
     m->length = row*col;
-
-
 }
 
 
@@ -515,14 +509,14 @@ OSLW_TOOL_FUN(OSlwToolMatrixSTU*, OSlwToolMatrixSet,
     OSLW_assert(!(s));
     if (a)//如果定义a 相当于复制构造函数
     {
-        /*(Ver.=0.9~)(Beg.=0.9)
+        /*(Ver.=0.93)
         for (i = 0; i < s->length; i++)
         {
         s->a[i] = a->a[i];
         }
         */
 
-        /*(Ver.=0.9~)(Beg.=0.9)
+        /*(Ver.=0.93)
         i = s->length;
         ps = s->a;
         pa = a->a;
@@ -544,7 +538,7 @@ OSLW_TOOL_FUN(OSlwToolMatrixSTU*, OSlwToolMatrixSet,
     }
     else//使用常量初始化
     {
-        /*(Ver.=0.9~)(Beg.=0.9)
+        /*(Ver.=0.93)
         for (i = 0; i < s->length; i++)
         {
         s->a[i] = data;
@@ -692,9 +686,9 @@ OSlwToolMatrixLossCrossEntropyForSoftMax
 )
 {
 
-	lw_u16 i = 0, j = 0, _i_max, col;
+	lw_u16 i = 0, j , col;
 	ParaType sum = _ParaFint(0), _n_max;
-	ParaType *_s, *_ref, *_pre, *_s_b, *_ref_b, *_pre_b;
+	ParaType *_s, *_ref,*_pre, *_pre_b, *_s_b, *_ref_b;
 	OSLW_assert(!(ref));
 	OSLW_assert(!(pre));
 	OSLW_assert(!(s));
@@ -706,22 +700,30 @@ OSlwToolMatrixLossCrossEntropyForSoftMax
 #if OSLW_TOOL_NN_DATA_FRAME==OSLW_TOOL_NN_D_FRAME_C
 				_s_b = s->a;
 				_ref_b = ref->a;
-				_pre = pre->a;
-				for (i = 0; i < s->length; i++, _s_b++,_ref_b++,_pre++)
+				_pre_b = pre->a;
+				col = s->col;
+				for (; i < s->row; i++)
 				{
-					if (*_ref_b >= _ParaFrom(0.99))
+					//查找最大值
+					for ( j = 0,_n_max=*_ref_b,_pre=_pre_b,_s=_s_b,_ref=_ref_b; j < col; ++j, ++_s_b, ++_ref_b, ++_pre_b)
 					{
-						*_s_b = _ParaMpy(_ParaFrom(-1), _ParaLn(*_pre));
-						sum += *_s_b;
-					}
-					else
-					{
-						*_s_b = _ParaFint(0);
+						if (*_ref_b>= _n_max)
+						{
+							_pre = _pre_b;
+							_ref = _ref_b;
+							_s = _s_b;
+						}
+						*_s_b = _ParaFrom(0);
 					}
 
+					if (*_ref != *_pre)
+					{
+						*_s = _ParaMpy(_ParaFrom(-1), _ParaLn(*_pre));
+						sum += *_s;
+					}
 				}
-
 				sum = -sum;
+
 #elif OSLW_TOOL_NN_DATA_FRAME == OSLW_TOOL_NN_D_FRAME_F
 				_s_b = s->a;
 				_ref_b = ref->a;

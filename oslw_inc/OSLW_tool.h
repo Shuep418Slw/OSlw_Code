@@ -1,4 +1,4 @@
-/*(Ver.=0.9~)(Beg.=0.9)
+/*(Ver.=0.93)
  * OSLW_tool.h
  *
  *  Created on: 2017-7-25
@@ -23,4 +23,4 @@
 #include "OSLW_tool_NN.h"
 
 
-#endif /*(Ver.=0.9~)(Beg.=0.9) OSLW_TOOL_H_ */
+#endif /*(Ver.=0.93) OSLW_TOOL_H_ */

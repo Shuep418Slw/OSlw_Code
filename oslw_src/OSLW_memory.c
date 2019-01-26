@@ -1,4 +1,4 @@
-/*(Ver.=0.9~)(Beg.=0.9)
+/*(Ver.=0.93)
  * OSLW_memory.c
  *
  *  Created on: 2017-7-14
@@ -117,7 +117,7 @@ void* OSlwMemoryMapAlloc(OSlwMemoryMapSTU *pMU,lw_u32 dsize)
     len = OSLW_MEM_SIZE_DIV(dsize, pMU->basic.MemSectionSize);
 
     //得到比用户预订内存要大的内存片数量
-    /*(Ver.=0.9~)(Beg.=0.9)
+    /*(Ver.=0.93)
     if(len * pMU->MemSectionSize < dsize)
     	len++;
     	*/
@@ -219,7 +219,7 @@ static lw_32 _OSlwMemoryMapFind(OSlwMemoryMapSTU *pMU, void *p,lw_u16 *pLen,lw_u
 
 void * OSlwMemoryMapFree(OSlwMemoryMapSTU *pMU,void *p)
 {
-    /*(Ver.=0.9~)(Beg.=0.9)
+    /*(Ver.=0.93)
     	lw_u8 **pinfoarr=pMU->MemInfo.pData;
     	lw_u8 **pMemInfoButtom;
     	lw_u8 FindFlag = 0;
@@ -311,7 +311,7 @@ void* OSlwMemoryMapReAlloc(OSlwMemoryMapSTU *pMU,void *p, lw_u32 dsize)
     //len = dsize / pMU->MemSectionSize;
     len = OSLW_MEM_SIZE_DIV(dsize, pMU->basic.MemSectionSize);
     //得到比用户预订内存要大的内存片数量
-    /*(Ver.=0.9~)(Beg.=0.9)
+    /*(Ver.=0.93)
     if (len * pMU->MemSectionSize < dsize)
     	len++;
     */
@@ -430,7 +430,7 @@ void * OSlwMemorySimpleAlloc(OSlwMemorySimpleSTU *pMU, lw_u32 dsize)
     //len = dsize / pMU->MemSectionSize;
     len = OSLW_MEM_SIZE_DIV(dsize, pMU->basic.MemSectionSize);
     //得到比用户预订内存要大的内存片数量
-    /*(Ver.=0.9~)(Beg.=0.9)
+    /*(Ver.=0.93)
     if (len * pMU->MemSectionSize < dsize)
     	len++;
     */
@@ -547,7 +547,7 @@ void * OSlwMemoryListAlloc(OSlwMemoryListSTU *pMU, lw_u32 dsize)
 
     OSLW_assert(!(pMU));
     OSLW_assert(!(dsize));
-    /*(Ver.=0.9~)(Beg.=0.9)
+    /*(Ver.=0.93)
     MemSectionSize = pMU->MemSectionSize;
     dsize += sizeof(OSlwMemoryListNodeSTU);
     len = dsize / MemSectionSize;
@@ -584,7 +584,7 @@ void * OSlwMemoryListAlloc(OSlwMemoryListSTU *pMU, lw_u32 dsize)
         if (((size_t)(p->con.pNext) - (size_t)(p) - p->len) > dsize)//代表有剩余
         {
             q = (OSlwMemoryListNodeSTU *)(((size_t)p) + p->len);
-            /*(Ver.=0.9~)(Beg.=0.9)
+            /*(Ver.=0.93)
             			q->con.pLast = (OSlwToolDListNodeConnectSTU *)p;
             			q->con.pNext = (OSlwToolDListNodeConnectSTU *)p->con.pNext;
 

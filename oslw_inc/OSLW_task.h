@@ -1,4 +1,4 @@
-/*(Ver.=0.9~)(Beg.=0.9)
+/*(Ver.=0.93)
  * OSLW_task.h
  *
  *  Created on: 2017-7-14
@@ -126,7 +126,7 @@ typedef struct OSLW_TASK_STRUCT{
 	//成员函数
 	
 	void (*TaskFun)(struct OSLW_TASK_STRUCT *pta);//任务函数
-	/*(Ver.=0.9~)(Beg.=0.9)
+	/*(Ver.=0.93)
 #if !(OSLW_SIMPLE_MODE)
 	void (*SleepFun)(struct OSLW_TASK_STRUCT *pta,lw_u32 n);//睡眠函数
 	void (*WaitGRFun)(struct OSLW_TASK_STRUCT *pta);//
@@ -198,4 +198,4 @@ OSlwTaskDispatch((PTA)->pOS);\
 
 
 
-#endif /*(Ver.=0.9~)(Beg.=0.9) OSLW_TASK_H_*/
+#endif /*(Ver.=0.93) OSLW_TASK_H_*/

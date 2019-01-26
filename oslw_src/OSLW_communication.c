@@ -1,4 +1,4 @@
-/*(Ver.=0.9~)(Beg.=0.9)
+/*(Ver.=0.93)
  * OSLW_communication.c
  *
  *  Created on: 2017-7-26
@@ -169,7 +169,7 @@ void OSlwModBusCallBack(OSlwCoreSTU *pOS,lw_u8 ComID,lw_u8 *pdata,lw_u16 len)
 }
 
 
-/*(Ver.=0.9~)(Beg.=0.9)
+/*(Ver.=0.93)
 lw_8 OSlwModBusIsReady(void *pcom)
 {
 

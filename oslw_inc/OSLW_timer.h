@@ -1,4 +1,4 @@
-/*(Ver.=0.9~)(Beg.=0.9)
+/*(Ver.=0.93)
  * OSLW_timer.h
  *
  *  Created on: 2017-7-25
@@ -59,4 +59,4 @@ void OSlwTimerClockCallBack(OSlwTimerSTU *pt);
 
 #define OSlwTimerStart(T,H,M,S,MS) do{(T).Count=(((lw_u32)H*3600l+(lw_u32)M*60L+(lw_u32)S)*1000l+MS)/(lw_u32)OSLW_CORE_TICK_MS;(T).TimerEnableFlag=1;}while(0)
 
-#endif /*(Ver.=0.9~)(Beg.=0.9) OSLW_TIMER_H_ */
+#endif /*(Ver.=0.93) OSLW_TIMER_H_ */
