@@ -17,9 +17,9 @@
 
 #if OSLW_TOOL_IMPORT_MATH || OSLW_TOOL_IMPORT_ALL
 
-typedef lw_u32 LwMatRowType;
+typedef lw_u16 LwMatRowType;
 typedef lw_u16 LwMatColType;
-typedef lw_u16 LwMatLenType;
+typedef lw_u32 LwMatLenType;
 
 typedef struct OSLW_TOOL_MATRIX_STRUCT {
 	ParaType *a;
