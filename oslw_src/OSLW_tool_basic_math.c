@@ -687,8 +687,8 @@ OSlwToolMatrixLossCrossEntropyForSoftMax
 {
 
 	lw_u16 i = 0, j , col;
-	ParaType sum = _ParaFint(0), _n_max;
-	ParaType *_s, *_ref,*_pre, *_pre_b, *_s_b, *_ref_b;
+	ParaType sum = _ParaFint(0);
+	ParaType *_pre_b, *_s_b, *_ref_b;
 	OSLW_assert(!(ref));
 	OSLW_assert(!(pre));
 	OSLW_assert(!(s));
@@ -704,25 +704,15 @@ OSlwToolMatrixLossCrossEntropyForSoftMax
 				col = s->col;
 				for (; i < s->row; i++)
 				{
-					//查找最大值
-					for ( j = 0,_n_max=*_ref_b,_pre=_pre_b,_s=_s_b,_ref=_ref_b; j < col; ++j, ++_s_b, ++_ref_b, ++_pre_b)
+					
+					for ( j = 0; j < col; ++j, ++_s_b, ++_ref_b, ++_pre_b)
 					{
-						if (*_ref_b>= _n_max)
-						{
-							_pre = _pre_b;
-							_ref = _ref_b;
-							_s = _s_b;
-						}
-						*_s_b = _ParaFrom(0);
+						sum+= _ParaMpy(_ParaFrom(*_ref_b), _ParaLn(*_pre_b+ OSLW_GLOBAL_MATH_DELT));
+						*_s_b= *_ref_b - *_pre_b;
 					}
 
-					if (*_ref != *_pre)
-					{
-						*_s = _ParaMpy(_ParaFrom(-1), _ParaLn(*_pre));
-						sum += *_s;
-					}
+
 				}
-				sum = -sum;
 
 #elif OSLW_TOOL_NN_DATA_FRAME == OSLW_TOOL_NN_D_FRAME_F
 				_s_b = s->a;
@@ -764,7 +754,7 @@ OSlwToolMatrixLossCrossEntropyForSoftMax
 
 	
 
-	return sum;
+	return -sum;
 }
 
 OSLW_TOOL_FUN(ParaType, OSlwToolMatrixSum,
