@@ -303,7 +303,7 @@ lw_ptr OSlwToolBPnnLayerFullConBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRU
 		{
 			_sum = _ParaFint(0);
 			_out = _out_b;
-			for (j = 0; j < mini_b_num & 0xffff; j++)
+			for (j = 0; j < (mini_b_num & 0xffff); j++)
 			{
 				_sum = _ParaAdd(_sum, *_out);
 				_out += row;
@@ -327,7 +327,7 @@ lw_ptr OSlwToolBPnnLayerFullConBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRU
 		{
 			_sum = _ParaFint(0);
 			_out = _out_b;
-			for (j = 0; j < mini_b_num & 0xffff; j++)
+			for (j = 0; j < (mini_b_num & 0xffff); j++)
 			{
 				_sum = _ParaAdd(_sum, *_out);
 				_out += row;
@@ -695,7 +695,7 @@ lw_ptr OSlwToolBPnnLayerFullConClear(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT 
 		LW_MAT_CLR(&(pfc->DeltB));
 	}
 
-
+	return (lw_ptr)NULL;
 }
 
 
@@ -918,7 +918,7 @@ void* OSlwToolBPnnFullConAppend
 			pmem, pTemplet, 0
 		);  
 
-		pln1 = pmem->Malloc(pmem, sizeof(OSlwToolDListNodeSTU));
+		pln1 = pmem->Calloc(pmem, sizeof(OSlwToolDListNodeSTU));
 		//pln2 = pmem->Malloc(pmem, sizeof(OSlwToolDListNodeSTU));
 		
 
@@ -968,7 +968,7 @@ void* OSlwToolBPnnFullConAppend
 			pmem
 		);
 
-		pln1 = pmem->Malloc(pmem, sizeof(OSlwToolDListNodeSTU));
+		pln1 = pmem->Calloc(pmem, sizeof(OSlwToolDListNodeSTU));
 
 
 		ppLIST1 = pmem->Malloc(pmem, sizeof(OSlwToolNNSubLayerBasicSTU *) * 1);
@@ -1020,7 +1020,7 @@ void* OSlwToolBPnnFullConAppend
 		}
 	}
 
-	pBPnn->ParaGroupNum++;
+	//pBPnn->ParaGroupNum++;
 	return ppLIST1;
 }
 

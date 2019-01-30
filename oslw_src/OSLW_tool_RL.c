@@ -126,16 +126,16 @@ void OSlwToolQLearningParaInitial
     pTQL->Lr=Lr;
     pTQL->basic.basic.Gamma=Gamma;
     pTQL->basic.basic.pRand=prand;
-    pTQL->basic.basic.ActEnvFun=pActfun;
-    pTQL->basic.basic.BornFun= OSlwToolRL_Born;
-	pTQL->basic.basic.BornFunByUser = pBornfun;
+    pTQL->basic.basic.ActEnvFun=(void *)pActfun;
+    pTQL->basic.basic.BornFun= (void *)OSlwToolRL_Born;
+	pTQL->basic.basic.BornFunByUser = (void *)pBornfun;
 
     pTQL->basic.basic.pmem = pmem;
 
-    pTQL->basic.basic.LearnFun = OSlwToolQLearningLearnFun;
-    pTQL->basic.basic.ChooseFun = OSlwToolQLearningChooseFun;
-    pTQL->basic.basic.StateStoreFun = OSlwToolQLearningLearnStateStore;
-    pTQL->basic.basic.isTermialFun = OSlwToolRL_isTermial;
+    pTQL->basic.basic.LearnFun = (void *)OSlwToolQLearningLearnFun;
+    pTQL->basic.basic.ChooseFun = (void *)OSlwToolQLearningChooseFun;
+    pTQL->basic.basic.StateStoreFun = (void *)OSlwToolQLearningLearnStateStore;
+    pTQL->basic.basic.isTermialFun = (void *)OSlwToolRL_isTermial;
 
 }
 
@@ -410,16 +410,16 @@ void OSlwToolSarsaLamberParaInitial
     pTQL->basic.basic.Gamma = Gamma;
     pTQL->basic.basic.pRand = prand;
     pTQL->basic.basic.pmem = pmem;
-    pTQL->basic.basic.ActEnvFun = pActfun;
-	pTQL->basic.basic.BornFun = OSlwToolRL_Born;
-    pTQL->basic.basic.BornFunByUser = pBornfun;
+    pTQL->basic.basic.ActEnvFun = (void *)pActfun;
+	pTQL->basic.basic.BornFun = (void *)OSlwToolRL_Born;
+    pTQL->basic.basic.BornFunByUser = (void *)pBornfun;
     pTQL->Lamber = lamber;
 
-    pTQL->basic.basic.LearnFun = OSlwToolSarsaLamberLearnFun;
+    pTQL->basic.basic.LearnFun = (void *)OSlwToolSarsaLamberLearnFun;
 
-    pTQL->basic.basic.ChooseFun = OSlwToolQLearningChooseFun;
-    pTQL->basic.basic.StateStoreFun = OSlwToolQLearningLearnStateStore;
-    pTQL->basic.basic.isTermialFun = OSlwToolRL_isTermial;
+    pTQL->basic.basic.ChooseFun = (void *)OSlwToolQLearningChooseFun;
+    pTQL->basic.basic.StateStoreFun = (void *)OSlwToolQLearningLearnStateStore;
+    pTQL->basic.basic.isTermialFun = (void *)OSlwToolRL_isTermial;
 
 }
 
@@ -784,7 +784,7 @@ OSlwToolDQNetExpReplaySTU *_OSlwToolDQNetExpReplayInsert(OSlwToolDQNetExpReplayS
 OSlwToolDQNetExpReplaySTU *_OSlwToolDQNetExpReplayDelete(OSlwToolDQNetExpReplaySTU *pExpRe, OSlwToolDQNetExpReplayFrameSTU *pExpReF)
 {
 	lw_u8 _f_status;
-	lw_32 i, num;
+//	lw_32 i, num;
 	//OSlwToolDListNodeConnectSTU *pcon;
 
 	//pcon = pExpRe->DivResult.pData;
@@ -1021,14 +1021,14 @@ void OSlwToolDQNetInitial(OSlwToolDQNetSTU *pDQN)
 	OSlwToolBPnnInit(&(pDQN->TargetNet),1);
 	pDQN->TargetNet.Train.Flag.NeedTrain = 1;
 
-    pDQN->StoreMemFun = OSlwToolDQNetStoreMem;
-    pDQN->basic.basic.ChooseFun = OSlwToolDQNetChoose;
-    pDQN->basic.basic.LearnFun = OSlwToolDQNetLearning;
+    pDQN->StoreMemFun = (void *)OSlwToolDQNetStoreMem;
+    pDQN->basic.basic.ChooseFun = (void *)OSlwToolDQNetChoose;
+    pDQN->basic.basic.LearnFun = (void *)OSlwToolDQNetLearning;
 
-    pDQN->ExpReplay.AppendFun = OSlwToolDQNetExpReplayAppend;
-    pDQN->ExpReplay.SampleFun = OSlwToolDQNetExpReplaySample;
-    pDQN->ExpReplay.UpdateFun = OSlwToolDQNetExpReplayUpdate;
-    pDQN->ExpReplay.MinMaxFun = OSlwToolDQNetExpReplayMinMax;
+    pDQN->ExpReplay.AppendFun = (void *)OSlwToolDQNetExpReplayAppend;
+    pDQN->ExpReplay.SampleFun = (void *)OSlwToolDQNetExpReplaySample;
+    pDQN->ExpReplay.UpdateFun = (void *)OSlwToolDQNetExpReplayUpdate;
+    pDQN->ExpReplay.MinMaxFun = (void *)OSlwToolDQNetExpReplayMinMax;
 }
 
 
@@ -1540,14 +1540,14 @@ void OSlwToolDDPGradInitial(OSlwToolDDPGradSTU *pDDPG)//DDPG初始化函数，最先被调
 	pDDPG->CriticTargetNet.Train.Flag.NeedTrain = 1;
 	pDDPG->ActorTargetNet.Train.Flag.NeedTrain = 1;
 
-	pDDPG->StoreMemFun = OSlwToolDDPGradStoreMem;
-	pDDPG->PGradBasic.basic.ChooseFun = OSlwToolDDPGradChoose;
-	pDDPG->PGradBasic.basic.LearnFun = OSlwToolDDPGradLearning;
+	pDDPG->StoreMemFun = (void *)OSlwToolDDPGradStoreMem;
+	pDDPG->PGradBasic.basic.ChooseFun = (void *)OSlwToolDDPGradChoose;
+	pDDPG->PGradBasic.basic.LearnFun = (void *)OSlwToolDDPGradLearning;
 
-	pDDPG->PGradBasic.ExpReplay.AppendFun = OSlwToolDQNetExpReplayAppend;
-	pDDPG->PGradBasic.ExpReplay.SampleFun = OSlwToolDQNetExpReplaySample;
-	pDDPG->PGradBasic.ExpReplay.UpdateFun = OSlwToolDQNetExpReplayUpdate;
-	pDDPG->PGradBasic.ExpReplay.MinMaxFun = OSlwToolDQNetExpReplayMinMax;
+	pDDPG->PGradBasic.ExpReplay.AppendFun = (void *)OSlwToolDQNetExpReplayAppend;
+	pDDPG->PGradBasic.ExpReplay.SampleFun = (void *)OSlwToolDQNetExpReplaySample;
+	pDDPG->PGradBasic.ExpReplay.UpdateFun = (void *)OSlwToolDQNetExpReplayUpdate;
+	pDDPG->PGradBasic.ExpReplay.MinMaxFun = (void *)OSlwToolDQNetExpReplayMinMax;
 
 
 }
@@ -1573,11 +1573,11 @@ void OSlwToolDDPGradParaInitial//DDPG参数初始化函数
 
 	pDDPG->PGradBasic.basic.pRand = prand;
 	pDDPG->PGradBasic.basic.pmem = pMem;
-	pDDPG->PGradBasic.basic.ActEnvFun = pActfun;
-	pDDPG->PGradBasic.basic.BornFun = OSlwToolRL_Born;
-	pDDPG->PGradBasic.basic.BornFunByUser = pBornfun;
+	pDDPG->PGradBasic.basic.ActEnvFun = (void *)pActfun;
+	pDDPG->PGradBasic.basic.BornFun = (void *)OSlwToolRL_Born;
+	pDDPG->PGradBasic.basic.BornFunByUser = (void *)pBornfun;
 
-	pDDPG->PGradBasic.basic.isTermialFun = OSlwToolRL_isTermial;
+	pDDPG->PGradBasic.basic.isTermialFun = (void *)OSlwToolRL_isTermial;
 
 
 }
@@ -1664,7 +1664,7 @@ void OSlwToolDDPGradStoreMemInitial//DDPG内存分配初始化
 	{
 		pDDPG->CopyMethod = OSlwToolDDPG_CopyMethod_Hard;
 		pDDPG->Copy.HardReplace.Count_Copy = 0;
-		pDDPG->Copy.HardReplace.NetCopyThreshold = _ParaInt(copy_data);
+		pDDPG->Copy.HardReplace.NetCopyThreshold = (lw_u16)_ParaInt(copy_data);
 	}
 	else//软复制 谷歌DM论文中的方法
 	{
@@ -2468,20 +2468,20 @@ OSlwToolPPOptimSTU* OSlwToolPPOptimChoose(OSlwToolPPOptimSTU *pPPO)
 {
 
 
-
+	return NULL;
 }
 OSlwToolPPOptimSTU* OSlwToolPPOptimStoreMem(OSlwToolPPOptimSTU *pPPO)
 {
 
 
-
+	return NULL;
 }
 OSlwToolPPOptimSTU* OSlwToolPPOptimLearning(OSlwToolPPOptimSTU *pPPO)
 {
 
 
 
-
+	return NULL;
 }
 
 

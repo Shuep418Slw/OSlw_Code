@@ -130,7 +130,7 @@ OSlwGiftPostmanSTU * OSlwGiftReceiveMoveNext(OSlwGiftReceiveSTU *pgr)
 {
 
     OSlwGiftPostmanSTU *p,*q;
-    OSlwMemoryBasicSTU *pmem;
+//    OSlwMemoryBasicSTU *pmem;
 
     OSLW_assert(!pgr);
 

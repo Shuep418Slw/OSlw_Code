@@ -111,8 +111,8 @@ lw_ptr OSlwToolBPnnLayerReLU6Backward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT
 {
 	register ParaType temp;
 	_OSLW_TOOL_NN_ACTFUN_SEMI1(pNNSLB)
-	temp = (*_in > _ParaInt(0)) ? _ParaInt(1) : _ParaInt(0);
-	temp = (*_in < _ParaInt(6)) ? _ParaInt(1) : _ParaInt(0);
+	temp = (*_in > _ParaFrom(0)) ? _ParaFrom(1) : _ParaFrom(0);
+	temp = (*_in < _ParaFrom(6)) ? _ParaFrom(1) : _ParaFrom(0);
 	*_in = _ParaMpy(
 		temp
 		, *_out

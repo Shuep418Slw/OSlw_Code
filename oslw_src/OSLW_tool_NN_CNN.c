@@ -50,7 +50,7 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerConvNew(
 	
 	//node->DataRes = (ParaType *)(((lw_u8 *)node) + sizeof(OSlwToolNNLayerConvSTU));
 
-	if (move_method == 's')
+	if (move_method == 'v')
 	{
 		out_x = (in_x - kern_x) / (move_delt)+1;//横向移动次数
 		out_y = (in_y - kern_y) / (move_delt)+1;//纵向移动次数
@@ -119,6 +119,16 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerConvNew(
 	node->databasic.basic.FlowData.uData = PARA_MEM_CAL(kern_res_len);
 	node->move_delt = move_delt;
 
+
+	node->in_x = in_x;
+	node->in_y = in_y;
+	node->out_x = out_x;
+	node->out_y = out_y;
+
+	node->conv_kernal_x = kern_x;
+	node->conv_kernal_y = kern_y;
+	node->conv_kernal_z = in_z;
+	node->conv_kernal_num = kern_num;
 
 	//计算要分配的内存大小
 	node->databasic.basic.sizeofdata = PARA_MEM_CAL(node->databasic.Weight.length) + PARA_MEM_CAL(node->databasic.Bias.length);
@@ -1651,7 +1661,7 @@ void* OSlwToolBPnnConvAppend
 			in_x, in_y, in_z,
 			kern_x, kern_y, kern_num,
 			1,
-			's',
+			'v',
 			pBPnn->Train.mini_batch_max,
 			pmem,
 			info
@@ -1663,7 +1673,7 @@ void* OSlwToolBPnnConvAppend
 			pmem, pTemplet, 0
 		);
 
-		pln1 = pmem->Malloc(pmem, sizeof(OSlwToolDListNodeSTU));
+		pln1 = pmem->Calloc(pmem, sizeof(OSlwToolDListNodeSTU));
 		//pln2 = pmem->Malloc(pmem, sizeof(OSlwToolDListNodeSTU));
 
 
@@ -1719,7 +1729,7 @@ void* OSlwToolBPnnConvAppend
 			info
 		);
 
-		pln1 = pmem->Malloc(pmem, sizeof(OSlwToolDListNodeSTU));
+		pln1 = pmem->Calloc(pmem, sizeof(OSlwToolDListNodeSTU));
 
 
 		ppLIST1 = pmem->Malloc(pmem, sizeof(OSlwToolNNSubLayerBasicSTU *) * 1);
@@ -1739,16 +1749,6 @@ void* OSlwToolBPnnConvAppend
 	pfc->pr = pr;
 	pfc->initd1 = d1;
 	pfc->initd2 = d2;
-
-	pcv->in_x = in_x;
-	pcv->in_y = in_y;
-	pcv->out_x = out_x;
-	pcv->out_y = out_y;
-
-	pcv->conv_kernal_x = kern_x;
-	pcv->conv_kernal_y = kern_y;
-	pcv->conv_kernal_z = in_z;
-	pcv->conv_kernal_num = kern_num;
 
 
 	//碎片化存储 直接进行内存分配
@@ -1781,7 +1781,7 @@ void* OSlwToolBPnnConvAppend
 	}
 
 
-	pBPnn->ParaGroupNum++;
+	//pBPnn->ParaGroupNum++;
 
 	return ppLIST1;
 }
@@ -1846,7 +1846,7 @@ void* OSlwToolBPnnPoolAppend
 		info
 	);
 
-	pln1 = pmem->Malloc(pmem, sizeof(OSlwToolDListNodeSTU));
+	pln1 = pmem->Calloc(pmem, sizeof(OSlwToolDListNodeSTU));
 	ppLIST1 = pmem->Malloc(pmem, sizeof(OSlwToolNNSubLayerBasicSTU *) * 1);
 
 	ppLIST1[0] = pnode1;

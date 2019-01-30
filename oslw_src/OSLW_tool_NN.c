@@ -1624,6 +1624,7 @@ void OSlwToolBPnnLayerAppend
 		ppLIST1[i]->pNN = pBPnn;
 	}
 
+	pBPnn->ParaGroupNum += len;
 	return;
 }
 
@@ -1750,7 +1751,7 @@ void OSlwToolBPnnAllDataInit(OSlwToolBPnnSTU *pBPnn,OSlwMemoryBasicSTU *pMem)
 		//·ÖÅä¸¡¶¯ÄÚ´æ
 		if (flowdatamax)
 		{
-			pFlowDataAddr = pMem->Malloc(pMem, flowdatamax);
+			pFlowDataAddr = pMem->Calloc(pMem, flowdatamax);
 			node = (OSlwToolDListNodeSTU *)pBPnn->Net.Head.con.pNext;
 			while (node)
 			{

@@ -187,7 +187,7 @@ ParaType OSlwToolRandomChaosLogisticFun(void *pRand,ParaType Rmin,ParaType Rmax)
 
     //p->x=_ParaMpy(_ParaMpy(p->u,_ParaSub(_ParaFint(1),p->x)),p->x);
     p->x *= p->u*(1.0 - p->x);
-    return OSlwToolRandomRangeMapping((OSlwToolRandomBasicSTU *)p,p->x,Rmin,Rmax,_ParaFint(-1));
+    return OSlwToolRandomRangeMapping((OSlwToolRandomBasicSTU *)p,_ParaFrom(p->x),Rmin,Rmax,_ParaFint(-1));
 }
 
 
@@ -199,7 +199,7 @@ lw_32 OSlwToolRandomChaosLogisticFunInt(void *pRand,ParaType Rmin,ParaType Rmax)
 
     OSlwToolRandomChaosLogisticFun(pRand,p->basic.Rmax,p->basic.Rmin);
 
-    return _ParaInt(OSlwToolRandomRangeMapping((OSlwToolRandomBasicSTU *)p,p->x,Rmin,Rmax,_ParaFint(1)));
+    return _ParaInt(OSlwToolRandomRangeMapping((OSlwToolRandomBasicSTU *)p, _ParaFrom(p->x),Rmin,Rmax,_ParaFint(1)));
 
 }
 
@@ -222,7 +222,7 @@ ParaType OSlwToolRandomChaosTentFun(void *pRand,ParaType Rmin,ParaType Rmax)
 
     //p->x=_ParaSub(p->a,_ParaMpy(_ParaAdd(_ParaFint(1),p->a),_ParaAbs(p->x)));
     p->x = p->a - (1 + p->a)*(p->x > 0.0 ? p->x : -(p->x));
-    return OSlwToolRandomRangeMapping((OSlwToolRandomBasicSTU *)p,p->x,Rmin,Rmax,_ParaFint(-1));
+    return OSlwToolRandomRangeMapping((OSlwToolRandomBasicSTU *)p,_ParaFrom(p->x),Rmin,Rmax,_ParaFint(-1));
 }
 
 lw_32 OSlwToolRandomChaosTentFunInt(void *pRand,ParaType Rmin,ParaType Rmax)
@@ -232,7 +232,7 @@ lw_32 OSlwToolRandomChaosTentFunInt(void *pRand,ParaType Rmin,ParaType Rmax)
 
     OSlwToolRandomChaosTentFun(pRand,p->basic.Rmax,p->basic.Rmin);
 
-    return _ParaInt(OSlwToolRandomRangeMapping((OSlwToolRandomBasicSTU *)p,p->x,Rmin,Rmax,_ParaFint(1)));
+    return _ParaInt(OSlwToolRandomRangeMapping((OSlwToolRandomBasicSTU *)p, _ParaFrom(p->x),Rmin,Rmax,_ParaFint(1)));
 
 }
 
@@ -272,7 +272,7 @@ ParaType OSlwToolRandomChaosKentFun(void *pRand,ParaType Rmin,ParaType Rmax)
     }
 
 
-    return OSlwToolRandomRangeMapping((OSlwToolRandomBasicSTU *)p,p->x,Rmin,Rmax,_ParaFint(-1));
+    return OSlwToolRandomRangeMapping((OSlwToolRandomBasicSTU *)p, _ParaFrom(p->x),Rmin,Rmax,_ParaFint(-1));
 
 }
 
@@ -283,7 +283,7 @@ lw_32 OSlwToolRandomChaosKentFunInt(void *pRand,ParaType Rmin,ParaType Rmax)
 
     OSlwToolRandomChaosKentFun(pRand,p->basic.Rmax,p->basic.Rmin);
 
-    return _ParaInt(OSlwToolRandomRangeMapping((OSlwToolRandomBasicSTU *)p,p->x,Rmin,Rmax,_ParaFint(1)));
+    return _ParaInt(OSlwToolRandomRangeMapping((OSlwToolRandomBasicSTU *)p, _ParaFrom(p->x),Rmin,Rmax,_ParaFint(1)));
 }
 #endif // OSLW_TOOL_IMPORT_RAND_CHAOS || OSLW_TOOL_IMPORT_ALL
 
@@ -411,7 +411,7 @@ ParaType OSlwToolRandomWELL512Fun(void *pRand, ParaType Rmin, ParaType Rmax)
 
 	OSLW_assert(!(pRand));
 
-	_r = _OSlwToolRandWELL512Rand(pRand);
+	_r = (lw_u32)_OSlwToolRandWELL512Rand(pRand);
 
 #if OSLW_GLOBAL_MATH_TYPE==OSLW_GLOBAL_MATH_Q
 	return (_r) % ((Rmax) - (Rmin)) + (Rmin);
@@ -428,7 +428,7 @@ lw_32 OSlwToolRandomWELL512FunInt(void *pRand, ParaType Rmin, ParaType Rmax)
 
 	OSLW_assert(!(pRand));
 
-	_r = _OSlwToolRandWELL512Rand(pRand);
+	_r = (lw_u32)_OSlwToolRandWELL512Rand(pRand);
 
 	return (_r) % (_ParaInt(Rmax) - _ParaInt(Rmin)) + _ParaInt(Rmin);
 }

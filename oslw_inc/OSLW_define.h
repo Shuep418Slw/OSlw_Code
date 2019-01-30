@@ -41,7 +41,7 @@ typedef intptr_t lw_ptr;
 #define OSLW_CORE_TICK_MS 1
 
 //操作系统精简等级
-#define OSLW_SIMPLE_LEVEL 1
+#define OSLW_SIMPLE_LEVEL 0
 
 //操作系统高速运行
 #define OSLW_SPEED_RUNNING 0
@@ -55,7 +55,7 @@ typedef intptr_t lw_ptr;
 #endif // OSLW_SIMPLE_LEVEL
 
 //CPU任务数量
-#define OSLW_TASK_NUM_MAX 8
+#define OSLW_TASK_NUM_MAX 32
 
 #define DEBUG
 #if !defined(DEBUG)
@@ -153,9 +153,9 @@ typedef enum{
 	 typedef float ParaType;
 		//#include "arm_math.h"
 		#include "math.h"
-        #define OSLW_GLOBAL_MATH_MAX 3.2E38
-        #define OSLW_GLOBAL_MATH_MIN -3.2E38
-        #define OSLW_GLOBAL_MATH_DELT 1.2E-38
+        #define OSLW_GLOBAL_MATH_MAX 3.2E38f
+        #define OSLW_GLOBAL_MATH_MIN -3.2E38f
+        #define OSLW_GLOBAL_MATH_DELT 1.2E-38f
 #elif OSLW_GLOBAL_MATH_TYPE==OSLW_GLOBAL_MATH_DOUBLE
 	 typedef double ParaType;
 		#include "math.h"
@@ -403,10 +403,10 @@ typedef struct OSLW_TOOL_DLIST_NODE_CONNECT_STRUCT {
 //StringDebug 名字字符串大小
 #define OSLW_STR_DBG_NAME_LEN 10
 //StringDebug 数值字符串大小
-#define OSLW_STR_DBG_DATA_LEN 90
+#define OSLW_STR_DBG_DATA_LEN 200
 
 //StringDebug 内存大小
-#define OSLW_STR_DBG_MEM_SIZE 20
+#define OSLW_STR_DBG_MEM_SIZE 16
 #define OSLW_STR_DBG_MEM_LEN 100
 
 //StringDebug 哈希表大小

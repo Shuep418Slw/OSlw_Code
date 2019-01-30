@@ -768,6 +768,7 @@ OSlwToolMatrixSum
 	OSLW_assert(s);
 
 	i = s->length;
+	_s = s->a;
 	while (i--)
 	{
 		sum = _ParaAdd(sum, *_s++);
@@ -1018,6 +1019,8 @@ OSLW_TOOL_FUN(
 
 		}
 	}
+
+	return s;
 }
 
 OSLW_TOOL_FUN(
@@ -1074,6 +1077,7 @@ OSLW_TOOL_FUN(
 
 		}
 	}
+	return s;
 }
 
 OSLW_TOOL_FUN(
@@ -1555,7 +1559,7 @@ OSLW_TOOL_FUN(
 	}
 
 
-
+	return m_out;
 }
 
 

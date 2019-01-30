@@ -19,7 +19,7 @@
 #include <limits.h>
 #include <stdlib.h>
 
-typedef int (*_compar_fn)(const void *,const void *);
+typedef lw_16 (*_compar_fn)(const void *,const void *);
 
 
 //------------------------------------------

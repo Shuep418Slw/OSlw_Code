@@ -149,6 +149,7 @@ OSlwToolDListNodeSTU* OSlwToolDListAppend(struct OSLW_TOOL_DLIST_STRUCT *pDL,OSl
 
     pDL->pTail=pDLN;
     pDLN->Key.uData =pDL->MaxLen++;//ID赋予
+    //pDLN->con.pNext=NULL;
     pDL->NowLen++;
 
     return pDLN;
@@ -534,12 +535,12 @@ void * OSlwToolTableRead(struct OSLW_TOOL_TABLE_STRUCT *pT, lw_32 row, lw_32 col
         return NULL;
     }
 
-    if (col >= pT->Col.uData)//列数太大 一旦固定不在修改
+    if (col >= (lw_32)(pT->Col.uData))//列数太大 一旦固定不在修改
     {
         return NULL;
     }
 
-    if (row >= pT->Row.uData)//行数太大
+    if (row >= (lw_32)(pT->Row.uData))//行数太大
     {
         p = pT->pmem->ReAlloc(pT->pmem, pT->Row.pData, (row  * pT->ColSize));
         if (p==NULL)

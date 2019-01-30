@@ -36,7 +36,7 @@ lw_sf OSlwToolStringTolw_sf(const lw_u8 *str)
 
 	while (*str >= '0'&&*str <= '9'&&*str != '.')//计算小数点前整数部分
 	{
-		s = s*10.0 + *str - '0';
+		s = s*10.0f + *str - '0';
 		str++;
 	}
 
@@ -83,7 +83,7 @@ lw_sf OSlwToolStringTolw_sf(const lw_u8 *str)
 		}
 	}
 
-	return s*(falg ? -1.0 : 1.0);
+	return s*(falg ? -1.0f : 1.0f);
 }
 
 
@@ -179,12 +179,19 @@ lw_u8* OSlwToolString_gcvt(lw_sf value, lw_32 ndigit, lw_u8 *buf)
 	lw_32 int_part = (int)value;
 
 	lw_sf folat_part = value - int_part;
-	lw_8 *p;
+	lw_8 *p=tmpbuf;
 
-	if (folat_part < 0) folat_part = -folat_part;
-	OSlwToolString_itoa(int_part, tmpbuf, 10);
+	if(value<0)
+	{
+	    *p++='-';
+	    int_part=-int_part;
+	}
 
-	p = tmpbuf;
+	if (folat_part < 0)
+	{
+	    folat_part = -folat_part;
+	}
+	OSlwToolString_itoa(int_part, p, 10);
 
 	while (*p != '\0') p++;
 
@@ -230,7 +237,7 @@ void* OSlwToolStringVSprintf(lw_8 *buf, const lw_8 *fmt, va_list args)
 			p += strlen(p);
 			break;
 		case 'f':
-			OSlwToolString_gcvt(va_arg(p_next_arg, double), 6, p);
+			OSlwToolString_gcvt(va_arg(p_next_arg, lw_sf), 6, p);
 			p += strlen(p);
 			break;
 		default:

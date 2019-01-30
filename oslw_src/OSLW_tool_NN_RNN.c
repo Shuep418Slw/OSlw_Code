@@ -247,7 +247,7 @@ lw_ptr OSlwToolBPnnLayerBasicRnnDataInit(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STR
 		pbrnn->RnnCell.ActFun.in.a = pbrnn->h_t_mem.a;
 		pbrnn->RnnCell.ActFun.out.a = pbrnn->databasic.basic.out.a;
 	}
-	return NULL;
+	return (lw_ptr)NULL;
 }
 
 lw_ptr OSlwToolBPnnLayerBasicRnnClear(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB)
@@ -434,7 +434,7 @@ void* OSlwToolBPnnBasicRnnAppend
 	pBRNN->pActTemplet = pTemplet;
 	pBRNN->RnnCell.in.a= pmem->Malloc(pmem, PARA_MEM_CAL(in_col+out_col));
 
-	pln1 = pmem->Malloc(pmem, sizeof(OSlwToolDListNodeSTU));
+	pln1 = pmem->Calloc(pmem, sizeof(OSlwToolDListNodeSTU));
 	ppLIST1 = pmem->Malloc(pmem, sizeof(OSlwToolNNSubLayerBasicSTU *) * 1);
 	ppLIST1[0] = pnode1;
 
@@ -481,7 +481,7 @@ void* OSlwToolBPnnBasicRnnAppend
 	}
 
 
-	pBPnn->ParaGroupNum++;
+	//pBPnn->ParaGroupNum++;
 
 	return ppLIST1;
 }
@@ -919,7 +919,7 @@ lw_ptr OSlwToolBPnnLayerGruRnnDataInit(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUC
 		pbrnn->CoreCell.ActFun.out.a = pbrnn->CoreCellOutMem.a;
 
 	}
-	return NULL;
+	return (lw_ptr)NULL;
 }
 
 lw_ptr OSlwToolBPnnLayerGruRnnClear(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB)
@@ -1135,7 +1135,7 @@ void* OSlwToolBPnnGruRnnAppend
 	pBRNN->pActTemplet = pTemplet;
 	pfc->basic.FlowData.uData = 3 * PARA_MEM_CAL(in_col*out_col);
 
-	pln1 = pmem->Malloc(pmem, sizeof(OSlwToolDListNodeSTU));
+	pln1 = pmem->Calloc(pmem, sizeof(OSlwToolDListNodeSTU));
 	ppLIST1 = pmem->Malloc(pmem, sizeof(OSlwToolNNSubLayerBasicSTU *) * 1);
 	ppLIST1[0] = pnode1;
 
@@ -1180,7 +1180,7 @@ void* OSlwToolBPnnGruRnnAppend
 	}
 
 
-	pBPnn->ParaGroupNum++;
+	//pBPnn->ParaGroupNum++;
 
 	return ppLIST1;
 }

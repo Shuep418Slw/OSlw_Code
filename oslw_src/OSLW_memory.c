@@ -38,6 +38,19 @@ lw_32 OSlwMemorySizeInitial(OSlwMemSizeSTU *ps, lw_u16 len)
 
 }
 
+void * OSlwMemoryGlobalCalloc(struct OSLW_MEMORY_BASIC_STRUCT *pMU, lw_u32 dsize)
+{
+
+	void *p;
+	OSLW_assert(!(pMU));
+	p = pMU->Malloc(pMU, dsize);
+
+	OSLW_assert(!(p));
+
+	memset(p, 0, dsize);
+
+	return p;
+}
 
 #if OSLW_MEMORY_IMPORT_MAP
 
@@ -81,6 +94,7 @@ lw_32 OSlwMemoryMapInital
     pMU->basic.Malloc=(void *)OSlwMemoryMapAlloc;
     pMU->basic.Free=(void *)OSlwMemoryMapFree;
     pMU->basic.ReAlloc = (void *)OSlwMemoryMapReAlloc;
+	pMU->basic.Calloc = (void *)OSlwMemoryGlobalCalloc;
     pMU->basic.memMax = lenMem;//内存片总大小
     pMU->basic.memSurplus = pMU->basic.memMax;//剩余大小
 
@@ -95,7 +109,7 @@ lw_32 OSlwMemoryMapInital
 void* OSlwMemoryMapAlloc(OSlwMemoryMapSTU *pMU,lw_u32 dsize)
 {
 
-    size_t parr,phead=NULL;
+    size_t parr,phead= (size_t)NULL;
     void **pinfoarr;
     lw_u32 len;
     lw_u16 count=0;
@@ -136,13 +150,13 @@ void* OSlwMemoryMapAlloc(OSlwMemoryMapSTU *pMU,lw_u32 dsize)
         if((*pinfoarr)==NULL)
         {
             count++;//计数器++
-            if(phead == NULL)//如果之前没有找到过
+            if(phead == (size_t)(NULL))//如果之前没有找到过
                 phead=parr;//保存下内存片头部
         }
         else//如果已经有人使用
         {
             count=0;//计数器清零
-            phead=NULL;//头部释放
+            phead= (size_t)NULL;//头部释放
         }
         if(count==len)//如果找到了足够数量的内存片
         {
@@ -195,7 +209,7 @@ static lw_32 _OSlwMemoryMapFind(OSlwMemoryMapSTU *pMU, void *p,lw_u16 *pLen,lw_u
     }
 
     //headernum = (size_t)((size_t)p - (size_t)(pMU->Mem.pData))/((size_t)(pMU->MemSectionSize));//计算偏移
-	headernum = OSLW_MEM_SIZE_DIV((size_t)((size_t)p - (size_t)(pMU->Mem.pData)), (pMU->basic.MemSectionSize)); //计算偏移
+	headernum = (lw_u16)(OSLW_MEM_SIZE_DIV((size_t)((size_t)p - (size_t)(pMU->Mem.pData)), (pMU->basic.MemSectionSize))); //计算偏移
     if (pNum && pLen)
     {
         pinfoarr = pMU->MemInfo.pData;
@@ -395,6 +409,7 @@ lw_32 OSlwMemorySimpleInital(OSlwMemorySimpleSTU *pMU,
     pMU->basic.Malloc = (void *)OSlwMemorySimpleAlloc;
     pMU->basic.Free = (void *)OSlwMemorySimpleFree;
     pMU->basic.ReAlloc = (void *)OSlwMemorySimpleReAlloc;
+	pMU->basic.Calloc = (void *)OSlwMemoryGlobalCalloc;
 
     //pMU->MemSectionSize = MemSize;
     OSlwMemorySizeInitial(&(pMU->basic.MemSectionSize), MemSize);
@@ -489,7 +504,7 @@ lw_32 OSlwMemoryListInital(OSlwMemoryListSTU *pMU,
                           )
 {
     lw_u32 reallen;
-    lw_32 data_return;
+    //lw_32 data_return;
     lw_u32 dsize = 0;
 //    lw_u16 len;
     //OSlwMemoryListNodeSTU *ptail;
@@ -503,7 +518,7 @@ lw_32 OSlwMemoryListInital(OSlwMemoryListSTU *pMU,
     pMU->basic.Malloc = (void *)OSlwMemoryListAlloc;
     pMU->basic.Free = (void *)OSlwMemoryListFree;
     pMU->basic.ReAlloc = (void *)OSlwMemoryListReAlloc;
-
+	pMU->basic.Calloc = (void *)OSlwMemoryGlobalCalloc;
     //pMU->MemSectionSize = MemSize;
 
     OSlwMemorySizeInitial(&(pMU->basic.MemSectionSize), MemSize);

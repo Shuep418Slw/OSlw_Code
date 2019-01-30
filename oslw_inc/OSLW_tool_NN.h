@@ -642,7 +642,7 @@ typedef struct OSLW_TOOL_NN_LAYER_ACT_FUN_STRUCT {
 
 }OSlwToolNNLayerActFunSTU;
 
-#define _OSLW_TOOL_NN_ACT_FUN_DEFAULT(NAME,KIND) 0,0,0,NULL,0,0,0,NULL,\
+#define _OSLW_TOOL_NN_ACT_FUN_DEFAULT(NAME,KIND) NULL,0,0,0,NULL,0,0,0,\
 OSlwToolBPnnLayer##NAME##Forward,OSlwToolBPnnLayer##NAME##Backward,OSlwToolBPnnLayerUpdateDefault,OSlwToolBPnnLayerNNmallocDefault,\
 OSlwToolBPnnLayerClearDefault,OSlwToolBPnnLayerDataInitDefault,OSlwToolBPnnLayerCopyDefault,OSlwToolBPnnLayerSoftReplaceDefault,\
 OSlwToolNNSubLayerKind_ActFun,0,\

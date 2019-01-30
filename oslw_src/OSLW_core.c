@@ -584,7 +584,7 @@ OSlwCoreSTU *OSlwTaskAppend(OSlwCoreSTU *pOS,OSlwTaskSTU *pta)
     pOS->pTaskList[pta->Priority]=pta;//任务控制块存入相应位置
     pOS->TaskRunningList[pOS->TaskRunningNum]=pta->Priority;//任务优先级保存入运行表格
     pOS->TaskRunningNum++;//任务运行数+1
-    _quicksort(pOS->TaskRunningList,pOS->TaskRunningNum,sizeof(pOS->TaskRunningList[0]),comp);//对运行表格进行排序 自小向大
+    _quicksort(pOS->TaskRunningList,pOS->TaskRunningNum,sizeof(pOS->TaskRunningList[0]),(void *)comp);//对运行表格进行排序 自小向大
     pOS->InitialFlagGroup.all|=((lw_u64)1<<pta->Priority);//内核初始化标志组置起
 
     return pOS;
@@ -799,11 +799,11 @@ jump_over:
         }
     }
 
-#define min(x, y) ((x) < (y) ? (x) : (y))
+#define mymin(x, y) ((x) < (y) ? (x) : (y))
     {
         char *const end_ptr = &base_ptr[size * (total_elems - 1)];
         char *tmp_ptr = base_ptr;
-        char *thresh = min(end_ptr, base_ptr + max_thresh);
+        char *thresh = mymin(end_ptr, base_ptr + max_thresh);
         char *run_ptr;
         for (run_ptr = tmp_ptr + size; run_ptr <= thresh; run_ptr += size)
             if ((*cmp) ((void *) run_ptr, (void *) tmp_ptr) < 0)

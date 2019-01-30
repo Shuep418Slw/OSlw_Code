@@ -36,7 +36,7 @@ typedef struct OSLW_MEMORY_BASIC_STRUCT {
 	void * (*Malloc)(struct OSLW_MEMORY_BASIC_STRUCT *pMU, lw_u32 dsize);
 	void * (*ReAlloc)(struct OSLW_MEMORY_BASIC_STRUCT *pMU, void *p, lw_u32 dsize);
 	void * (*Free)(struct OSLW_MEMORY_BASIC_STRUCT *pMU, void *p);
-
+	void * (*Calloc)(struct OSLW_MEMORY_BASIC_STRUCT *pMU, lw_u32 dsize);
 	OSlwMemSizeSTU MemSectionSize;
 
 	//相对概念 对于不同的分配方式概念不同
