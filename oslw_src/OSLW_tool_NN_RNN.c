@@ -30,8 +30,6 @@ void OSlwToolNNLayerRnnCellInit(
 	OSLW_assert(!(pin));
 	OSLW_assert(!(pwe));
 	OSLW_assert(!(pbi));
-	OSLW_assert(!(pdwe));
-	OSLW_assert(!(pdbi));
 	OSLW_assert(!(pActTemplet));
 
 	OSlwMatInit(&(pCell->in), 1, in_size, pin);
@@ -257,8 +255,10 @@ lw_ptr OSlwToolBPnnLayerBasicRnnClear(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT
 	prnn = (void *)pNNSLB;
 
 	OSlwToolBPnnLayerFullConClear(pNNSLB);
-	LW_MAT_CLR(&(prnn->out_t_1_mem));
-
+	if(prnn->out_t_1_mem.a)
+	{
+		LW_MAT_CLR(&(prnn->out_t_1_mem));
+	}
 	return 0;
 	
 }
@@ -365,6 +365,9 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerBasicRnnNew(
 	node->basic.NNmalloc = OSlwToolBPnnLayerFullConNNmalloc;
 	node->basic.Copy = OSlwToolBPnnLayerFullConCopy;
 	node->basic.SoftReplace = OSlwToolBPnnLayerFullConSoftReplace;
+
+
+	pbrnn->NeedTrainFlag = NeedTrainFlag;
 
 	return (OSlwToolNNSubLayerBasicSTU *)node;
 
@@ -929,8 +932,11 @@ lw_ptr OSlwToolBPnnLayerGruRnnClear(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *
 	prnn = (void *)pNNSLB;
 
 	OSlwToolBPnnLayerFullConClear(pNNSLB);
-	LW_MAT_CLR(&(prnn->OutT_1));
-
+	if(prnn->OutT_1.a)
+	{
+		LW_MAT_CLR(&(prnn->OutT_1));
+	}
+	
 	return 0;
 
 }
@@ -1060,6 +1066,8 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerGruRnnNew(
 	node->basic.NNmalloc = OSlwToolBPnnLayerFullConNNmalloc;
 	node->basic.Copy = OSlwToolBPnnLayerFullConCopy;
 	node->basic.SoftReplace = OSlwToolBPnnLayerFullConSoftReplace;
+
+	pbrnn->NeedTrainFlag = NeedTrainFlag;
 
 	return (OSlwToolNNSubLayerBasicSTU *)node;
 

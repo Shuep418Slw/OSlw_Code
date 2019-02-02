@@ -1498,10 +1498,10 @@ OSlwToolDQNetSTU* OSlwToolDQNetChoose(OSlwToolDQNetSTU *pDQN)
         //查询Q最大的行为
         OSlwToolMatrixMaxMin(&(pDQN->MainNet.y), &dmax, &selrand, NULL, NULL);
 
-		if (isnan(pDQN->MainNet.y.a[0]))
-		{
-			printf("------------\n-------------");
-		}
+//		if (isnan(pDQN->MainNet.y.a[0]))
+//		{
+//			printf("------------\n-------------");
+//		}
 
         pQRLB->ActNowIndex = selrand;
 

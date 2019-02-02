@@ -19,7 +19,7 @@ typedef struct OSLW_TOOL_RANDOM_BASIC_STRUCT{
 	ParaType Rmin, Rmax;
 
 	ParaType(*rand)(void *pRand, ParaType Rmin, ParaType Rmax);
-	lw_32(*randint)(void *pRand, ParaType Rmin, ParaType Rmax);
+	lw_32(*randint)(void *pRand, lw_32 Rmin, lw_32 Rmax);
 	ParaType(*randn)(void *pRand, ParaType Cent, ParaType Var);
 	void(*Seed)(void *pRand, lw_u32 seed);
 #if OSLW_TOOL_RAND_NORM_METHOD == OSLW_TOOL_RAND_NORM_BM
@@ -48,7 +48,7 @@ typedef struct OSLW_TOOL_RANDOM_CHAOS_LOGISTIC_STRUCT{
 extern OSlwToolRandomChaosLogisticSTU OSlwTRCLog;
 extern OSlwToolRandomBasicSTU *pRCLog;
 ParaType OSlwToolRandomChaosLogisticFun(void *pRand,ParaType Rmin,ParaType Rmax);
-lw_32 OSlwToolRandomChaosLogisticFunInt(void *pRand,ParaType Rmin,ParaType Rmax);
+lw_32 OSlwToolRandomChaosLogisticFunInt(void *pRand,lw_32 Rmin,lw_32 Rmax);
 
 
 typedef struct OSLW_TOOL_RANDOM_CHAOS_TENT_STRUCT{
@@ -60,7 +60,7 @@ typedef struct OSLW_TOOL_RANDOM_CHAOS_TENT_STRUCT{
 extern OSlwToolRandomChaosTentSTU OSlwTRCTent;
 extern OSlwToolRandomBasicSTU *pRCTent;
 ParaType OSlwToolRandomChaosTentFun(void *pRand,ParaType Rmin,ParaType Rmax);
-lw_32 OSlwToolRandomChaosTentFunInt(void *pRand,ParaType Rmin,ParaType Rmax);
+lw_32 OSlwToolRandomChaosTentFunInt(void *pRand,lw_32 Rmin,lw_32 Rmax);
 
 
 typedef struct OSLW_TOOL_RANDOM_CHAOS_KENT_STRUCT{
@@ -72,7 +72,7 @@ typedef struct OSLW_TOOL_RANDOM_CHAOS_KENT_STRUCT{
 extern OSlwToolRandomChaosKentSTU OSlwTRCKent;
 extern OSlwToolRandomBasicSTU *pRCKent;
 ParaType OSlwToolRandomChaosKentFun(void *pRand,ParaType Rmin,ParaType Rmax);
-lw_32 OSlwToolRandomChaosKentFunInt(void *pRand,ParaType Rmin,ParaType Rmax);
+lw_32 OSlwToolRandomChaosKentFunInt(void *pRand,lw_32 Rmin,lw_32 Rmax);
 
 
 
@@ -89,7 +89,7 @@ extern OSlwToolRandomLCGSTU OSlwTRLcg;
 extern OSlwToolRandomBasicSTU *pRLcg;
 
 ParaType OSlwToolRandomLCGFun(void *pRand, ParaType Rmin, ParaType Rmax);
-lw_32 OSlwToolRandomLCGFunInt(void *pRand, ParaType Rmin, ParaType Rmax);
+lw_32 OSlwToolRandomLCGFunInt(void *pRand, lw_32 Rmin, lw_32 Rmax);
 
 typedef struct OSLW_TOOL_RANDOM_WELL512_STRUCT {
 	OSlwToolRandomBasicSTU basic;
@@ -99,7 +99,7 @@ typedef struct OSLW_TOOL_RANDOM_WELL512_STRUCT {
 
 
 ParaType OSlwToolRandomWELL512Fun(void *pRand, ParaType Rmin, ParaType Rmax);
-lw_32 OSlwToolRandomWELL512FunInt(void *pRand, ParaType Rmin, ParaType Rmax);
+lw_32 OSlwToolRandomWELL512FunInt(void *pRand, lw_32 Rmin, lw_32 Rmax);
 void OSlwToolRandomWELL512Seed(OSlwToolRandomWELL512STU *pRand, lw_u32 seed);
 
 
@@ -112,7 +112,7 @@ typedef struct OSLW_TOOL_RANDOM_MT_STRUCT {
 
 
 ParaType OSlwToolRandomMTFun(void *pRand, ParaType Rmin, ParaType Rmax);
-lw_32 OSlwToolRandomMTFunInt(void *pRand, ParaType Rmin, ParaType Rmax);
+lw_32 OSlwToolRandomMTFunInt(void *pRand, lw_32 Rmin, lw_32 Rmax);
 void OSlwToolRandomMTSeed(OSlwToolRandomMTSTU *pRand, lw_u32 seed);
 
 

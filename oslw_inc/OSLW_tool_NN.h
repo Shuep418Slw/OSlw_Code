@@ -341,7 +341,8 @@ typedef struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT {
 	lw_ptr(*Copy)(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB1, struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB2);//复制函数 输入:this1 this2
 	lw_ptr(*SoftReplace)(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB1, struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB2, ParaType Raido);//软复制函数 输入:this1 this2
 	
-	OSlwToolNNSubLayerKind NN_Kind;
+	OSlwToolNNSubLayerKind NN_Kind : 8;
+	lw_u16 RunningStopFlag : 8;
 	
 	lw_u32 sizeofdata;//sizeof(参数)
 	
@@ -645,7 +646,7 @@ typedef struct OSLW_TOOL_NN_LAYER_ACT_FUN_STRUCT {
 #define _OSLW_TOOL_NN_ACT_FUN_DEFAULT(NAME,KIND) NULL,0,0,0,NULL,0,0,0,\
 OSlwToolBPnnLayer##NAME##Forward,OSlwToolBPnnLayer##NAME##Backward,OSlwToolBPnnLayerUpdateDefault,OSlwToolBPnnLayerNNmallocDefault,\
 OSlwToolBPnnLayerClearDefault,OSlwToolBPnnLayerDataInitDefault,OSlwToolBPnnLayerCopyDefault,OSlwToolBPnnLayerSoftReplaceDefault,\
-OSlwToolNNSubLayerKind_ActFun,0,\
+OSlwToolNNSubLayerKind_ActFun,0,0,\
 NULL,0,\
 _ParaFint(0),_ParaFint(0),\
 NULL,\

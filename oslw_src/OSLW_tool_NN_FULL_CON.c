@@ -298,7 +298,7 @@ lw_ptr OSlwToolBPnnLayerFullConBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRU
 		//db = sum(out, 1);按列求和
 		_out_b = pNNSLB->out.a;
 		_db = pfc->DeltB.a;
-		row = pNNSLB->out.row;
+		row = pNNSLB->out.col;
 		for (i = 0; i < pNNSLB->out.col; i++)
 		{
 			_sum = _ParaFint(0);
@@ -322,7 +322,7 @@ lw_ptr OSlwToolBPnnLayerFullConBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRU
 		//db = sum(out, 1);按列求和
 		_out_b = pNNSLB->out.a;
 		_db = pfc->DeltB.a;
-		row = pNNSLB->out.row;
+		row = pNNSLB->out.col;
 		for (i = 0; i < pNNSLB->out.col; i++)
 		{
 			_sum = _ParaFint(0);
@@ -588,9 +588,6 @@ lw_ptr OSlwToolBPnnLayerFullConUpdate(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT
 
 		k = _ParaMpy(pBPnn->_nl_factor, pNNSLB->nl);
 		_div_m = _ParaDiv(_ParaFrom(1) , _ParaFint(all_batch_count));
-
-		pBPnn->Train.Beta1T = _ParaMpy(pBPnn->Train.Beta1T,b1);
-		pBPnn->Train.Beta2T = _ParaMpy(pBPnn->Train.Beta2T,b2);
 
 		//adam
 		for (i = 0; i < pfc->Bias.length; i++,_mw++, _mwd++, _uw++, _vw++, _mb++, _mbd++, _ub++,_vb++)

@@ -337,7 +337,7 @@ lw_u32 _StringDebugMemLengthPl(lw_u8 *data, lw_u8 *info,lw_sf *pstart, lw_sf *pd
 		_delt = _ParaFint(1);
 	}
 
-	num = _ParaInt((_end - _start) / _delt) & 0xff;
+	num = (lw_u32)((_end - _start) / _delt) & 0xff;
 
 	*pstart = _start;
 	*pdelt = _delt;
@@ -507,7 +507,7 @@ void *_StringDebugString2Number(OSlwMemoryBasicSTU *pmem, lw_u8 *str, lw_u8 *inf
 			d8 = pdata;
 			while (data_len--)
 			{
-				*d8++ = _ParaInt(startn) & 0xff;
+				*d8++ = (lw_32)(startn) & 0xff;
 				startn += deltn;
 			}
 			break;
@@ -515,7 +515,7 @@ void *_StringDebugString2Number(OSlwMemoryBasicSTU *pmem, lw_u8 *str, lw_u8 *inf
 			d16 = pdata;
 			while (data_len--)
 			{
-				*d16++ = _ParaInt(startn) & 0xffff;
+				*d16++ = (lw_32)(startn) & 0xffff;
 				startn += deltn;
 			}
 
@@ -524,7 +524,7 @@ void *_StringDebugString2Number(OSlwMemoryBasicSTU *pmem, lw_u8 *str, lw_u8 *inf
 			d32 = pdata;
 			while (data_len--)
 			{
-				*d32++ = _ParaInt(startn) & 0xffffffff;
+				*d32++ = (lw_32)(startn) & 0xffffffff;
 				startn += deltn;
 			}
 			break;

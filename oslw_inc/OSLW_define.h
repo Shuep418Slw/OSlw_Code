@@ -41,7 +41,7 @@ typedef intptr_t lw_ptr;
 #define OSLW_CORE_TICK_MS 1
 
 //操作系统精简等级
-#define OSLW_SIMPLE_LEVEL 0
+#define OSLW_SIMPLE_LEVEL 1
 
 //操作系统高速运行
 #define OSLW_SPEED_RUNNING 0
@@ -179,12 +179,12 @@ typedef enum{
 	#define _ParaSin(A) (_IQ24sin(A))
 	#define _ParaCos(A) (_IQ24cos(A))
 	#define _ParaTan(A) (_IQ24tan(A))
+	#define _ParaLn(A) (_IQ24(logf((lw_sf)_IQ26toF(A))))
+  #define _ParaLog(A) (_IQ26div(_ParaLn(A),_ParaLn(_IQ24(10))))
 	#define _ParaSqrt(A) (_IQ24sqrt(A))
 	#define _ParaAbs(A) (_IQ24abs(A))
-    #define _ParaPow(A,B) (A==0?0:(_IQ24exp(_IQ24mpy((B),_IQ24log(A)))))
+    #define _ParaPow(A,B) (A==0?0:(_IQ24exp(_IQ24mpy((B),_ParaLn(A)))))
     #define _ParaCeil(A) (_ParaInt((A))+1)
-    #define _ParaLn(A) (_IQ24log((A)))
-    #define _ParaLog(A) (_IQ24div(_IQ24log(A),_IQ24log(_IQ24(10))))
     #define _ParaExp(A) (_IQ24exp(A))
 	#define PARA_LEN 4
 #elif OSLW_GLOBAL_MATH_TYPE==OSLW_GLOBAL_MATH_FLOAT

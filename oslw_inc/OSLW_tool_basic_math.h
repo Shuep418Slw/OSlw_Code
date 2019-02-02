@@ -166,6 +166,12 @@ OSLW_TOOL_FUN_STATEMENT(
 
 #define OSlwMatNew OSLW_TOOL_M_DY_INIT
 
+#define OSlwMatDef(R,C,A) {((ParaType *)(A)),R*C,R,C}
+
+#define OSlwMatStaticNew(M,R,C) static ParaType _##M##PARA[R*C];static OSlwMat M=OSlwMatDef(_##M##PARA,R,C);
+
+
+
 
 #if PARA_LEN==8
 #define LW_MAT_CLR(A) do{\

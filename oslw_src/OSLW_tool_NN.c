@@ -1972,6 +1972,11 @@ void OSlwToolBPnnForward(OSlwToolBPnnSTU *pBPnn)
 		ppNNL = node->Data.pData;
 		for (i = 0; i < node->Data.uData; i++)
 		{
+			if (ppNNL[i]->RunningStopFlag)
+			{
+				return;
+			}
+
 			mmb = ppNNL[i]->Forward(ppNNL[i], mmb);
 		}
 
@@ -2002,6 +2007,11 @@ void OSlwToolBPnnBackward(OSlwToolBPnnSTU *pBPnn)
 		i = node->Data.uData;
 		while (i--)
 		{
+			if (ppNNL[i]->RunningStopFlag)
+			{
+				return;
+			}
+
 			mmb = ppNNL[i]->Backward(ppNNL[i], mmb);
 		}
 
@@ -2033,6 +2043,9 @@ void OSlwToolBPnnReview(OSlwToolBPnnSTU *pBPnn)
 	pBPnn->Train.AllBatchCount = 0;
 	pBPnn->Train._batch_stream_count = 0;
 	pBPnn->Train.mini_batch_now = 0;
+
+	pBPnn->Train.Beta1T = _ParaMpy(pBPnn->Train.Beta1T, pBPnn->Train.Beta1T);
+	pBPnn->Train.Beta2T = _ParaMpy(pBPnn->Train.Beta2T, pBPnn->Train.Beta2T);
 
 	return;
 
