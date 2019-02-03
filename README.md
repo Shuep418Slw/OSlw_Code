@@ -1,5 +1,5 @@
 # OSlw_Code
-移植步骤
+## OS移植步骤
 
 0)添加文件与路径
 
@@ -42,4 +42,56 @@ myos.TaskAppendFun(&myos,&mytask);
 7)启动os
 ~~~
 myos.StartFun(&myos);
+~~~
+
+
+##搭建神经网络
+
+1)新建神经网络结构体
+~~~
+OSlwToolBPnnSTU mynn;
+~~~
+
+2)定义内存堆
+~~~
+OSLW_MEM_SIMPLE_DEF(mem, 32, 1500)
+~~~
+
+3)定义随机数用以初始化
+~~~
+OSlwToolRandomWELL512STU myrand;
+OSlwToolRandomBasicSTU *pr = &myrand;
+~~~
+
+4)初始化内存堆与随机数
+~~~
+OSLW_MEM_INIT(mem);
+OSlwToolRandomWELL512Seed(&myrand, 1);
+~~~
+
+5)初始化神经网络 并且定义神经网络最大mini-batch
+~~~
+OSlwToolBPnnInit(&mynn, 1);
+~~~
+
+6)追加神经网络层
+~~~
+OSlwToolBPnnFullConAppend(
+	&mynn,
+	784, 10,
+	NULL, NULL,
+	NULL, NULL,
+	pr->randn, pr, _ParaFrom(0), _ParaFrom(0.1),
+	LwSoftMax, pmem
+);
+~~~
+
+7)追加损失层
+~~~
+OSlwToolBPnnTrainInit(&mynn, NULL, pmem, pOSlwToolMatrixLossCrossEntropyForSoftMax, _ParaFrom(0.1));
+~~~
+
+8)初始化所有数据
+~~~
+OSlwToolBPnnAllDataInit(&mynn, pmem);
 ~~~
