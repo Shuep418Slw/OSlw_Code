@@ -1,4 +1,4 @@
-/*(Ver.=0.93)
+/*(Ver.=0.94)
 * OSLW_tool.h
 *
 *  Created on: 2017-7-25
@@ -46,73 +46,77 @@ void OSlwToolMatrixInitial(OSlwToolMatrixSTU *m, LwMatRowType row, LwMatColType 
 //typedef OSlwToolMatrixSTU* (*pOSlwToolMatrixAddFunType)(OSlwToolMatrixSTU *s,OSlwToolMatrixSTU *m1,OSlwToolMatrixSTU *m2);
 
 OSLW_TOOL_FUN_STATEMENT(OSlwToolMatrixSTU*, OSlwToolMatrixAdd,
-(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *m1, OSlwToolMatrixSTU *m2));
+(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *m1, OSlwToolMatrixSTU *m2))
 
 //OSlwToolMatrixSTU* OSlwToolMatrixSub(OSlwToolMatrixSTU *s,OSlwToolMatrixSTU *m1,OSlwToolMatrixSTU *m2);
 //typedef OSlwToolMatrixSTU* (*pOSlwToolMatrixSubFunType)(OSlwToolMatrixSTU *s,OSlwToolMatrixSTU *m1,OSlwToolMatrixSTU *m2);
 OSLW_TOOL_FUN_STATEMENT(OSlwToolMatrixSTU*, OSlwToolMatrixSub,
-(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *m1, OSlwToolMatrixSTU *m2));
+(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *m1, OSlwToolMatrixSTU *m2))
 
 
 OSLW_TOOL_FUN_STATEMENT(OSlwToolMatrixSTU*, OSlwToolMatrixDot,
-(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *m1, OSlwToolMatrixSTU *m2));
+(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *m1, OSlwToolMatrixSTU *m2))
 
 //OSlwToolMatrixSTU* OSlwToolMatrixMpy(OSlwToolMatrixSTU *s,OSlwToolMatrixSTU *m1,OSlwToolMatrixSTU *m2);
 //typedef OSlwToolMatrixSTU* (*pOSlwToolMatrixMpyFunType)(OSlwToolMatrixSTU *s,OSlwToolMatrixSTU *m1,OSlwToolMatrixSTU *m2);
 OSLW_TOOL_FUN_STATEMENT(OSlwToolMatrixSTU*, OSlwToolMatrixMpy,
-(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *m1, OSlwToolMatrixSTU *m2));
+(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *m1, OSlwToolMatrixSTU *m2))
 
 OSLW_TOOL_FUN_STATEMENT(OSlwToolMatrixSTU*, OSlwToolMatrixTurn,
-(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *buf));
+(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *buf))
 
 OSLW_TOOL_FUN_STATEMENT(OSlwToolMatrixSTU*, OSlwToolMatrixReSize,
-(OSlwToolMatrixSTU *s, lw_u16 row, lw_u16 col));
+(OSlwToolMatrixSTU *s, lw_u16 row, lw_u16 col))
 
 
 OSLW_TOOL_FUN_STATEMENT(OSlwToolMatrixSTU*, OSlwToolMatrixMaxMin,
-(OSlwToolMatrixSTU *s, ParaType *pMax, lw_u16 *pMaxIndex, ParaType *pMin, lw_u16 *pMinIndex));
+(OSlwToolMatrixSTU *s, ParaType *pMax, lw_u16 *pMaxIndex, ParaType *pMin, lw_u16 *pMinIndex))
 
 OSLW_TOOL_FUN_STATEMENT(OSlwMartixResNum, OSlwToolMatrixIndex,
-(OSlwToolMatrixSTU *s, ParaType data, lw_u16 *pindex, lw_u16 *pmaxlen));
+(OSlwToolMatrixSTU *s, ParaType data, lw_u16 *pindex, lw_u16 *pmaxlen))
 
 OSLW_TOOL_FUN_STATEMENT(OSlwMartixResNum, OSlwToolMatrixFind,
-(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *m, lw_u16 SpacingLen, lw_u16 First, lw_u16 *pres));
+(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *m, lw_u16 SpacingLen, lw_u16 First, lw_u16 *pres))
 
 
 OSLW_TOOL_FUN_STATEMENT(OSlwMartixResNum, OSlwToolMatrixCmp,
-(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *m, lw_u8 *pbuf));
-
+(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *m, lw_u8 *pbuf))
 
 OSLW_TOOL_FUN_STATEMENT(OSlwToolMatrixSTU*, OSlwToolMatrixSet,
-(OSlwToolMatrixSTU *s, ParaType data, OSlwToolMatrixSTU *a));
+(OSlwToolMatrixSTU *s, ParaType data, OSlwToolMatrixSTU *a))
 
 OSLW_TOOL_FUN_STATEMENT(OSlwToolMatrixSTU*, OSlwToolMatrixJoin,
-(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *m1, OSlwToolMatrixSTU *m2));
+(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *m1, OSlwToolMatrixSTU *m2))
 
 OSLW_TOOL_FUN_STATEMENT(ParaType, OSlwToolMatrixLossSquare,
-(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *ref, OSlwToolMatrixSTU *pre));
+(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *ref, OSlwToolMatrixSTU *pre))
 
 OSLW_TOOL_FUN_STATEMENT(ParaType, OSlwToolMatrixLossCrossEntropyForSoftMax,
-(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *ref, OSlwToolMatrixSTU *pre));
+(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *ref, OSlwToolMatrixSTU *pre))
+
+/*
 
 OSLW_TOOL_FUN_STATEMENT(ParaType, OSlwToolMatrixSum,
 (OSlwToolMatrixSTU *s));
 
 OSLW_TOOL_FUN_STATEMENT(ParaType, OSlwToolMatrixVar,
 (OSlwToolMatrixSTU *s, ParaType *pMean, OSlwToolMatrixSTU *_normal_res, ParaType epsi));
+*/
 
+OSLW_TOOL_FUN_STATEMENT(ParaType, OSlwToolMatrixSum,
+(OSlwToolMatrixSTU *DST, OSlwToolMatrixSTU *SRC, lw_u8 dim))
 
 OSLW_TOOL_FUN_STATEMENT(OSlwToolMatrixSTU*, OSlwToolMatrixMPYA,
-(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *x, OSlwToolMatrixSTU *we, OSlwToolMatrixSTU *bi));
+(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *x, OSlwToolMatrixSTU *we, OSlwToolMatrixSTU *bi))
 
 OSLW_TOOL_FUN_STATEMENT(OSlwToolMatrixSTU*, OSlwToolMatrixWeXBi,
-(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *we, OSlwToolMatrixSTU *x, OSlwToolMatrixSTU *bi));
+(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *we, OSlwToolMatrixSTU *x, OSlwToolMatrixSTU *bi))
 
 OSLW_TOOL_FUN_STATEMENT(OSlwToolMatrixSTU*, OSlwToolMatrixXWeBi,
-(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *we, OSlwToolMatrixSTU *x, OSlwToolMatrixSTU *bi));
+(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *we, OSlwToolMatrixSTU *x, OSlwToolMatrixSTU *bi))
 
 OSLW_TOOL_FUN_STATEMENT(OSlwToolMatrixSTU*,OSlwToolMatrixTurnMpy,
-	(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *m1, OSlwToolMatrixSTU *m2, lw_u8 flag));
+	(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *m1, OSlwToolMatrixSTU *m2, lw_u8 flag))
 
 
 OSLW_TOOL_FUN_STATEMENT(void*, OSlwToolMatrixConv2,
@@ -125,7 +129,7 @@ OSLW_TOOL_FUN_STATEMENT(void*, OSlwToolMatrixConv2,
 	lw_u8 MoveModel, //移动模式 's'/'f'
 	lw_u8 KernalModel, //核模式 0/180 180+‘f’=数学二维卷积
 	ParaType *fast_buf//快速卷积内存区
-	));
+	))
 
 //只计算一个batch
 OSLW_TOOL_FUN_STATEMENT(void*, OSlwToolMatrixConvFastMultCh,
@@ -139,13 +143,40 @@ OSLW_TOOL_FUN_STATEMENT(void*, OSlwToolMatrixConvFastMultCh,
 	lw_u16 move_x, lw_u16 move_y,//横向纵向移动距离
 	lw_u8 FD_1_or_BK_0,//前向传递或者反向传递
 	ParaType *fast_buf//核 区域
-	));
+))
+
+
+OSLW_TOOL_FUN_STATEMENT(void*, OSlwToolMatrixMoments,
+(
+	OSlwToolMatrixSTU *src, 
+	ParaType *mean,
+	ParaType *var,
+	lw_u8 dim	
+))
+
+OSLW_TOOL_FUN_STATEMENT(void*, OSlwToolMatrixVectShift,
+(
+	OSlwToolMatrixSTU *y,
+	OSlwToolMatrixSTU *we,
+	OSlwToolMatrixSTU *x,
+	OSlwToolMatrixSTU *bi
+	)
+)
+
+OSLW_TOOL_FUN_STATEMENT(void*, OSlwToolMatrixDotSum,
+(
+	OSlwToolMatrixSTU *y,
+	OSlwToolMatrixSTU *x1,
+	OSlwToolMatrixSTU *x2,
+	lw_u8 dim
+	)
+)
 
 OSLW_TOOL_FUN_STATEMENT(
 	OSlwToolMatrixSTU*,
 	OSlwToolMatrix_RATIO_ADD,
 	(OSlwToolMatrixSTU *s, ParaType a, OSlwToolMatrixSTU *m1, ParaType b, OSlwToolMatrixSTU *m2)
-);
+)
 
 
 #define OSLW_TOOL_M_SIZE_EQU(A,B) ((A)->length == (B)->length)
@@ -166,9 +197,9 @@ OSLW_TOOL_FUN_STATEMENT(
 
 #define OSlwMatNew OSLW_TOOL_M_DY_INIT
 
-#define OSlwMatDef(R,C,A) {((ParaType *)(A)),R*C,R,C}
+#define OSlwMatDef(R,C,A) {((ParaType *)(A)),(R)*(C),(R),(C)}
 
-#define OSlwMatStaticNew(M,R,C) static ParaType _##M##PARA[R*C];static OSlwMat M=OSlwMatDef(_##M##PARA,R,C);
+#define OSlwMatStaticNew(M,R,C) static ParaType M##R##C [(R)*(C)];static OSlwMat M={((ParaType *)( M##R##C )),(R)*(C),(R),(C)};
 
 
 

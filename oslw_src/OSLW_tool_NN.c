@@ -1,4 +1,4 @@
-/*(Ver.=0.93)
+/*(Ver.=0.94)
  * OSLW_tool.c
  *
  *  Created on: 2017-11-13
@@ -625,7 +625,7 @@ void OSlwToolBPnnReguInitial(OSlwToolBPnnSTU *pBPnn, OSlwToolNNReguTypeNUM ReguT
 
 }
 
-/*(Ver.=0.93)
+/*(Ver.=0.94)
 //对网络减肥
 //dropout 效果不好
 OSlwToolBPnnSTU* OSlwToolBPnnDropOutStart(OSlwToolBPnnSTU *_pBPnn)
@@ -957,7 +957,7 @@ OSlwToolBPnnSTU *OSlwToolBPnnErrCalu(OSlwToolBPnnSTU *pBPnn)
 }
 
 
-/*(Ver.=0.93)
+/*(Ver.=0.94)
 //旧版本
 //后向传播
 OSlwToolBPnnSTU *OSlwToolBPnnUpdate(OSlwToolBPnnSTU *_pBPnn)

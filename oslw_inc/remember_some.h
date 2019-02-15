@@ -28,5 +28,10 @@ random部分修改了RMIN与RMAX位置 现在使用前小后大
 增加了RNN GRURNN
 修改了IQ类型运算的bug
 
+0.94版本 2019/02/16
+修改了RNNCELL的模型 可以支持更加丰富的RNNcell
+增加了LayerNorm,并且可以与RNN（包括GRU）相结合，也可单独用在其他层
+增加了shift层（不包括追加函数），可以用于替换训练好的BatchNorm
+修改了部分全连接层追加函数代码，降低代码耦合性
 
 */

@@ -1,4 +1,4 @@
-/*(Ver.=0.93)
+/*(Ver.=0.94)
 * OSLW_tool.c
 *
 *  Created on: 2017-7-14
@@ -509,14 +509,14 @@ OSLW_TOOL_FUN(OSlwToolMatrixSTU*, OSlwToolMatrixSet,
     OSLW_assert(!(s));
     if (a)//如果定义a 相当于复制构造函数
     {
-        /*(Ver.=0.93)
+        /*(Ver.=0.94)
         for (i = 0; i < s->length; i++)
         {
         s->a[i] = a->a[i];
         }
         */
 
-        /*(Ver.=0.93)
+        /*(Ver.=0.94)
         i = s->length;
         ps = s->a;
         pa = a->a;
@@ -538,7 +538,7 @@ OSLW_TOOL_FUN(OSlwToolMatrixSTU*, OSlwToolMatrixSet,
     }
     else//使用常量初始化
     {
-        /*(Ver.=0.93)
+        /*(Ver.=0.94)
         for (i = 0; i < s->length; i++)
         {
         s->a[i] = data;
@@ -756,7 +756,7 @@ OSlwToolMatrixLossCrossEntropyForSoftMax
 
 	return -sum;
 }
-
+/*
 OSLW_TOOL_FUN(ParaType, OSlwToolMatrixSum,
 (OSlwToolMatrixSTU *s),
 OSlwToolMatrixSum
@@ -828,6 +828,123 @@ OSlwToolMatrixVar
 	return _var;
 
 
+}
+*/
+
+OSLW_TOOL_FUN(ParaType, OSlwToolMatrixSum,
+(OSlwToolMatrixSTU *DST, OSlwToolMatrixSTU *SRC, lw_u8 dim),
+OSlwToolMatrixSum
+)
+{
+	register ParaType _sum = _ParaFint(0);
+	register LwMatRowType r;
+	register LwMatColType c;
+	register LwMatLenType l;
+	register lw_u32 i, j;
+	register ParaType *s, *d, *si;
+
+	OSLW_assert(!(SRC));
+	l = SRC->length;
+	r = SRC->row;
+	c = SRC->col;
+	s = SRC->a;
+	switch (dim)
+	{
+	case 0x00:
+		while (l--)
+		{
+			_sum = _ParaAdd(_sum, *s++);
+		}
+		break;
+
+	case 0x10:
+		OSLW_assert(!(DST));
+		d = DST->a;
+		while (l--)
+		{
+			_sum = _ParaAdd(_sum, *s++);
+		}
+		*d = _ParaAdd(*d, _sum);
+		break;
+
+	case 0x01:
+		OSLW_assert(!(DST));
+		OSLW_assert(!(DST->length >= r));
+
+		d = DST->a;
+		while (r--)
+		{
+			i = c;
+			_sum = _ParaFrom(0);
+			while (i--)
+			{
+				_sum = _ParaAdd(_sum, *s++);
+			}
+			*d++ = _sum;
+		}
+		break;
+
+	case 0x11:
+		OSLW_assert(!(DST));
+		OSLW_assert(!(DST->length >= r));
+		d = DST->a;
+		while (r--)
+		{
+			i = c;
+			_sum = _ParaFrom(0);
+			while (i--) _sum = _ParaAdd(_sum, *s++);
+			*d = _ParaAdd(*d, _sum);
+			++d;
+		}
+		break;
+
+	case 0x02:
+		OSLW_assert(!(DST));
+		OSLW_assert(!(DST->length >= c));
+		d = DST->a;
+		j = c;
+		while (j--)
+		{
+			i = r;
+			_sum = _ParaFrom(0);
+			si = s++;
+			while (i--)
+			{
+				_sum = _ParaAdd(_sum, *si);
+				si += c;
+			}
+			*d++ = _sum;
+		}
+		break;
+
+	case 0x12:
+		OSLW_assert(!(DST));
+		OSLW_assert(!(DST->length >= c));
+		d = DST->a;
+		j = c;
+		while (j--)
+		{
+			i = r;
+			_sum = _ParaFrom(0);
+			si = s++;
+			while (i--)
+			{
+				_sum = _ParaAdd(_sum, *si);
+				si += c;
+			}
+
+			*d = _ParaAdd(*d, _sum);
+			++d;
+		}
+		break;
+
+	default:
+		OSLW_assert(1);
+		break;
+	}
+
+
+	return _sum;
 }
 
 
@@ -1563,6 +1680,222 @@ OSLW_TOOL_FUN(
 }
 
 
+OSLW_TOOL_FUN(void*, OSlwToolMatrixMoments,
+(
+	OSlwToolMatrixSTU *src,
+	ParaType *mean,
+	ParaType *var,
+	lw_u8 dim
+	), 
+	OSlwToolMatrixMoments)
+{
+
+	register ParaType _sum1, _sum2;
+	register ParaType *p, *pbase;
+	register ParaType _div_m;
+	register lw_u32 i, j;
+	register lw_u32 r, c;
+	OSLW_assert(!(src));
+	OSLW_assert(!(mean));
+	OSLW_assert(!(var));
+
+	r = src->row;
+	c = src->col;
+	
+	if (dim==0x01)
+	{
+		pbase = src->a;
+		_div_m = _ParaDiv(_ParaFrom(1), _ParaFint(c));
+		for ( i = 0; i < r; ++i)
+		{
+			p = pbase;
+			//求和
+			for ( j = 0, _sum1=_ParaFrom(0); j < c; ++j,++p)
+			{
+				_sum1 = _ParaAdd(_sum1, *p);
+			}
+			//求平均
+			_sum1 = _ParaMpy(_sum1, _div_m);
+			//保存均值
+			*mean++ = _sum1;
+
+			//方差
+			for (j = 0, _sum2 = _ParaFrom(0); j < c; ++j, ++pbase)
+			{
+				_sum2 = _ParaAdd(
+					_sum2,
+					_ParaMpy(_ParaSub(*pbase, _sum1), _ParaSub(*pbase, _sum1))
+				);
+			}
+			//求方差
+			_sum2 = _ParaMpy(_sum2, _div_m);
+			//保存方差
+			*var++ = _sum2;
+		}
+
+	}
+	else
+	{
+		OSLW_assert(1);
+	}
+
+
+
+	return src;
+}
+
+
+OSLW_TOOL_FUN(void*, OSlwToolMatrixVectShift,
+(
+	OSlwToolMatrixSTU *y,
+	OSlwToolMatrixSTU *we,
+	OSlwToolMatrixSTU *x,
+	OSlwToolMatrixSTU *bi
+	),
+	OSlwToolMatrixVectShift)
+{
+	LwMatRowType i, _r;
+	LwMatColType j, _c;
+	ParaType *ya, *xa, *wa, *ba, *wa_b, *ba_b;
+	OSLW_assert(!(y));
+	OSLW_assert(!(we));
+	OSLW_assert(!(x));
+
+	if (bi)
+	{
+		ya = y->a;
+		xa = x->a;
+		wa_b = we->a;
+		ba_b = bi->a;
+		for (i = 0, _r = y->row, _c = y->col; i < _r; i++)
+		{
+			for (j = 0, wa = wa_b, ba = ba_b; j < _c; ++j, ++ya, ++wa, ++xa, ++ba)
+			{
+				*ya = _ParaAdd(_ParaMpy(*wa, *xa), *ba);
+			}
+		}
+	}
+	else
+	{
+		ya = y->a;
+		xa = x->a;
+		wa_b = we->a;
+		for (i = 0, _r = y->row, _c = y->col; i < _r; i++)
+		{
+			for (j = 0, wa = wa_b; j < _c; ++j, ++ya, ++wa, ++xa)
+			{
+				*ya = _ParaMpy(*wa, *xa);
+			}
+		}
+	}
+
+	return y;
+
+}
+
+
+OSLW_TOOL_FUN(void*, OSlwToolMatrixDotSum,
+(
+	OSlwToolMatrixSTU *y,
+	OSlwToolMatrixSTU *x1,
+	OSlwToolMatrixSTU *x2,
+	lw_u8 dim
+	),
+	OSlwToolMatrixDotSum)
+{
+
+	LwMatRowType i, _r;
+	LwMatColType j, _c;
+	LwMatLenType l, _L;
+	ParaType _sum;
+	ParaType *ya, *ya_b;
+	ParaType *x1a, *x1a_b;
+	ParaType *x2a, *x2a_b;
+
+	OSLW_assert(!(y));
+	OSLW_assert(!(x1));
+	OSLW_assert(!(x2));
+
+
+	switch (dim)
+	{
+
+	case 0x00:
+		x1a = x1->a;
+		x2a = x2->a;
+		_sum = _ParaFint(0);
+		for ( l = 0,_L=x1->length; l < _L; ++l,++x1a,++x2a)
+		{
+			_sum = _ParaAdd(_sum, (_ParaMpy(*x1a, *x2a)));
+		}
+		y->a[0] = _sum;
+		break;
+
+	case 0x10:
+		x1a = x1->a;
+		x2a = x2->a;
+		_sum = _ParaFint(0);
+		for (l = 0, _L = x1->length; l < _L; ++l, ++x1a, ++x2a)
+		{
+			_sum = _ParaAdd(_sum, (_ParaMpy(*x1a, *x2a)));
+		}
+		y->a[0] = _ParaAdd(y->a[0], _sum);
+		break;
+
+	case 0x01:
+		x1a = x1->a;
+		x2a = x2->a;
+		ya = y->a;
+		for (i = 0, _r = x1->row, _c = x1->col; i < _r; ++i, ++ya)
+		{
+			for (j = 0, _sum = _ParaFint(0); j < _c; ++j, ++x1a, ++x2a)
+			{
+				_sum = _ParaAdd(_sum, (_ParaMpy(*x1a, *x2a)));
+			}
+			*ya = _sum;
+		}
+
+		break;
+
+	case 0x11:
+		x1a = x1->a;
+		x2a = x2->a;
+		ya = y->a;
+		for (i = 0, _r = x1->row, _c = x1->col; i < _r; ++i, ++ya)
+		{
+			for (j = 0, _sum = _ParaFint(0); j < _c; ++j, ++x1a, ++x2a)
+			{
+				_sum = _ParaAdd(_sum, (_ParaMpy(*x1a, *x2a)));
+			}
+			*ya = _ParaAdd(*ya, _sum);
+		}
+		break;
+
+	case 0x02:
+		LW_MAT_CLR(y);
+	case 0x12:
+		x1a = x1->a;
+		x2a = x2->a;
+		ya_b = y->a;
+		for (i = 0, _r = x1->row, _c = x1->col; i < _r; ++i, ++ya)
+		{
+			for (j = 0, ya = ya_b; j < _c; ++j, ++x1a, ++x2a, ++ya)
+			{
+				*ya = _ParaAdd(*ya, (_ParaMpy(*x1a, *x2a)));
+			}
+		}
+		break;
+
+	default:
+		OSLW_assert(1);
+		break;
+	}
+
+
+}
+
+
+
 OSLW_TOOL_FUN(OSlwToolMatrixSTU*, OSlwToolMatrix_RATIO_ADD,
 (OSlwToolMatrixSTU *s,ParaType a, OSlwToolMatrixSTU *m1, ParaType b, OSlwToolMatrixSTU *m2),
 OSlwToolMatrix_RATIO_ADD
@@ -1600,3 +1933,4 @@ OSlwToolMatrix_RATIO_ADD
 #endif //OSLW_TOOL_IMPORT_MATH || OSLW_TOOL_IMPORT_ALL
 
 #endif // !(OSLW_SIMPLE_LEVEL >= 4)
+

@@ -1,4 +1,4 @@
-/*(Ver.=0.93)
+/*(Ver.=0.94)
  * OSLW_tool.c
  *
  *  Created on: 2019-01-22
@@ -472,6 +472,87 @@ lw_ptr OSlwToolBPnnLayerSoftMaxBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRU
 	_OSLW_TOOL_NN_ACTFUN_SEMI1(pNNSLB)
 	*_in = *_out;
 	_OSLW_TOOL_NN_ACTFUN_SEMI2(pNNSLB, mini_b_num)
+}
+
+
+OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerActFunNew(
+	ParaType *pin,
+	ParaType *pout,
+	lw_u16 Col,
+	lw_u16 max_mini_batch,
+	OSlwMemoryBasicSTU *pmem,
+	OSlwToolNNLayerActFunSTU *pTemplet,
+	lw_u8 TrainFlag
+)
+{
+	lw_u32 node_size;
+	OSlwToolNNLayerActFunSTU *node;
+	OSLW_assert(!pmem);
+	OSLW_assert(!pTemplet);
+	//分配节点内存
+
+	if (pTemplet->_real_size < sizeof(OSlwToolNNLayerActFunSTU))
+	{
+		node_size = sizeof(OSlwToolNNLayerActFunSTU);
+	}
+	else
+	{
+		node_size = pTemplet->_real_size;
+	}
+
+	node = pmem->Malloc(pmem, node_size);
+
+	memcpy(node, pTemplet, node_size);
+
+
+
+#if OSLW_TOOL_NN_DATA_FRAME==OSLW_TOOL_NN_D_FRAME_C
+
+	//设置输入
+	if (pin == NULL)
+	{
+		pin = pmem->Malloc(pmem, PARA_MEM_CAL(max_mini_batch * Col));
+	}
+	OSlwToolMatrixInitial(&(node->basic.in), max_mini_batch, Col, pin);
+
+	//设置输出
+	if (pout == NULL)
+	{
+		pout = pmem->Malloc(pmem, PARA_MEM_CAL(max_mini_batch * Col));
+	}
+	OSlwToolMatrixInitial(&(node->basic.out), max_mini_batch, Col, pout);
+
+
+#elif OSLW_TOOL_NN_DATA_FRAME == OSLW_TOOL_NN_D_FRAME_F
+
+	//设置输入
+	if (pin == NULL)
+	{
+		pin = pmem->Malloc(pmem, PARA_MEM_CAL(max_mini_batch * Col));
+	}
+	OSlwToolMatrixInitial(&(node->basic.in), Col, max_mini_batch, pin);
+
+	//设置输出
+	if (pout == NULL)
+	{
+		pout = pmem->Malloc(pmem, PARA_MEM_CAL(max_mini_batch * Col));
+	}
+	OSlwToolMatrixInitial(&(node->basic.out), Col, max_mini_batch, pout);
+
+#else
+
+#error"NN data frame is unknown"
+	OSLW_assert(1);
+
+#endif // OSLW_TOOL_NN_DATA_FRAME==OSLW_TOOL_NN_D_FRAME_C
+
+
+	if (pTemplet->_init)
+	{
+		pTemplet->_init(pTemplet, TrainFlag);
+	}
+
+	return (OSlwToolNNSubLayerBasicSTU *)node;
 }
 
 

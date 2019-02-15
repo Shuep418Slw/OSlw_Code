@@ -1,4 +1,4 @@
-/*(Ver.=0.93)
+/*(Ver.=0.94)
  * OSLW_define.h
  *
  *  Created on: 2017-7-14
@@ -188,7 +188,7 @@ typedef enum{
     #define _ParaExp(A) (_IQ24exp(A))
 	#define PARA_LEN 4
 #elif OSLW_GLOBAL_MATH_TYPE==OSLW_GLOBAL_MATH_FLOAT
-/*(Ver.=0.93)
+/*(Ver.=0.94)
 	#define _ParaAdd(A,B) ((lw_sf)(A)+(lw_sf)(B))
 	#define _ParaSub(A,B) ((lw_sf)(A)-(lw_sf)(B))
 	#define _ParaMpy(A,B) ((lw_sf)(A)*(lw_sf)(B))
@@ -593,6 +593,6 @@ typedef union OSLW_CORE_GROUP_UNION{
 }OSlwCoreGroupUN;
 
 
-#endif /*(Ver.=0.93) OSLW_DEFINE_H_ */
+#endif /*(Ver.=0.94) OSLW_DEFINE_H_ */
 
 

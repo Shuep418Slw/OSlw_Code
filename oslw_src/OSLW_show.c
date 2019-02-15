@@ -1,4 +1,4 @@
-/*(Ver.=0.93)
+/*(Ver.=0.94)
  * OSLW_show.c
  *
  *  Created on: 2017-7-25
@@ -21,7 +21,7 @@ OSlwTimerSTU OSlwTimerShowIrp=OSLW_TIMER_DEFAULT;
 
 #endif
 
-/*(Ver.=0.93)
+/*(Ver.=0.94)
 OSlwShowParaDateSTU* OSlwShowCursorMove(OSlwShowParaDateSTU *pSPD,lw_16 dir)
 {
 	OSlwShowCursorSTU *pSC= &(pSPD->Cursor);

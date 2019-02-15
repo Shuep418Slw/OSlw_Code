@@ -1,4 +1,4 @@
-/*(Ver.=0.9~)
+/*(Ver.=0.94)
  * OSLW_core.h
  *
  *  Created on: 2017-7-14
@@ -131,7 +131,7 @@ typedef struct OSLW_CORE_STRUCT{
 	void(*StartFun)(struct OSLW_CORE_STRUCT *pOS);//系统开始函数
 	struct OSLW_CORE_STRUCT *(*TaskAppendFun)(struct OSLW_CORE_STRUCT *pOS, struct OSLW_TASK_STRUCT *pta);//任务注册函数
 	struct OSLW_CORE_STRUCT *(*TimerAppendFun)(struct OSLW_CORE_STRUCT *pOS, OSlwTimerSTU *pT);
-	/*(Ver.=0.9~)
+	/*(Ver.=0.94)
 #if !(OSLW_SIMPLE_MODE)
 	void (*DispatchFun)(struct OSLW_CORE_STRUCT *pOS);//调度器函数
 	void (*ClockCBFun)(struct OSLW_CORE_STRUCT *pOS);//系统时钟回掉函数 !!!!!!!!!不建议以成员函数调用!!!!!!!!!
@@ -408,4 +408,4 @@ typedef struct
 
 //#define OSlwSleepN(A,N) do {DISPATCH_READY(A){ A->SleepFun(A,N-1);}} while(0)
 
-#endif /*(Ver.=0.9~) OSLW_CORE_H_ */
+#endif /*(Ver.=0.94) OSLW_CORE_H_ */

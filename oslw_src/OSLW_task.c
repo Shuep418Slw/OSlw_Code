@@ -1,4 +1,4 @@
-/*(Ver.=0.93)
+/*(Ver.=0.94)
  * OSLW_task.c
  *
  *  Created on: 2017-7-14
@@ -122,7 +122,7 @@ void OSlwInlineTaskBoringExe(OSlwTaskSTU *_pta)
 //------------------------------------------
 
 //!!!!!!!!!!!!为了防止部分编译器的断点不支持局部变量保存 推荐尽量使用全局变量!!!!!!!!!!!!!!!!!!!!!!!!
-/*(Ver.=0.93)
+/*(Ver.=0.94)
 OSlwParaCtrlSTU *ppc_1;
 OSlwGiftReceiveSTU *pgr_1;
 OSlwGiftPostmanSTU *pp_1;

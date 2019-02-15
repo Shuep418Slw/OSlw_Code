@@ -1,4 +1,4 @@
-/*(Ver.=0.93)
+/*(Ver.=0.94)
  * OSLW_tool.c
  *
  *  Created on: 2017-7-25
@@ -104,12 +104,12 @@ ParaType OSlwToolSogiPllCal(OSlwToolSogiPllSTU *pSP)
 
 //if nargin==6
 //    restr1=sprintf('//kr is %f and wc is %f\n',kr,wc);
-//    redata=sprintf('%sPara_num[0].Parameter=_ParaFrom(%f);//*(Ver.=0.93)-1\n%sPara_num[1].Parameter=_ParaFrom(%f);//*(Ver.=0.93)-1\n%sPara_den[0].Parameter=_ParaFrom(%f);\n%sPara_den[1].Parameter=_ParaFrom(%f);\n',STUname,-b(2),STUname,-b(3),STUname,a(2),STUname,a(3));
+//    redata=sprintf('%sPara_num[0].Parameter=_ParaFrom(%f);//*(Ver.=0.94)-1\n%sPara_num[1].Parameter=_ParaFrom(%f);//*(Ver.=0.94)-1\n%sPara_den[0].Parameter=_ParaFrom(%f);\n%sPara_den[1].Parameter=_ParaFrom(%f);\n',STUname,-b(2),STUname,-b(3),STUname,a(2),STUname,a(3));
 //    redata=[restr1,redata];
 //elseif nargin==5 && strcmp(opt,'code')
 //    restr1=sprintf('//kr is %f and wr is %f\n',kr,wr);
 //    STUname='p->';
-//    redata=sprintf('%sPara_num[0].Parameter=_ParaFrom(%f);//*(Ver.=0.93)-1\n%sPara_num[1].Parameter=_ParaFrom(%f);//*(Ver.=0.93)-1\n%sPara_den[0].Parameter=_ParaFrom(%f);\n%sPara_den[1].Parameter=_ParaFrom(%f);\n',STUname,-b(2),STUname,-b(3),STUname,a(2),STUname,a(3));
+//    redata=sprintf('%sPara_num[0].Parameter=_ParaFrom(%f);//*(Ver.=0.94)-1\n%sPara_num[1].Parameter=_ParaFrom(%f);//*(Ver.=0.94)-1\n%sPara_den[0].Parameter=_ParaFrom(%f);\n%sPara_den[1].Parameter=_ParaFrom(%f);\n',STUname,-b(2),STUname,-b(3),STUname,a(2),STUname,a(3));
 //    redata=[restr1,redata];
 //elseif nargin==5 && strcmp(opt,'data')
 //    redata=[a;b];

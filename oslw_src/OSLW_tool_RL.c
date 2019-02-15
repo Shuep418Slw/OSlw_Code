@@ -1,4 +1,4 @@
-/*(Ver.=0.93)
+/*(Ver.=0.94)
  * OSLW_tool.c
  *
  *  Created on: 2017-11-27
@@ -265,7 +265,7 @@ OSlwToolQLearningSTU* OSlwToolQLearningLearnFun(OSlwToolQLearningSTU *pQRL)
 
 	OSLW_RL_UPDATE(pQRL);
 
-    /*(Ver.=0.93)
+    /*(Ver.=0.94)
     mat.length = pTQRLDS->state.length;
     mat.a = pTQRLDS->state.a;
 
@@ -332,7 +332,7 @@ OSlwToolQLearningSTU* OSlwToolQLearningChooseFun(OSlwToolQLearningSTU *pQRLB)
 
 
     //根据state 查询state的ID
-    /*(Ver.=0.93)
+    /*(Ver.=0.94)
     mat.col = pTQRLDS->action.col;
     mat.row = 1;
     mat.length = pTQRLDS->action.length;
@@ -484,7 +484,7 @@ OSlwToolSarsaLamberSTU* OSlwToolSarsaLamberLearnFun(OSlwToolSarsaLamberSTU *pTSL
 	pRL = &(pTSL->basic.basic);
     pTQRLDS = &(pTSL->basic.DataTable);
 	OSLW_RL_UPDATE(pTSL);
-    /*(Ver.=0.93)
+    /*(Ver.=0.94)
         mat.length = pTQRLDS->state.length;
         mat.a = pTQRLDS->state.a;
         pOSlwToolMatrixIndex(&mat, pQRLB->StateNow, &(pQRLB->StateNowIndex), &col);
@@ -554,7 +554,7 @@ OSlwToolDQNetExpReplaySTU *OSlwToolDQNetExpReplayAppend(OSlwToolDQNetExpReplayST
 
 	OSLW_assert(!(pExpRe));
 
-	/*(Ver.=0.93)
+	/*(Ver.=0.94)
 	//旧版本 没有采用table
 	pbase = ((lw_u8 *)(pExpRe->MemPool.pData) + Num*OSLW_TOOL_DQN_EXP_FRAME_SIZE(*pExpRe));
 	//state last 保存
@@ -640,7 +640,7 @@ OSlwToolDQNetExpReplaySTU *OSlwToolDQNetExpReplayAppend(OSlwToolDQNetExpReplayST
 
 
 
-	/*(Ver.=0.93)
+	/*(Ver.=0.94)
 	//旧版本 没有采用table
 	pbase = ((lw_u8 *)(pExpRe->MemPool.pData) + (Num + 1)*OSLW_TOOL_DQN_EXP_FRAME_SIZE(*pExpRe));
 
@@ -755,7 +755,7 @@ OSlwToolDQNetExpReplaySTU *_OSlwToolDQNetExpReplayInsert(OSlwToolDQNetExpReplayS
 
 	pExpRe->Sum = _ParaAdd(pExpRe->Sum, pExpReF->Importance);
 
-	/*(Ver.=0.93)
+	/*(Ver.=0.94)
 	if (pExpRe->pMax == NULL)
 	{
 	pExpRe->pMax = pExpReF;
@@ -827,7 +827,7 @@ OSlwToolDQNetExpReplaySTU *_OSlwToolDQNetExpReplayDelete(OSlwToolDQNetExpReplayS
 
 	pExpRe->Sum = _ParaSub(pExpRe->Sum, pExpReF->Importance);
 
-	/*(Ver.=0.93)
+	/*(Ver.=0.94)
 	num = pExpRe->DivResult.uData;
 
 	if (pExpRe->pMax ==pExpReF)
@@ -933,7 +933,7 @@ lw_u16 OSlwToolDQNetExpReplaySample(OSlwToolDQNetExpReplaySTU *pExpRe)
 			{
 				//循环本体
 				now_Sum = _ParaAdd(now_Sum, pexpref->Importance);
-				/*(Ver.=0.93)
+				/*(Ver.=0.94)
 				if (now_Sum >= sample_th && num < pExpRe->SampleResult.uData)
 				{
 				now_min = _ParaAdd(para_div, now_min);
@@ -1416,7 +1416,7 @@ OSlwToolDQNetSTU* OSlwToolDQNetLearning(OSlwToolDQNetSTU *pDQN)
     pDQN->ExpReplay.UpdateFun(&(pDQN->ExpReplay), sample_len);
 
 
-    /*(Ver.=0.93)
+    /*(Ver.=0.94)
     //旧版本
     for (i = 0; i < pDQN->CountMax; i++)
     {
@@ -1486,7 +1486,7 @@ OSlwToolDQNetSTU* OSlwToolDQNetChoose(OSlwToolDQNetSTU *pDQN)
     if (drand < pQRLB->Ep)
     {
         //填装数据
-        /*(Ver.=0.93)dmax= _ParaDiv(pQRLB->StateNow, pDQN->StateFactor);//归一化
+        /*(Ver.=0.94)dmax= _ParaDiv(pQRLB->StateNow, pDQN->StateFactor);//归一化
         pDQN->MainNet.x.a[0] = dmax;*/
         //pOSlwToolMatrixSet(&(pDQN->MainNet.x), 0, &(pQRLB->StateNow));
         pOSlwToolMatrixDot(&(pDQN->MainNet.x), &(pRL->StateNow), &(pDQN->StateFactor));//乘以归一化因子

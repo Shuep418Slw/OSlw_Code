@@ -1,4 +1,4 @@
-/*(Ver.=0.93)
+/*(Ver.=0.94)
  * OSLW_tool.h
  *
  *  Created on: 2017-7-25
@@ -100,16 +100,16 @@ OSlwToolDListNodeSTU* _OSlwToolDListRemoveNode (struct OSLW_TOOL_DLIST_STRUCT *p
 #endif // !(OSLW_SIMPLE_LEVEL >= 4)
 
 
-#define OSLW_TOOL_DLIST_NODE_CONNECT(P1,P2) 	(P1)->con.pNext=(OSlwToolDListNodeConnectSTU *)(P2);/*(Ver.=0.93)尾部的下一个为新的*/\
-(P2)->con.pLast = (OSlwToolDListNodeConnectSTU *)(P1);/*(Ver.=0.93)新节点的上一个为原来尾部*/
+#define OSLW_TOOL_DLIST_NODE_CONNECT(P1,P2) 	(P1)->con.pNext=(OSlwToolDListNodeConnectSTU *)(P2);/*(Ver.=0.94)尾部的下一个为新的*/\
+(P2)->con.pLast = (OSlwToolDListNodeConnectSTU *)(P1);/*(Ver.=0.94)新节点的上一个为原来尾部*/
 
 #define OSLW_TOOL_DLIST_NODE_INSERT(P1,P_INSERT) (P_INSERT)->con.pLast = (OSlwToolDListNodeConnectSTU *)(P1);\
 (P_INSERT)->con.pNext = (OSlwToolDListNodeConnectSTU *)(P1)->con.pNext;\
 (P1)->con.pNext->pLast = (OSlwToolDListNodeConnectSTU *)(P_INSERT);\
 (P1)->con.pNext = (OSlwToolDListNodeConnectSTU *)(P_INSERT);
 
-#define OSLW_TOOL_DLIST_NODE_DELECT(P) 			(P)->con.pLast->pNext=(P)->con.pNext;/*(Ver.=0.93)上一个的下一个为下一个*/\
-(P)->con.pNext->pLast = (P)->con.pLast;/*(Ver.=0.93)下一个的上一个为上一个*/
+#define OSLW_TOOL_DLIST_NODE_DELECT(P) 			(P)->con.pLast->pNext=(P)->con.pNext;/*(Ver.=0.94)上一个的下一个为下一个*/\
+(P)->con.pNext->pLast = (P)->con.pLast;/*(Ver.=0.94)下一个的上一个为上一个*/
 
 
 void OSlwToolDListInitial(OSlwToolDListSTU *pDL,lw_u8 len,void *p);

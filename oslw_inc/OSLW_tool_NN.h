@@ -1,4 +1,4 @@
-/*(Ver.=0.93)
+/*(Ver.=0.94)
  * OSLW_tool.h
  *
  *  Created on: 2017-11-13
@@ -326,7 +326,8 @@ typedef enum {
 	OSlwToolNNSubLayerKind_Conv='C',
 	OSlwToolNNSubLayerKind_Pool='P',
 	OSlwToolNNSubLayerKind_BasicRnn = 'R',
-	OSlwToolNNSubLayerKind_GruRnn = 'G'
+	OSlwToolNNSubLayerKind_GruRnn = 'G',
+	OSlwToolNNSubLayerKind_LNorm = 'L'
 }OSlwToolNNSubLayerKind;
 
 //神经网络层的基类
@@ -394,6 +395,14 @@ typedef struct OSLW_TOOL_NN_LAYER_FULL_CONNECTION_STRUCT
 	
 }OSlwToolNNLayerFullConSTU;
 
+OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerFullConNew(
+	ParaType *pin,//输入指针 为NULL则分配 
+	ParaType *pout,//输出指针 为NULL则分配 
+	lw_u16 InCol,//权重的行 = 输入的行
+	lw_u16 OutCol,//权重的列 = 输出的行
+	lw_u16 max_mini_batch,//最大minibatch
+	OSlwMemoryBasicSTU *pmem//内存分配结构体
+);
 
 
 typedef struct OSLW_TOOL_NN_LAYER_CONVOLUTION_STRUCT{
@@ -524,122 +533,12 @@ OSlwToolMatrixSTU* _OSlwToolNNAvgPoolingBK
 	lw_u16 move_x, lw_u16 move_y
 );
 
-
-
-
-
-typedef struct OSLW_TOOL_NN_LAYER_RECURRENT_CELL_STRUCT {
-	OSlwMat in;
-	OSlwMat we, bi;
-	OSlwMat dwe, dbi;
-	struct 
-	{
-		OSlwMat in, out;//输入矩阵与输出矩阵
-		lw_ptr(*Forward)(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);//前向传递函数 输入:this 当前min_batch
-		lw_ptr(*Backward)(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);//反向传递函数 输入:this 当前min_batch
-	}ActFun;
-	//OSlwToolNNSubLayerBasicSTU ActFun;
-}OSlwToolNNLayerRnnCellSTU;
-
-
-typedef struct OSLW_TOOL_NN_LAYER_BASIC_RECURRENT_STRUCT {
-	OSlwToolNNLayerFullConSTU databasic;//借用全连接类 作为基类
-	OSlwToolNNLayerRnnCellSTU RnnCell;
-	OSlwMat out_t_1_mem;
-	OSlwMat h_t_mem;
-	lw_u8 NeedTrainFlag;
-	void *pActTemplet;
-}OSlwToolNNLayerBasicRnnSTU;
-
-
-OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerBasicRnnNew(
-	ParaType *pin,
-	ParaType *pout,
-	ParaType *ph,
-	ParaType *pOut_t_1,
-	lw_u16 InCol,
-	lw_u16 OutCol,
-	lw_u16 max_mini_batch,
-	lw_u8 NeedTrainFlag,
-	OSlwMemoryBasicSTU *pmem
-);
-OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerFullConNew(
-	ParaType *pin,//输入指针 为NULL则分配 
-	ParaType *pout,//输出指针 为NULL则分配 
-	lw_u16 InCol,//权重的行 = 输入的行
-	lw_u16 OutCol,//权重的列 = 输出的行
-	lw_u16 max_mini_batch,//最大minibatch
-	OSlwMemoryBasicSTU *pmem//内存分配结构体
-);
-
-void OSlwToolNNLayerRnnCellForword(
-	OSlwToolNNLayerRnnCellSTU *pCell
-);
-void OSlwToolNNLayerRnnCellBackword(
-	OSlwToolNNLayerRnnCellSTU *pCell
-);
-void OSlwToolNNLayerRnnCellInit(
-	OSlwToolNNLayerRnnCellSTU *pCell,
-	lw_u16 in_size,//这个是CELL的输入大小 对应应该是RNN的输入+输出
-	lw_u16 out_size,
-	ParaType *pin,//只需要输入 因为隐藏层与输出要输入时候才确定
-	ParaType *pwe, ParaType *pbi,
-	ParaType *pdwe, ParaType *pdbi,
-	OSlwToolNNSubLayerBasicSTU *pActTemplet
-);
-
-
-
-typedef struct OSLW_TOOL_NN_LAYER_GRU_RECURRENT_STRUCT {
-	OSlwToolNNLayerFullConSTU databasic;//借用全连接类 作为基类
-	
-	//RNN单元
-	OSlwToolNNLayerRnnCellSTU CoreCell;
-	OSlwMat CoreCellOutMem;
-	OSlwMat CoreCellHtMem;
-
-	//重置门
-	OSlwToolNNLayerRnnCellSTU ResetGate;
-	OSlwMat ResetGateOutMem;
-	OSlwMat ResetGateHtMem;
-
-	//更新门
-	OSlwToolNNLayerRnnCellSTU UpdateGate;
-	OSlwMat UpdateGateOutMem;
-	OSlwMat UpdateGateHtMem;
-
-	//上一轮记忆
-	OSlwMat OutT_1;
-
-	lw_u8 NeedTrainFlag;
-	void *pActTemplet;
-}OSlwToolNNLayerGruRnnSTU;
-
-
-OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerGruRnnNew(
-	ParaType *pin,
-	ParaType *pout,
-	ParaType *pCoreCellOut,
-	ParaType *pCoreCellHt,
-	ParaType *pResetGateOut,
-	ParaType *pResetGateHt,
-	ParaType *pUpdateGateOut,
-	ParaType *pUpdateGateHt,
-	ParaType *pOutT_1,
-	lw_u16 InCol,
-	lw_u16 OutCol,
-	lw_u16 max_mini_batch,
-	lw_u8 NeedTrainFlag,
-	OSlwMemoryBasicSTU *pmem
-);
-
-
 typedef struct OSLW_TOOL_NN_LAYER_ACT_FUN_STRUCT {
 
 	OSlwToolNNSubLayerBasicSTU basic;
 	lw_u32 _real_size;
-	void(*_init)(struct OSLW_TOOL_NN_LAYER_ACT_FUN_STRUCT *p,lw_u8 TrainFlag);
-	
+	void(*_init)(struct OSLW_TOOL_NN_LAYER_ACT_FUN_STRUCT *p, lw_u8 TrainFlag);
+
 
 }OSlwToolNNLayerActFunSTU;
 
@@ -651,6 +550,154 @@ NULL,0,\
 _ParaFint(0),_ParaFint(0),\
 NULL,\
 sizeof(KIND),NULL
+
+typedef struct OSLW_TOOL_NN_LAYER_RECURRENT_CELL_BASIC_STRUCT {
+	OSlwMat cell_in_now;
+	OSlwMat *cell_out_now_handle;
+
+	OSlwExternMemorySTU cell_h_mem, cell_out_mem;
+
+	ParaType *(*cell_forward)(struct OSLW_TOOL_NN_LAYER_RECURRENT_CELL_BASIC_STRUCT *pCELL, lw_u8 TrainFlag);
+	ParaType *(*cell_backward)(struct OSLW_TOOL_NN_LAYER_RECURRENT_CELL_BASIC_STRUCT *pCELL, lw_u8 TrainFlag);
+	ParaType *(*cell_load)(struct OSLW_TOOL_NN_LAYER_RECURRENT_CELL_BASIC_STRUCT *pCELL, LwMatRowType index);
+	ParaType *(*cell_parameter_init)(struct OSLW_TOOL_NN_LAYER_RECURRENT_CELL_BASIC_STRUCT *pCELL, ParaType *we, ParaType *bi, ParaType *dwe, ParaType *dbi, ParaType *stack);
+
+	OSlwExternMemorySTU cell_we, cell_bi;
+	ParaType *p_cell_dwe, *p_cell_dbi;
+	lw_u32 FlowDataLen;
+}OSlwToolNNLayerRnnCellBasicSTU;
+
+typedef void* (*OSlwToolNNLayerRnnCellNewFunType)(ParaType *,lw_u16,lw_u16,lw_u16,void *,void *);
+
+
+
+void* OSlwToolNNLayerRnnCellNew(
+	ParaType *pout,
+	lw_u16 in_size,//这个是CELL的输入大小 对应应该是RNN的输入+输出
+	lw_u16 out_size,
+	lw_u16 max_min_batch,
+	OSlwToolNNLayerActFunSTU *ptem,
+	OSlwMemoryBasicSTU *pmem
+);
+
+#define LwRnnCellType1 OSlwToolNNLayerRnnCellNew
+
+
+typedef struct OSLW_TOOL_NN_LAYER_RECURRENT_CELL_STRUCT {
+	OSlwToolNNLayerRnnCellBasicSTU base;
+
+	struct 
+	{
+		OSlwMat in, out;
+		lw_ptr(*Forward)(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);//前向传递函数 输入:this 当前min_batch
+		lw_ptr(*Backward)(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);//反向传递函数 输入:this 当前min_batch
+
+	}ActFun;
+	
+}OSlwToolNNLayerRnnCellSTU;
+
+
+
+typedef struct OSLW_TOOL_NN_LAYER_RECURRENT_LNORM_CELL_STRUCT {
+	OSlwToolNNLayerRnnCellBasicSTU base;
+
+	struct
+	{
+		OSlwMat in, out;
+		lw_ptr(*Forward)(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);//前向传递函数 输入:this 当前min_batch
+		lw_ptr(*Backward)(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);//反向传递函数 输入:this 当前min_batch
+	}ActFun;
+
+	ParaType *pNormWe, *pNormBi;
+	ParaType *pmean, *pvar;
+	ParaType *pHt, *pBuf;
+
+}OSlwToolNNLayerRnnCellLNormSTU;
+
+void* OSlwToolNNLayerRnnCellLNormNew(
+	ParaType *pout,
+	lw_u16 in_size,//这个是CELL的输入大小 对应应该是RNN的输入+输出
+	lw_u16 out_size,
+	lw_u16 max_min_batch,
+	OSlwToolNNLayerActFunSTU *ptem,
+	OSlwMemoryBasicSTU *pmem
+);
+
+#define LwRnnCellType2 OSlwToolNNLayerRnnCellLNormNew
+
+typedef struct OSLW_TOOL_NN_LAYER_BASIC_RECURRENT_STRUCT {
+	OSlwToolNNLayerFullConSTU databasic;//借用全连接类 作为基类
+	OSlwToolNNLayerRnnCellBasicSTU *pRnnCell;
+	OSlwMat out_t_1_mem;
+	lw_u8 NeedTrainFlag;
+}OSlwToolNNLayerBasicRnnSTU;
+
+
+
+OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerBasicRnnNew(
+	ParaType *pin,
+	ParaType *pout,
+	ParaType *pOut_t_1,
+	lw_u16 InCol,
+	lw_u16 OutCol,
+	lw_u16 max_mini_batch,
+	lw_u8 NeedTrainFlag,
+	OSlwToolNNLayerRnnCellNewFunType new_cell_fun,
+	OSlwToolNNLayerActFunSTU *ptem,
+	OSlwMemoryBasicSTU *pmem
+);
+
+//void OSlwToolNNLayerRnnCellForword(
+//	OSlwToolNNLayerRnnCellSTU *pCell
+//);
+//void OSlwToolNNLayerRnnCellBackword(
+//	OSlwToolNNLayerRnnCellSTU *pCell
+//);
+//void OSlwToolNNLayerRnnCellInit(
+//	OSlwToolNNLayerRnnCellSTU *pCell,
+//	lw_u16 in_size,//这个是CELL的输入大小 对应应该是RNN的输入+输出
+//	lw_u16 out_size,
+//	ParaType *pin,//只需要输入 因为隐藏层与输出要输入时候才确定
+//	ParaType *pwe, ParaType *pbi,
+//	ParaType *pdwe, ParaType *pdbi,
+//	OSlwToolNNSubLayerBasicSTU *pActTemplet
+//);
+
+
+
+typedef struct OSLW_TOOL_NN_LAYER_GRU_RECURRENT_STRUCT {
+	OSlwToolNNLayerFullConSTU databasic;//借用全连接类 作为基类
+	
+	//RNN单元
+	OSlwToolNNLayerRnnCellBasicSTU *CoreCellHandle;
+	//重置门
+	OSlwToolNNLayerRnnCellBasicSTU *ResetGateHandle;
+	//更新门
+	OSlwToolNNLayerRnnCellBasicSTU *UpdateGateHandle;
+	//上一轮记忆
+	OSlwMat OutT_1;
+	lw_u8 NeedTrainFlag;
+}OSlwToolNNLayerGruRnnSTU;
+
+
+OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerGruRnnNew(
+	ParaType *pin,
+	ParaType *pout,
+	ParaType *pResetGateOut,
+	ParaType *pUpdateGateOut,
+	ParaType *pCoreCellOut,
+	ParaType *pOutT_1,
+	lw_u16 InCol,
+	lw_u16 OutCol,
+	lw_u16 max_mini_batch,
+	lw_u8 NeedTrainFlag,
+	OSlwToolNNLayerRnnCellNewFunType new_cell_fun,
+	OSlwToolNNLayerActFunSTU *ptem,
+	OSlwMemoryBasicSTU *pmem
+);
+
+
+
 
 
 typedef struct OSLW_TOOL_NN_LAYER_ACT_FUN_SELU_STRUCT
@@ -669,6 +716,50 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerActFunNew(
 	OSlwToolNNLayerActFunSTU *pTemplet,//激活函数模板
 	lw_u8 TrainFlag//是否训练
 );
+
+
+
+typedef struct OSLW_TOOL_NN_LAYER_NORM_STRUCT {
+	OSlwToolNNLayerFullConSTU databasic;//借用全连接类 作为基类
+	ParaType *pMean;
+	ParaType *pVar;
+}OSlwToolNNLayerLNormSTU;
+
+ParaType _OSlwToolNNLayerLnForwordSub(
+	ParaType *in,
+	ParaType *out,
+	ParaType *we,
+	ParaType *bi,
+	ParaType mean,
+	ParaType var,
+	LwMatColType col
+);
+
+
+ParaType _OSlwToolNNLayerLnBackwordSub(
+	ParaType *in,
+	ParaType *out,
+	ParaType *we,
+	ParaType *bi,
+	ParaType *dwe,
+	ParaType *dbi,
+	ParaType mean,
+	ParaType div,
+	LwMatColType col,
+	ParaType *pBuf
+);
+
+OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerLNormNew(
+	ParaType *pin,
+	ParaType *pout,
+	ParaType *pmean,
+	ParaType *pvar,
+	lw_u16 Col,
+	lw_u16 max_mini_batch,
+	OSlwMemoryBasicSTU *pmem
+);
+
+
 
 
 
@@ -715,6 +806,9 @@ lw_ptr OSlwToolBPnnLayerGruRnnDataInit(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUC
 lw_ptr OSlwToolBPnnLayerGruRnnClear(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB);
 
 
+//layer norm函数
+lw_ptr OSlwToolNNLayerLNormForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolNNLayerLNormBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
 
 extern OSlwToolNNLayerActFunSTU _OSlwToolNNSigmoid;
 extern OSlwToolNNLayerActFunSTU *LwSigmoid;
@@ -942,6 +1036,52 @@ void OSlwToolBPnnLayerAppend
 	void *LayerList
 );
 
+#define _NN_GET_IN(PBPNN,PIN) do{if ((PIN) == NULL)\
+{\
+	if ((PBPNN)->Net.NowLen == 1)\
+	{\
+		(PIN) = pmem->Malloc(pmem, PARA_MEM_CAL(in_col*(PBPNN)->Train.mini_batch_max));\
+		OSlwMatInit(&((PBPNN)->x), (PBPNN)->Train.mini_batch_max, in_col, (PIN));\
+	}\
+	else\
+	{\
+		pptail = (PBPNN)->Net.pTail->Data.pData;\
+		(PIN) = pptail[(PBPNN)->Net.pTail->Data.uData - 1]->out.a;\
+	}\
+}\
+else\
+{\
+	if ((PBPNN)->Net.NowLen == 1)OSlwMatInit(&((PBPNN)->x), (PBPNN)->Train.mini_batch_max, in_col, (PIN));\
+}\
+}while (0)
+
+
+#define _NN_FULL_CON_CHIP_ALLAC_1() do{\
+if (pBPnn->Train.Flag.MemoryMethod == OSlwToolNNMemoryMethod_Chip)\
+{\
+	pfc->Weight.a = pWe == NULL ? pmem->Malloc(pmem, PARA_MEM_CAL(pfc->Weight.length)) : pWe;\
+	pfc->Bias.a = pBi == NULL ? pmem->Malloc(pmem, PARA_MEM_CAL(pfc->Bias.length)) : pBi;\
+	if (pBPnn->Train.Flag.NeedTrain == OSlwToolNNNeedTrain_Need)\
+	{\
+		pnode1->NNmalloc(pnode1, NULL, pmem->Malloc(pmem, pnode1->sizeofdata * (lw_u32)(pBPnn->Train._MemAllocCoff)));\
+	}\
+}\
+}while(0)
+
+#define _NN_FULL_CON_CHIP_ALLAC() do{\
+memcpy(&(pBPnn->y), &(pfc->basic.out), sizeof(OSlwMat));\
+pfc->pfun = pfun;pfc->pr = pr;pfc->initd1 = d1;pfc->initd2 = d2;\
+if (pBPnn->Train.Flag.MemoryMethod == OSlwToolNNMemoryMethod_Chip)\
+{\
+	pfc->Weight.a = pWe == NULL ? pmem->Malloc(pmem, PARA_MEM_CAL(pfc->Weight.length)) : pWe;\
+	pfc->Bias.a = pBi == NULL ? pmem->Malloc(pmem, PARA_MEM_CAL(pfc->Bias.length)) : pBi;\
+	if (pBPnn->Train.Flag.NeedTrain == OSlwToolNNNeedTrain_Need)\
+	{\
+		pnode1->NNmalloc(pnode1, NULL, pmem->Malloc(pmem, pnode1->sizeofdata * (lw_u32)(pBPnn->Train._MemAllocCoff)));\
+	}\
+}\
+}while(0)
+
 
 void* OSlwToolBPnnFullConAppend
 (
@@ -991,6 +1131,7 @@ void* OSlwToolBPnnBasicRnnAppend
 	OSlwNNinitFunType pfun,
 	OSlwToolRandomBasicSTU *pr,
 	ParaType d1, ParaType d2,
+	OSlwToolNNLayerRnnCellNewFunType new_cell_fun,
 	OSlwToolNNLayerActFunSTU *pTemplet,
 	OSlwMemoryBasicSTU *pmem
 );
@@ -1007,6 +1148,17 @@ void* OSlwToolBPnnGruRnnAppend
 	OSlwToolNNLayerActFunSTU *pTemplet,
 	OSlwMemoryBasicSTU *pmem
 );
+
+void* OSlwToolBPnnLNormAppend
+(
+	OSlwToolBPnnSTU *pBPnn,
+	lw_u16 in_col,
+	ParaType *pin, ParaType *pout,
+	ParaType *pWe, ParaType *pBi,
+	ParaType *pmean, ParaType *pvar,
+	OSlwMemoryBasicSTU *pmem
+);
+
 
 void OSlwToolBPnnTrainInit(
 	OSlwToolBPnnSTU *pBPnn,

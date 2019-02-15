@@ -1,4 +1,4 @@
-/*(Ver.=0.93)
+/*(Ver.=0.94)
  * OSLW_parameter.h
  *
  *  Created on: 2017-7-14
@@ -9,7 +9,7 @@
 #define OSLW_PARAMETER_H_
 
 #include "OSLW_define.h"
-/*(Ver.=0.93)
+/*(Ver.=0.94)
 
 核心理念：
 参数: 数据
@@ -122,7 +122,7 @@ extern const pOSlwExeFun OSlwRealGetFunList[];
 extern const pOSlwExeFun OSlwRealSetFunList[];
 
 //函数声明
-/*(Ver.=0.93)
+/*(Ver.=0.94)
 OSlwParameterSTU *OSlwParameter_GetPrecision(OSlwParameterSTU *p,lw_u8 arr[5],lw_u8 aim);
 OSlwParameterSTU *OSlwParameter_GetNormal(OSlwParameterSTU *p,lw_u8 *arr,lw_u8 aim);
 
@@ -133,7 +133,7 @@ OSlwParameterSTU *OSlwParameter_SelfSL(OSlwParameterSTU *p,lw_u8 cmd);
 */
 #define OSLW_PARA_SELF_CMD_SAVE 0
 #define OSLW_PARA_SELF_CMD_LOAD 1
-/*(Ver.=0.93)
+/*(Ver.=0.94)
 OSlwParameterSTU *OSlwParameter_SelfUp(OSlwParameterSTU *p,lw_u8 aim);
 OSlwParameterSTU *OSlwParameter_SelfDown(OSlwParameterSTU *p,lw_u8 aim);
 */
@@ -218,4 +218,4 @@ OSlwParaCtrlSTU *OSlwParaCtrlCmdExe(OSlwParaCtrlSTU *pPC,void *pGU);
 	
 #define OLSW_PARA_EXE_FUN_NAME(NAME) void*NAME(OSlwParameterDataUN*pPD,OSlwParameterOrderSTU*pPO,void*pBuf)	
 	
-#endif /*(Ver.=0.93) OSLW_PARAMETER_H*/
+#endif /*(Ver.=0.94) OSLW_PARAMETER_H*/

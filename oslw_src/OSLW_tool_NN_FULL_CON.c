@@ -1,4 +1,4 @@
-/*(Ver.=0.93)
+/*(Ver.=0.94)
  * OSLW_tool.c
  *
  *  Created on: 2019-01-22
@@ -128,87 +128,6 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerFullConNew(
 }
 
 
-OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerActFunNew(
-	ParaType *pin,
-	ParaType *pout,
-	lw_u16 Col,
-	lw_u16 max_mini_batch,
-	OSlwMemoryBasicSTU *pmem,
-	OSlwToolNNLayerActFunSTU *pTemplet,
-	lw_u8 TrainFlag
-)
-{
-	lw_u32 node_size;
-	OSlwToolNNLayerActFunSTU *node;
-	OSLW_assert(!pmem);
-	OSLW_assert(!pTemplet);
-	//分配节点内存
-
-	if (pTemplet->_real_size < sizeof(OSlwToolNNLayerActFunSTU))
-	{
-		node_size = sizeof(OSlwToolNNLayerActFunSTU);
-	}
-	else
-	{
-		node_size = pTemplet->_real_size;
-	}
-
-	node = pmem->Malloc(pmem, node_size);
-
-	memcpy(node, pTemplet, node_size);
-
-
-
-#if OSLW_TOOL_NN_DATA_FRAME==OSLW_TOOL_NN_D_FRAME_C
-
-	//设置输入
-	if (pin == NULL)
-	{
-		pin = pmem->Malloc(pmem, PARA_MEM_CAL(max_mini_batch * Col));
-	}
-	OSlwToolMatrixInitial(&(node->basic.in), max_mini_batch, Col, pin);
-
-	//设置输出
-	if (pout == NULL)
-	{
-		pout = pmem->Malloc(pmem, PARA_MEM_CAL(max_mini_batch * Col));
-	}
-	OSlwToolMatrixInitial(&(node->basic.out), max_mini_batch, Col, pout);
-
-
-#elif OSLW_TOOL_NN_DATA_FRAME == OSLW_TOOL_NN_D_FRAME_F
-	
-	//设置输入
-	if (pin == NULL)
-	{
-		pin = pmem->Malloc(pmem, PARA_MEM_CAL(max_mini_batch * Col));
-	}
-	OSlwToolMatrixInitial(&(node->basic.in), Col, max_mini_batch, pin);
-
-	//设置输出
-	if (pout == NULL)
-	{
-		pout = pmem->Malloc(pmem, PARA_MEM_CAL(max_mini_batch * Col));
-	}
-	OSlwToolMatrixInitial(&(node->basic.out), Col, max_mini_batch, pout);
-
-#else
-
-#error"NN data frame is unknown"
-	OSLW_assert(1);
-
-#endif // OSLW_TOOL_NN_DATA_FRAME==OSLW_TOOL_NN_D_FRAME_C
-
-
-	if (pTemplet->_init)
-	{
-		pTemplet->_init(pTemplet, TrainFlag);
-	}
-
-	return (OSlwToolNNSubLayerBasicSTU *)node;
-}
-
-
 lw_ptr OSlwToolBPnnLayerFullConForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
 	register lw_u16 buf1;
@@ -289,57 +208,70 @@ lw_ptr OSlwToolBPnnLayerFullConBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRU
 	pNNSLB->in.row = mini_b_num;
 
 
-	//表示第一次反向传递 update函数自动清空梯度
-	if (pNNSLB->pNN->Train._batch_stream_count <= 1)
+	////表示第一次反向传递 update函数自动清空梯度
+	//if (pNNSLB->pNN->Train._batch_stream_count <= 1)
+	//{
+	//	//直接覆盖
+	//	//dw=in'*out
+	//	pOSlwToolMatrixTurnMpy(&(pfc->DeltW), &(pNNSLB->in), &(pNNSLB->out), 2);
+	//	//db = sum(out, 1);按列求和
+	//	//_out_b = pNNSLB->out.a;
+	//	//_db = pfc->DeltB.a;
+	//	//row = pNNSLB->out.col;
+	//	//for (i = 0; i < pNNSLB->out.col; i++)
+	//	//{
+	//	//	_sum = _ParaFint(0);
+	//	//	_out = _out_b;
+	//	//	for (j = 0; j < (mini_b_num & 0xffff); j++)
+	//	//	{
+	//	//		_sum = _ParaAdd(_sum, *_out);
+	//	//		_out += row;
+	//	//	}
+	//	//	*_db++ = _sum;
+	//	//	_out_b ++;
+	//	//}
+
+
+	//	//xd = out*w';
+	//	pOSlwToolMatrixTurnMpy(&(pNNSLB->in), &(pNNSLB->out), &(pfc->Weight), 1);
+	//}
+	//else
+	//{
+	//	//采用叠加方法
+	//	//dw=in'*out
+	//	pOSlwToolMatrixTurnMpy(&(pfc->DeltW), &(pNNSLB->in), &(pNNSLB->out), 6);
+	//	//db = sum(out, 1);按列求和
+	//	_out_b = pNNSLB->out.a;
+	//	_db = pfc->DeltB.a;
+	//	row = pNNSLB->out.col;
+	//	for (i = 0; i < pNNSLB->out.col; i++)
+	//	{
+	//		_sum = _ParaFint(0);
+	//		_out = _out_b;
+	//		for (j = 0; j < (mini_b_num & 0xffff); j++)
+	//		{
+	//			_sum = _ParaAdd(_sum, *_out);
+	//			_out += row;
+	//		}
+	//		*_db = _ParaAdd(*_db, _sum);
+	//		_db++;
+	//		_out_b++;
+	//	}
+	//	//xd = out*w';
+	//	pOSlwToolMatrixTurnMpy(&(pNNSLB->in), &(pNNSLB->out), &(pfc->Weight), 1);
+	//}
+
+	//采用叠加方法
+	if (pNNSLB->pNN->Train.Flag.NeedTrain== OSlwToolNNNeedTrain_Need)
 	{
-		//直接覆盖
-		//dw=in'*out
-		pOSlwToolMatrixTurnMpy(&(pfc->DeltW), &(pNNSLB->in), &(pNNSLB->out), 2);
-		//db = sum(out, 1);按列求和
-		_out_b = pNNSLB->out.a;
-		_db = pfc->DeltB.a;
-		row = pNNSLB->out.col;
-		for (i = 0; i < pNNSLB->out.col; i++)
-		{
-			_sum = _ParaFint(0);
-			_out = _out_b;
-			for (j = 0; j < (mini_b_num & 0xffff); j++)
-			{
-				_sum = _ParaAdd(_sum, *_out);
-				_out += row;
-			}
-			*_db++ = _sum;
-			_out_b ++;
-		}
-		//xd = out*w';
-		pOSlwToolMatrixTurnMpy(&(pNNSLB->in), &(pNNSLB->out), &(pfc->Weight), 1);
-	}
-	else
-	{
-		//采用叠加方法
 		//dw=in'*out
 		pOSlwToolMatrixTurnMpy(&(pfc->DeltW), &(pNNSLB->in), &(pNNSLB->out), 6);
 		//db = sum(out, 1);按列求和
-		_out_b = pNNSLB->out.a;
-		_db = pfc->DeltB.a;
-		row = pNNSLB->out.col;
-		for (i = 0; i < pNNSLB->out.col; i++)
-		{
-			_sum = _ParaFint(0);
-			_out = _out_b;
-			for (j = 0; j < (mini_b_num & 0xffff); j++)
-			{
-				_sum = _ParaAdd(_sum, *_out);
-				_out += row;
-			}
-			*_db = _ParaAdd(*_db, _sum);
-			_db++;
-			_out_b++;
-		}
-		//xd = out*w';
-		pOSlwToolMatrixTurnMpy(&(pNNSLB->in), &(pNNSLB->out), &(pfc->Weight), 1);
+		pOSlwToolMatrixSum(&(pfc->DeltB), &(pNNSLB->out), 0x12);
 	}
 
+	//xd = out*w';
+	pOSlwToolMatrixTurnMpy(&(pNNSLB->in), &(pNNSLB->out), &(pfc->Weight), 1);
 
 
 	//还原
@@ -879,28 +811,7 @@ void* OSlwToolBPnnFullConAppend
 	
 	if (pTemplet)
 	{
-		
-		//只有输入层
-		if (pBPnn->Net.NowLen == 1)
-		{
-			if (pin == NULL)
-			{
-				pin = pmem->Malloc(pmem, PARA_MEM_CAL(in_col*pBPnn->Train.mini_batch_max));			
-			}
-#if OSLW_TOOL_NN_DATA_FRAME==OSLW_TOOL_NN_D_FRAME_C
-			OSlwToolMatrixInitial(&(pBPnn->x), pBPnn->Train.mini_batch_max, in_col, pin);
-#elif OSLW_TOOL_NN_DATA_FRAME == OSLW_TOOL_NN_D_FRAME_F
-			OSlwToolMatrixInitial(&(pBPnn->x), in_col, pBPnn->Train.mini_batch_max, pin);
-#else
-#error"NN data frame is unknown"
-			OSLW_assert(1);
-#endif // OSLW_TOOL_NN_DATA_FRAME==OSLW_TOOL_NN_D_FRAME_C
-		}
-		else
-		{
-			pptail = pBPnn->Net.pTail->Data.pData;
-			pin = pptail[pBPnn->Net.pTail->Data.uData-1]->out.a;
-		}
+		_NN_GET_IN(pBPnn, pin);
 
 		pnode1 = OSlwToolNNLayerFullConNew(
 			pin, NULL,
@@ -916,17 +827,13 @@ void* OSlwToolBPnnFullConAppend
 		);  
 
 		pln1 = pmem->Calloc(pmem, sizeof(OSlwToolDListNodeSTU));
-		//pln2 = pmem->Malloc(pmem, sizeof(OSlwToolDListNodeSTU));
 		
-
 		ppLIST1 = pmem->Malloc(pmem, sizeof(OSlwToolNNSubLayerBasicSTU *) * 2);
-		//ppLIST2 = pmem->Malloc(pmem, sizeof(OSlwToolNNSubLayerBasicSTU *) * 1);
 
 		ppLIST1[0] = pnode1;
 		ppLIST1[1] = pnode2;
 
 		OSlwToolBPnnLayerAppend(pBPnn, pln1, 2, ppLIST1);
-		//OSlwToolBPnnLayerAppend(pBPnn, pln2, 1, ppLIST2);
 
 		//每次都要复制输出层
 		memcpy(&(pBPnn->y), &(pnode2->out), sizeof(OSlwMat));
@@ -935,28 +842,7 @@ void* OSlwToolBPnnFullConAppend
 	}
 	else//采用不带激活函数的方式
 	{
-
-		//只有输入层
-		if (pBPnn->Net.NowLen == 1)
-		{
-			if (pin == NULL)
-			{
-				pin = pmem->Malloc(pmem, PARA_MEM_CAL(in_col*pBPnn->Train.mini_batch_max));		
-			}
-#if OSLW_TOOL_NN_DATA_FRAME==OSLW_TOOL_NN_D_FRAME_C
-			OSlwToolMatrixInitial(&(pBPnn->x), pBPnn->Train.mini_batch_max, in_col, pin);
-#elif OSLW_TOOL_NN_DATA_FRAME == OSLW_TOOL_NN_D_FRAME_F
-			OSlwToolMatrixInitial(&(pBPnn->x), in_col, pBPnn->Train.mini_batch_max, pin);
-#else
-#error"NN data frame is unknown"
-			OSLW_assert(1);
-#endif // OSLW_TOOL_NN_DATA_FRAME==OSLW_TOOL_NN_D_FRAME_C
-		}
-		else
-		{
-			pptail = pBPnn->Net.pTail->Data.pData;
-			pin = pptail[pBPnn->Net.pTail->Data.uData-1]->out.a;
-		}
+		_NN_GET_IN(pBPnn, pin);
 
 		pnode1 = OSlwToolNNLayerFullConNew(
 			pin, pout,
@@ -985,41 +871,160 @@ void* OSlwToolBPnnFullConAppend
 	pfc->initd1 = d1;
 	pfc->initd2 = d2;
 
-
-
-
-	//碎片化存储 直接进行内存分配
-	if (pBPnn->Train.Flag.MemoryMethod== OSlwToolNNMemoryMethod_Chip)
-	{
-		if (pWe==NULL)
-		{
-			pWreal = pmem->Malloc(pmem, PARA_MEM_CAL(pfc->Weight.length));
-		}
-		else
-		{
-			pWreal = pWe;
-		}
-
-		if (pBi==NULL)
-		{
-			pBreal = pmem->Malloc(pmem, PARA_MEM_CAL(pfc->Bias.length));
-		}
-		else
-		{
-			pBreal = pBi;
-		}
-
-		pfc->Weight.a = pWreal;
-		pfc->Bias.a = pBreal;
-		if (pBPnn->Train.Flag.NeedTrain==OSlwToolNNNeedTrain_Need)
-		{
-			pnode1->NNmalloc(pnode1, NULL, pmem->Malloc(pmem, pnode1->sizeofdata * (lw_u32)(pBPnn->Train._MemAllocCoff)));
-		}
-	}
+	_NN_FULL_CON_CHIP_ALLAC_1();
 
 	//pBPnn->ParaGroupNum++;
 	return ppLIST1;
 }
+
+
+
+OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerShiftNew(
+	ParaType *pin,
+	ParaType *pout,
+	lw_u16 Col,
+	lw_u16 max_mini_batch,
+	OSlwMemoryBasicSTU *pmem
+)
+{
+
+	OSlwToolNNLayerFullConSTU *node;
+	OSLW_assert(!(pmem));
+
+	//分配节点内存
+	node = pmem->Calloc(pmem, sizeof(OSlwToolNNLayerFullConSTU));
+	node->basic.NN_Kind = OSlwToolNNSubLayerKind_FullCon;
+
+
+	//设置参数
+	node->Bias.row = 1;
+	node->Bias.col = Col;
+	node->Bias.length = Col;
+
+	node->DeltB.row = 1;
+	node->DeltB.col = Col;
+	node->DeltB.length = Col;
+
+	node->Weight.row = 1;
+	node->Weight.col = Col;
+	node->Weight.length = Col;
+
+	node->DeltW.row = 1;
+	node->DeltW.col = Col;
+	node->DeltW.length = Col;
+
+	//设置输入
+
+	if (pin == NULL)
+	{
+		pin = pmem->Malloc(pmem, PARA_MEM_CAL(max_mini_batch * Col));
+	}
+
+	OSlwToolMatrixInitial(&(node->basic.in), max_mini_batch, Col, pin);
+
+	//设置输出
+	if (pout == NULL)
+	{
+		pout = pmem->Malloc(pmem, PARA_MEM_CAL(max_mini_batch * Col));
+	}
+
+	OSlwToolMatrixInitial(&(node->basic.out), max_mini_batch, Col, pout);
+
+	//计算要分配的内存大小
+	node->basic.sizeofdata = PARA_MEM_CAL(node->Weight.length) + PARA_MEM_CAL(node->Bias.length);
+
+
+	//成员函数
+	node->basic.Forward = OSlwToolBPnnLayerFullConForward;
+	node->basic.Backward = OSlwToolBPnnLayerFullConBackward;
+
+
+	node->basic.Update = OSlwToolBPnnLayerFullConUpdate;
+	node->basic.NNmalloc = OSlwToolBPnnLayerFullConNNmalloc;
+	node->basic.Clear = OSlwToolBPnnLayerFullConClear;
+	node->basic.DataInit = OSlwToolBPnnLayerFullConDataInit;
+	node->basic.Copy = OSlwToolBPnnLayerFullConCopy;
+	node->basic.SoftReplace = OSlwToolBPnnLayerFullConSoftReplace;
+
+
+
+	return (OSlwToolNNSubLayerBasicSTU *)node;
+
+}
+
+
+lw_ptr OSlwToolBPnnLayerShiftForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
+{
+	register lw_u16 buf1;
+	register OSlwToolNNLayerFullConSTU *pfc;
+	OSLW_assert(!(pNNSLB));
+	pfc = (OSlwToolNNLayerFullConSTU *)pNNSLB;
+
+	//保存maxminibatch
+	buf1 = pNNSLB->out.row;
+
+	//记录当前minibatch
+	pNNSLB->out.row = mini_b_num;
+	pNNSLB->in.row = mini_b_num;
+
+	pOSlwToolMatrixVectShift(
+		&(pNNSLB->out),
+		&(pfc->Weight),
+		&(pNNSLB->in),
+		&(pfc->Bias)
+	);
+
+	//还原
+	pNNSLB->out.row = buf1;
+	pNNSLB->in.row = buf1;
+
+
+	return mini_b_num;
+
+}
+
+
+lw_ptr OSlwToolBPnnLayerShiftBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
+{
+
+	register lw_u16 buf1;
+	register lw_u16 i, j, col, row;
+	register ParaType _sum;
+	register ParaType *_out, *_db, *_out_b;
+
+	register OSlwToolNNLayerFullConSTU *pfc;
+	OSLW_assert(!(pNNSLB));
+	pfc = (OSlwToolNNLayerFullConSTU *)pNNSLB;
+
+
+	//保存maxminibatch
+	buf1 = pNNSLB->out.col;
+
+	//记录当前minibatch
+	pNNSLB->out.row = mini_b_num;
+	pNNSLB->in.row = mini_b_num;
+
+	//采用叠加方法
+	if (pNNSLB->pNN->Train.Flag.NeedTrain == OSlwToolNNNeedTrain_Need)
+	{
+		//dw=sum(in.*out,2)
+		pOSlwToolMatrixDotSum(&(pfc->DeltW), &(pNNSLB->in), &(pNNSLB->out), 0x12);
+		//db = sum(out, 1);按列求和
+		pOSlwToolMatrixSum(&(pfc->DeltB), &(pNNSLB->out), 0x12);
+	}
+	//xd = out.*remat(we);
+	pOSlwToolMatrixVectShift(&(pNNSLB->in), &(pNNSLB->out), &(pfc->Weight), NULL);
+
+
+	//还原
+	pNNSLB->out.row = buf1;
+	pNNSLB->in.row = buf1;
+
+
+	return mini_b_num;
+
+}
+
 
 
 #endif // OSLW_TOOL_IMPORT_NN_BPnn || OSLW_TOOL_IMPORT_ALL

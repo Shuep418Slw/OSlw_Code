@@ -1,4 +1,4 @@
-/*(Ver.=0.9~)
+/*(Ver.=0.94)
  * OSLW_include.h
  *
  *  Created on: 2017-7-14
@@ -28,7 +28,7 @@
 #include "OSLW_string_debug.h"
 #include "OSLW_core.h"
 
-/*(Ver.=0.9~)
+/*(Ver.=0.94)
 移植步骤
 0)添加文件与路径
 
@@ -70,4 +70,4 @@ myos.StartFun(&myos);
 */
 
 
-#endif /*(Ver.=0.9~) OSLW_INCLUDE_H_*/
+#endif /*(Ver.=0.94) OSLW_INCLUDE_H_*/
