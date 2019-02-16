@@ -1145,6 +1145,7 @@ void* OSlwToolBPnnGruRnnAppend
 	OSlwNNinitFunType pfun,
 	OSlwToolRandomBasicSTU *pr,
 	ParaType d1, ParaType d2,
+	OSlwToolNNLayerRnnCellNewFunType new_cell_fun,
 	OSlwToolNNLayerActFunSTU *pTemplet,
 	OSlwMemoryBasicSTU *pmem
 );
