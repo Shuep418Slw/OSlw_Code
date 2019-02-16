@@ -111,24 +111,15 @@ typedef struct OSLW_CORE_STRUCT{
 	//OSlwParaListCtrlSTU ParaBook[OSLW_CORE_PARA_PAGE_NUM];
 	//lw_u16 ParaIdCount;
 
-#if OSLW_MEMORY_ENABLE
-	//逐渐放弃 鸡肋
-#if 0
-	OSlwMemoryMapSTU GiftMem;
-	lw_u8 GiftBuf[OSLW_MEM_MAP_LEN(sizeof(OSlwGiftUnitSTU),OSLW_CORE_GIFT_NUM)];
-
-	OSlwMemoryMapSTU PostmanMem;
-	lw_u8 PostmanBuf[OSLW_MEM_MAP_LEN(sizeof(OSlwGiftPostmanSTU), OSLW_CORE_POSTMAN_NUM)];
-#endif
-
-#endif
-
 
 
 
 	//成员函数
-
+#if OSLW_STEP_RUNNING
+	void(*StepFun)(struct OSLW_CORE_STRUCT *pOS);//系统开始函数
+#else
 	void(*StartFun)(struct OSLW_CORE_STRUCT *pOS);//系统开始函数
+#endif
 	struct OSLW_CORE_STRUCT *(*TaskAppendFun)(struct OSLW_CORE_STRUCT *pOS, struct OSLW_TASK_STRUCT *pta);//任务注册函数
 	struct OSLW_CORE_STRUCT *(*TimerAppendFun)(struct OSLW_CORE_STRUCT *pOS, OSlwTimerSTU *pT);
 	/*(Ver.=0.94)
@@ -178,8 +169,12 @@ void OSlwCoreInitial(OSlwCoreSTU *pOS);
 OSlwCoreSTU* OSlwTaskAppend(OSlwCoreSTU *pOS,struct OSLW_TASK_STRUCT *pta);
 OSlwCoreSTU* OSlwParaAppend(OSlwCoreSTU *pOS,lw_u8 num,struct OSLW_PARAMETER_STRUCT *p);
 OSlwCoreSTU* OSlwTimerAppend(OSlwCoreSTU *pOS,OSlwTimerSTU *pT);
-
+#if OSLW_STEP_RUNNING
+void OSlwCoreStep(OSlwCoreSTU *pOS);
+#else
 void OSlwCoreStart(OSlwCoreSTU *pOS);
+#endif
+
 void _quicksort (void *const pbase, size_t total_elems, size_t size,_compar_fn cmp);
 lw_16 comp(const void*a,const void*b);
 
@@ -398,12 +393,12 @@ typedef struct
 
 //设置一共休息时间
 //<输入>A:任务控制块指针</输入>
-#define OSlwSetRest(A,S,MS) do{(A)->BackToSleep.bits.all_time_count=((S)*1000+(MS))/(OSLW_CORE_TICK_MS);}while(0);
+#define OSlwSetNap(A,S,MS) do{(A)->BackToSleep.bits.all_time_count=((S)*1000+(MS))/(OSLW_CORE_TICK_MS);}while(0);
 
 
 //设置休息时间
 //<输入>A:任务控制块指针</输入>
-#define OSlwRest(A) do{lw_u16 _res_t=OSlwToc((A));if((A)->BackToSleep.bits.all_time_count >(1+ _res_t)){OSlwSleepN(A,(A)->BackToSleep.bits.all_time_count - _res_t);}}while(0);
+#define OSlwNap(A) do{lw_u16 _res_t=OSlwToc((A));if((A)->BackToSleep.bits.all_time_count >(1+ _res_t)){OSlwSleepN(A,(A)->BackToSleep.bits.all_time_count - _res_t);}}while(0);
 
 
 //#define OSlwSleepN(A,N) do {DISPATCH_READY(A){ A->SleepFun(A,N-1);}} while(0)

@@ -46,6 +46,8 @@ typedef intptr_t lw_ptr;
 //操作系统高速运行
 #define OSLW_SPEED_RUNNING 0
 
+//操作系统步进运行
+#define OSLW_STEP_RUNNING 0
 
 //精简模式
 #if OSLW_SIMPLE_LEVEL
@@ -74,7 +76,9 @@ typedef lw_u16 _BP;
 typedef jmp_buf _BP;
 #endif
 
-
+#if OSLW_STEP_RUNNING && OSLW_SIMPLE_MODE==0
+ #error "STEP RUNNING MOST BE IN SIMPLE"
+#endif
 
 
 //--------------------------------
@@ -188,23 +192,6 @@ typedef enum{
     #define _ParaExp(A) (_IQ24exp(A))
 	#define PARA_LEN 4
 #elif OSLW_GLOBAL_MATH_TYPE==OSLW_GLOBAL_MATH_FLOAT
-/*(Ver.=0.94)
-	#define _ParaAdd(A,B) ((lw_sf)(A)+(lw_sf)(B))
-	#define _ParaSub(A,B) ((lw_sf)(A)-(lw_sf)(B))
-	#define _ParaMpy(A,B) ((lw_sf)(A)*(lw_sf)(B))
-	#define _ParaDiv(A,B) ((lw_sf)(A)/(lw_sf)(B))
-	#define _ParaInt(A) ((long)(A))
-	#define _ParaFrac(A) ((A)-long(A))
-	#define _ParaFint(A)	((lw_sf)A)
-	#define _ParaToF(A) ((lw_sf)(A))
-	#define _ParaFrom(A) ((lw_sf)A)
-	#define _ParaSin(A) (arm_sin_f32(A))
-	#define _ParaCos(A) (arm_cos_f32(A))
-	#define _ParaTan(A) (arm_sin_f32(A)/arm_cos_f32(A))		
-	#define _ParaSqrt(A) (__sqrtf(A))
-	#define _ParaAbs(A) (A > 0.0f?A:-A)		
-	#define PARA_LEN 4
-	*/
 	#define _ParaAdd(A,B) ((lw_sf)(A)+(lw_sf)(B))
 	#define _ParaSub(A,B) ((lw_sf)(A)-(lw_sf)(B))
 	#define _ParaMpy(A,B) ((lw_sf)(A)*(lw_sf)(B))
@@ -225,6 +212,7 @@ typedef enum{
 	#define _ParaLn(A) (logf((A)))
 	#define _ParaLog(A) (logf10((A)))
 	#define PARA_LEN 4
+	
 #elif OSLW_GLOBAL_MATH_TYPE==OSLW_GLOBAL_MATH_DOUBLE
 	#define _ParaAdd(A,B) ((A)+(B))
 	#define _ParaSub(A,B) ((A)-(B))

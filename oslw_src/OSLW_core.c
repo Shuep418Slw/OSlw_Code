@@ -234,12 +234,6 @@ void OSlwClockCallBack(OSlwCoreSTU *pOS)
         //判断任务状态
         if(pta->TaskFrozenFlag) continue;//如果是冻结状态 不用管
 
-
-		if (pta->BackToSleep.bits.timer_start_flag)
-		{
-			pta->BackToSleep.bits.work_time_count++;
-		}
-
         switch((pta->TaskStatus))
         {
 					
@@ -248,6 +242,10 @@ void OSlwClockCallBack(OSlwCoreSTU *pOS)
 #if !(OSLW_SIMPLE_LEVEL >= 3)
             pta->RunningTimeSinceStart++;
             pta->RunningTimeSinceRunning++;
+						if (pta->BackToSleep.bits.timer_start_flag)
+						{
+							pta->BackToSleep.bits.work_time_count++;
+						}
 						break;
 #endif // !(OSLW_SIMPLE_LEVEL >= 3)
 				
@@ -281,19 +279,6 @@ void OSlwClockCallBack(OSlwCoreSTU *pOS)
 						
 #endif //OSLW_GIFT_EN						
 						
-            //逐渐放弃 鸡肋
-#if 0
-        case OSlwTaskStatus_Wait_ForGiftTransmit://等待发送完成
-            if(!(pta->Concierge.giftT.PostmanFlag.all))//如果标志组==0 代表全部发送相应完成
-            {
-                OSlwCoreTaskIsReady(pOS,pta,tindex);//转换任务状态 为准备态
-            }
-            break;
-#endif
-						
-						
-						
-						
         case OSlwTaskStatus_Wait_ForGroupFlag:
             if(pta->TaskGroupFlag.CurrentStatus.all & pta->TaskGroupFlag.AimStatus.all)
             {
@@ -318,7 +303,7 @@ void OSlwClockCallBack(OSlwCoreSTU *pOS)
         OSlwTimerClockCallBack(pOS->TimerCtrl.pTimerList[n]);
     }
 
-    pOS->pTaskList[OSLW_TASK_NUM_MAX - 1]->TaskGroupFlag.AimStatus.all = 0;
+    pOS->pTaskList[OSLW_TASK_NUM_MAX - 1]->TaskGroupFlag.CurrentStatus.all = 0;
 
 
 
@@ -380,7 +365,11 @@ void OSlwCoreInitial(OSlwCoreSTU *pOS)
 
 
     //函数指针初始化
-    pOS->StartFun = OSlwCoreStart;
+#if OSLW_STEP_RUNNING
+    pOS->StepFun = OSlwCoreStep;
+#else
+    pOS->StartFun = OSlwCoreStart;		
+#endif
     pOS->TimerAppendFun = OSlwTimerAppend;
     pOS->TaskAppendFun = OSlwTaskAppend;
     /*(Ver.=0.94)
@@ -686,6 +675,31 @@ void OSlwCoreStart(OSlwCoreSTU *pOS)
         ;
     }
 
+}
+
+
+//------------------------------------------
+//<函数名>OSlwCoreStep</函数名>
+//<功能说明>OSLW步进 !!!!!请在所以任务控制块与操作系统内核初始化完成之后再调用!!!!!!</功能说明>
+//while(1)
+//{....
+//OSlwCoreStep(&myos);
+//....}
+//<输入说明>pOS:this</输入说明>
+//<输出说明>void</输出说明>
+//------------------------------------------
+void OSlwCoreStep(OSlwCoreSTU *pOS)
+{
+
+    pOS->DispatchEable=1;//调度器使能
+    pOS->CoreStatus=OSlwCoreStatus_Running;//任务内核转换为运行态
+#if !(OSLW_SIMPLE_MODE)
+    OSLW_assert(1);
+#else
+    pOS->OSlwInlineTaskBoring.TaskFun(&(pOS->OSlwInlineTaskBoring));
+#endif
+
+		return;
 }
 
 

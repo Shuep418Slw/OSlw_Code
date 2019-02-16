@@ -61,7 +61,35 @@ void OSlwTaskInit(
 //<输入说明>pta:this</输入说明>
 //<输出说明>void</输出说明>
 //------------------------------------------
+#if OSLW_STEP_RUNNING
 
+void OSlwInlineTaskBoringExe(OSlwTaskSTU *_pta)
+{
+    static OSlwTaskSTU *pta=NULL;
+
+		
+		
+    pta = _pta;
+
+		pta->pOS->InitialFlagGroup.all&=(~((OSlwGroupAllType)1<<(OSLW_TASK_NUM_MAX-1)));//清除初始化标志位
+		pta->pOS->ReadyFlagGroup.all|=((OSlwGroupAllType)1<<(OSLW_TASK_NUM_MAX-1));		
+		pta->TaskStatus=OSlwTaskStatus_Running;
+
+		OSlwTaskDispatch(pta->pOS);
+
+		pta->pOS->CurrentTaskIndex=OSLW_TASK_NUM_MAX-1;
+		
+#if !OSLW_SPEED_RUNNING						
+		while (pta->TaskGroupFlag.CurrentStatus.all) {
+				OSLW_LOW_POW_ENABLE();    //等待任务完成一次 !!!!!可以在此时进入低功耗模式!!!!!!!!
+		}
+		OSLW_LOW_POW_DISABLE();
+#endif
+
+		pta->TaskGroupFlag.CurrentStatus.all = 0x01;//清除			
+}
+
+#else
 void OSlwInlineTaskBoringExe(OSlwTaskSTU *_pta)
 {
     static OSlwTaskSTU *pta;
@@ -76,14 +104,14 @@ void OSlwInlineTaskBoringExe(OSlwTaskSTU *_pta)
         //while(!(pta_last->PrivateMem.m8[0])) {;} //等待任务完成一次 !!!!!可以在此时进入低功耗模式!!!!!!!!
 		pta->pOS->CurrentTaskIndex = OSLW_TASK_NUM_MAX - 1;
 #if !OSLW_SPEED_RUNNING			
-        while (pta->TaskGroupFlag.AimStatus.all) {
+        while (pta->TaskGroupFlag.CurrentStatus.all) {
             OSLW_LOW_POW_ENABLE();    //等待任务完成一次 !!!!!可以在此时进入低功耗模式!!!!!!!!
         }
         OSLW_LOW_POW_DISABLE();
 #endif
 				
 				
-        pta->TaskGroupFlag.AimStatus.all = 0x01;//清除
+        pta->TaskGroupFlag.CurrentStatus.all = 0x01;//清除	
         OSlwTaskDispatch(pta->pOS);
     }
 
@@ -99,20 +127,22 @@ void OSlwInlineTaskBoringExe(OSlwTaskSTU *_pta)
 			pta->pOS->CurrentTaskIndex=OSLW_TASK_NUM_MAX-1;
 			
 #if !OSLW_SPEED_RUNNING						
-			while (pta->TaskGroupFlag.AimStatus.all) {
+			while (pta->TaskGroupFlag.CurrentStatus.all) {
 					OSLW_LOW_POW_ENABLE();    //等待任务完成一次 !!!!!可以在此时进入低功耗模式!!!!!!!!
 			}
 			OSLW_LOW_POW_DISABLE();
 #endif
 
 			
-			pta->TaskGroupFlag.AimStatus.all = 0x01;//清除			
+			pta->TaskGroupFlag.CurrentStatus.all=1;//清除			
 		
 		}while(1);
 		
 		
 #endif
 }
+
+#endif
 
 //------------------------------------------
 //<函数名>OSlwInlineTaskParameterExe</函数名>
@@ -373,13 +403,15 @@ OSlwGroupAllType OSlwTaskAuctionJudge(OSlwTaskSTU *pta,lw_8 task_price)
 
 }
 
+
+#if !(OSLW_SIMPLE_LEVEL >= 3)
 lw_u16 OSlwTaskToc(OSlwTaskSTU *pta) {
 	lw_u16 _res = pta->BackToSleep.bits.work_time_count; 
 	pta->BackToSleep.bits.timer_start_flag = 0; 
 	pta->BackToSleep.bits.work_time_count = 0;
 	return _res;
 }
-
+#endif
 
 #endif
 

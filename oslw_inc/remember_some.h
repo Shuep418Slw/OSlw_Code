@@ -34,4 +34,8 @@ random部分修改了RMIN与RMAX位置 现在使用前小后大
 增加了shift层（不包括追加函数），可以用于替换训练好的BatchNorm
 修改了部分全连接层追加函数代码，降低代码耦合性
 
+增加stepfun模式，使OS可以嵌入其他运行
+修改rest为nap
+修改OSlwTic与Toc的测试方式
+
 */

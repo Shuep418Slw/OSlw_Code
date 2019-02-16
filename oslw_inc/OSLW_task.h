@@ -94,17 +94,9 @@ typedef struct OSLW_TASK_STRUCT{
 #endif //OSLW_GIFT_EN	
 	
 	lw_u32 RunningTimeSinceStart;
-	lw_u32 RunningTimeSinceRunning;
-	lw_u32 TimeSliceMax;
+	lw_u16 RunningTimeSinceRunning;
+	lw_u16 TimeSliceMax;
 	OSlwTaskExternMemorySTU ExternMem;//任务外部存储器	
-	
-
-
-#elif OSLW_SIMPLE_LEVEL==3 && OSLW_GIFT_EN
-	OSlwToolDListNodeConnectSTU Concierge;
-#else
-
-#endif
 	
 	union 
 	{
@@ -116,7 +108,16 @@ typedef struct OSLW_TASK_STRUCT{
 		}bits;
 
 		lw_u32 all;
-	}BackToSleep;
+	}BackToSleep;	
+
+
+#elif OSLW_SIMPLE_LEVEL==3 && OSLW_GIFT_EN
+	OSlwToolDListNodeConnectSTU Concierge;
+#else
+
+#endif
+	
+
 	
 	lw_u32 SleepCount;//睡眠计数器
 	OSlwTaskGroupFlagSTU TaskGroupFlag;
@@ -182,6 +183,7 @@ void OSlwTaskInit(OSlwTaskSTU *pta,
 #if OSLW_SIMPLE_MODE
 
 #define OSLW_TASK_DISPATH_EXE(PTA) do{\
+(PTA)->RunningTimeSinceRunning=0;\
 (PTA)->pOS->ReadyFlagGroup.all&=~((lw_u64)1<<((PTA)->Priority));\
 return;}while(0)
 	
