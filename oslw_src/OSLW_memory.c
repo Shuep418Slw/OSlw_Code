@@ -562,6 +562,7 @@ void * OSlwMemoryListAlloc(OSlwMemoryListSTU *pMU, lw_u32 dsize)
 
     OSlwMemoryListNodeSTU *p, *q;
     void *preturn = NULL;
+		register size_t buf1;
 
     OSLW_assert(!(pMU));
     OSLW_assert(!(dsize));
@@ -599,7 +600,8 @@ void * OSlwMemoryListAlloc(OSlwMemoryListSTU *pMU, lw_u32 dsize)
             OSLW_assert(1);
             return NULL;
         }
-        if (((size_t)(p->con.pNext) - (size_t)(p) - p->len) > dsize)//代表有剩余
+				buf1=((size_t)(p->con.pNext) - (size_t)(p) - p->len);
+        if (buf1 >= dsize)//代表有剩余
         {
             q = (OSlwMemoryListNodeSTU *)(((size_t)p) + p->len);
             /*(Ver.=0.94)
