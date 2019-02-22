@@ -47,7 +47,7 @@ typedef intptr_t lw_ptr;
 #define OSLW_SPEED_RUNNING 0
 
 //操作系统步进运行
-#define OSLW_STEP_RUNNING 0
+#define OSLW_STEP_RUNNING 1
 
 //精简模式
 #if OSLW_SIMPLE_LEVEL
