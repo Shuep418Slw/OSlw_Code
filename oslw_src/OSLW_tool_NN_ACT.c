@@ -1,4 +1,4 @@
-/*(Ver.=0.94)
+/*(Ver.=0.95)
  * OSLW_tool.c
  *
  *  Created on: 2019-01-22
@@ -16,13 +16,108 @@
 #if OSLW_TOOL_IMPORT_NN_BPnn || OSLW_TOOL_IMPORT_ALL
 
 
+static const ParaType _LwMathTanhTable[32][4] = { _ParaFrom(-0.323768137), _ParaFrom(0.000000000), _ParaFrom(0.999829378), _ParaFrom(0.000000012),
+_ParaFrom(-0.224577786),_ParaFrom(-0.060942552), _ParaFrom(1.012310413),_ParaFrom(-0.000852027),
+_ParaFrom(-0.085294811),_ParaFrom(-0.232093472), _ParaFrom(1.082413830),_ParaFrom(-0.010423480),
+_ParaFrom(0.030060432),_ParaFrom(-0.444716255), _ParaFrom(1.213049268),_ParaFrom(-0.037177618),
+_ParaFrom(0.093805209),_ParaFrom(-0.601375420), _ParaFrom(1.341384456),_ParaFrom(-0.072221680),
+_ParaFrom(0.112109067),_ParaFrom(-0.657604872), _ParaFrom(1.398963414),_ParaFrom(-0.091875298),
+_ParaFrom(0.103550306),_ParaFrom(-0.626053856), _ParaFrom(1.360193527),_ParaFrom(-0.075995152),
+_ParaFrom(0.084237250),_ParaFrom(-0.542992262), _ParaFrom(1.241116425),_ParaFrom(-0.019092174),
+_ParaFrom(0.063665066),_ParaFrom(-0.441875863), _ParaFrom(1.075447316), _ParaFrom(0.071385249),
+_ParaFrom(0.045976471),_ParaFrom(-0.344065011), _ParaFrom(0.895162355), _ParaFrom(0.182152329),
+_ParaFrom(0.032252527),_ParaFrom(-0.259745097), _ParaFrom(0.722475170), _ParaFrom(0.300040114),
+_ParaFrom(0.022203363),_ParaFrom(-0.191828827), _ParaFrom(0.569473397), _ParaFrom(0.414934245),
+_ParaFrom(0.015098239),_ParaFrom(-0.139444167), _ParaFrom(0.440732858), _ParaFrom(0.520398495),
+_ParaFrom(0.010183947),_ParaFrom(-0.100192739), _ParaFrom(0.336229856), _ParaFrom(0.613141426),
+_ParaFrom(0.006832574),_ParaFrom(-0.071365567), _ParaFrom(0.253576587), _ParaFrom(0.692135910),
+_ParaFrom(0.004567905),_ParaFrom(-0.050494378), _ParaFrom(0.189460295), _ParaFrom(0.757790993),
+_ParaFrom(0.003046723),_ParaFrom(-0.035540547), _ParaFrom(0.140459581), _ParaFrom(0.811312839),
+_ParaFrom(0.002028966),_ParaFrom(-0.024910282), _ParaFrom(0.103449253), _ParaFrom(0.854264559),
+_ParaFrom(0.001349801),_ParaFrom(-0.017399257), _ParaFrom(0.075760608), _ParaFrom(0.888288365),
+_ParaFrom(0.000897363),_ParaFrom(-0.012117675), _ParaFrom(0.055208919), _ParaFrom(0.914945277),
+_ParaFrom(0.000596306),_ParaFrom(-0.008418297), _ParaFrom(0.040056265), _ParaFrom(0.935633700),
+_ParaFrom(0.000396132),_ParaFrom(-0.005835573), _ParaFrom(0.028948485), _ParaFrom(0.951557814),
+_ParaFrom(0.000263102),_ParaFrom(-0.004037429), _ParaFrom(0.020846768), _ParaFrom(0.963725513),
+_ParaFrom(0.000174724),_ParaFrom(-0.002788538), _ParaFrom(0.014963994), _ParaFrom(0.972962252),
+_ParaFrom(0.000116020),_ParaFrom(-0.001922917), _ParaFrom(0.010709291), _ParaFrom(0.979933157),
+_ParaFrom(0.000077044),_ParaFrom(-0.001324238), _ParaFrom(0.007644057), _ParaFrom(0.985164489),
+_ParaFrom(0.000051128),_ParaFrom(-0.000910244), _ParaFrom(0.005439617), _ParaFrom(0.989077223),
+_ParaFrom(0.000034046),_ParaFrom(-0.000626889), _ParaFrom(0.003872778), _ParaFrom(0.991965222),
+_ParaFrom(0.000022230),_ParaFrom(-0.000423612), _ParaFrom(0.002707107), _ParaFrom(0.994193362),
+_ParaFrom(0.000016157),_ParaFrom(-0.000315402), _ParaFrom(0.002064429), _ParaFrom(0.995465695),
+_ParaFrom(0.000005511),_ParaFrom(-0.000119165), _ParaFrom(0.000858748), _ParaFrom(0.997934929),
+_ParaFrom(0.000023128),_ParaFrom(-0.000454708), _ParaFrom(0.002989045), _ParaFrom(0.993426652) };
+
+
+
+inline ParaType OSlwToolMathTanh(ParaType _x)
+{
+	register ParaType y;
+	register lw_u32 _i;
+
+	if (_x>0)
+	{
+
+		if (_x>_ParaFrom(6.5536))
+		{
+			return _ParaFrom(1);
+		}
+
+		_i = (_ParaInt(_ParaMpy(_x, _ParaFrom(10000)))) >> 11;
+		y = _ParaAdd(_LwMathTanhTable[_i][1], _ParaMpy(_x, _LwMathTanhTable[_i][0]));
+		y = _ParaAdd(_LwMathTanhTable[_i][2], _ParaMpy(y, _x));
+		y = _ParaAdd(_LwMathTanhTable[_i][3], _ParaMpy(y, _x));
+
+		return y;
+
+	}
+	else if (_x<0)
+	{
+		if (_x<_ParaFrom(-6.5536))
+		{
+			return _ParaFrom(-1);
+		}
+
+		_x = -_x;
+
+		_i = (_ParaInt(_ParaMpy(_x, _ParaFrom(10000)))) >> 11;
+		y = _x;
+		y = _ParaAdd(_LwMathTanhTable[_i][1], _ParaMpy(_x, _LwMathTanhTable[_i][0]));
+		y = _ParaAdd(_LwMathTanhTable[_i][2], _ParaMpy(y, _x));
+		y = _ParaAdd(_LwMathTanhTable[_i][3], _ParaMpy(y, _x));
+
+		return -y;
+
+	}
+
+	return _ParaFrom(0);
+
+}
+
+
+inline ParaType OSlwToolMathSigmoid(ParaType _x)
+{
+
+#if OSLW_GLOBAL_MATH_TYPE==OSLW_GLOBAL_MATH_Q
+	register ParaType y;
+	y = OSlwToolMathTanh(_x >> 1);
+	return (y + _ParaFrom(1)) >> 1;
+#else
+	register ParaType y;
+	y = OSlwToolMathTanh(_ParaMpy(_x, _ParaFrom(0.5)));
+	return _ParaMpy((y + _ParaFrom(1)), _ParaFrom(0.5));
+#endif
+
+}
 
 OSlwToolNNLayerActFunSTU _OSlwToolNNSigmoid = { _OSLW_TOOL_NN_ACT_FUN_DEFAULT(Sigmoid,OSlwToolNNLayerActFunSTU)};
 OSlwToolNNLayerActFunSTU *LwSigmoid = (OSlwToolNNLayerActFunSTU *)&_OSlwToolNNSigmoid;
 lw_ptr OSlwToolBPnnLayerSigmoidForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
 	_OSLW_TOOL_NN_ACTFUN_SEMI1(pNNSLB)
-		*_out=_ParaDiv(_ParaFint(1), _ParaAdd(_ParaFint(1), _ParaExp(_ParaMpy(*_in, _ParaFint(-1)))));
+		//*_out=_ParaDiv(_ParaFint(1), _ParaAdd(_ParaFint(1), _ParaExp(_ParaMpy(*_in, _ParaFint(-1)))));
+		*_out = OSlwToolMathSigmoid(*_in);
 		*_in = *_out;
 	_OSLW_TOOL_NN_ACTFUN_SEMI2(pNNSLB, mini_b_num)
 
@@ -43,15 +138,15 @@ OSlwToolNNLayerActFunSTU *LwTanh = (OSlwToolNNLayerActFunSTU *)&_OSlwToolNNTanh;
 
 lw_ptr OSlwToolBPnnLayerTanhForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
-	ParaType _exp_x,_exp_nx;
+	//ParaType _exp_x,_exp_nx;
 	_OSLW_TOOL_NN_ACTFUN_SEMI1(pNNSLB)
-		_exp_x = _ParaExp(*_in);
-		_exp_nx = _ParaExp(-(*_in));
-		*_out = _ParaDiv(
-			_ParaSub(_exp_x, _exp_nx),
-			_ParaAdd(_exp_x, _exp_nx)
-		);
-
+		//_exp_x = _ParaExp(*_in);
+		//_exp_nx = _ParaExp(-(*_in));
+		//*_out = _ParaDiv(
+		//	_ParaSub(_exp_x, _exp_nx),
+		//	_ParaAdd(_exp_x, _exp_nx)
+		//);
+		*_out = OSlwToolMathTanh(*_in);
 		*_in = *_out;
 	_OSLW_TOOL_NN_ACTFUN_SEMI2(pNNSLB, mini_b_num)
 
@@ -478,7 +573,7 @@ lw_ptr OSlwToolBPnnLayerSoftMaxBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRU
 OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerActFunNew(
 	ParaType *pin,
 	ParaType *pout,
-	lw_u16 Col,
+	LwMatColType Col,
 	lw_u16 max_mini_batch,
 	OSlwMemoryBasicSTU *pmem,
 	OSlwToolNNLayerActFunSTU *pTemplet,

@@ -1,4 +1,4 @@
-/*(Ver.=0.94)
+/*(Ver.=0.95)
 * OSLW_tool.c
 *
 *  Created on: 2019-01-22
@@ -21,7 +21,7 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerConvNew(
 	lw_u16 in_x, lw_u16 in_y, lw_u16 in_z,
 	lw_u16 kern_x, lw_u16 kern_y, lw_u16 kern_num,
 	lw_u16 move_delt,
-	lw_u8 move_method,
+	OSlwToolMatrixConvMethodNUM move_method,
 	lw_u16 max_mini_batch,
 	OSlwMemoryBasicSTU *pmem,
 	lw_u32 info[4]
@@ -42,21 +42,21 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerConvNew(
 	kern_len2 = kern_x*kern_y*kern_num;
 
 	//分配节点内存
-	node = pmem->Malloc(pmem, sizeof(OSlwToolNNLayerConvSTU));
-
-	memset(node, 0, sizeof(OSlwToolNNLayerConvSTU));
+	node = pmem->Calloc(pmem, sizeof(OSlwToolNNLayerConvSTU));
 
 	node->databasic.basic.NN_Kind = OSlwToolNNSubLayerKind_Conv;
 
 	//node->DataRes = (ParaType *)(((lw_u8 *)node) + sizeof(OSlwToolNNLayerConvSTU));
 
-	if (move_method == 'v')
+	node->ConvMethod = move_method;
+
+	if (move_method == OSlwToolMatrixConvMethod_Valid)
 	{
-		out_x = (in_x - kern_x) / (move_delt)+1;//横向移动次数
-		out_y = (in_y - kern_y) / (move_delt)+1;//纵向移动次数
+		out_x = (in_x - kern_x + 1) / (move_delt);//横向移动次数
+		out_y = (in_y - kern_y + 1) / (move_delt);//纵向移动次数
 
 	}
-	else if (move_method == 'f')
+	else if (move_method == OSlwToolMatrixConvMethod_Full)
 	{
 		out_x = (in_x) / (move_delt)+1;//横向移动次数
 		out_y = (in_y) / (move_delt)+1;//纵向移动次数
@@ -630,6 +630,7 @@ lw_ptr OSlwToolBPnnLayerConvForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *
 	OSlwMatInit(&out, pcv->out_x, pcv->out_y, pfc->basic.out.a);
 	OSlwMatInit(&we, pcv->conv_kernal_x, pcv->conv_kernal_y, pfc->Weight.a);
 	we.length *= pcv->conv_kernal_z;
+	out.length *= pcv->conv_kernal_z;
 
 	while (min_b--)
 	{
@@ -638,6 +639,7 @@ lw_ptr OSlwToolBPnnLayerConvForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *
 			&out, &we, &in, &(pfc->Bias),
 			pcv->conv_kernal_z, pcv->conv_kernal_num,
 			pcv->move_delt, pcv->move_delt,
+			pcv->ConvMethod,
 			1,
 			pfc->basic.FlowData.pData
 		);
@@ -755,7 +757,7 @@ lw_ptr OSlwToolBPnnLayerConvBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT 
 						&m_dw, &m_out, &m_in,
 						pcv->move_delt, pcv->move_delt,
 						0,
-						's',
+						OSlwToolMatrixConvMethod_Valid,
 						0,
 						NULL
 					);
@@ -773,13 +775,14 @@ lw_ptr OSlwToolBPnnLayerConvBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT 
 	m_dw.length *= pcv->conv_kernal_z;
 	m_out.a = pfc->basic.out.a;
 	m_in.a = pfc->basic.in.a;
-
+	m_in.length *= pcv->conv_kernal_z;
 	while (i--)
 	{
 		pOSlwToolMatrixConvFastMultCh(
 			&m_in, &m_dw, &m_out, NULL,
 			pcv->conv_kernal_num, pcv->conv_kernal_z,
 			pcv->move_delt, pcv->move_delt,
+			pcv->ConvMethod,
 			0,
 			pfc->basic.FlowData.pData
 		);
@@ -1605,6 +1608,7 @@ void* OSlwToolBPnnConvAppend
 	OSlwToolBPnnSTU *pBPnn,
 	lw_u16 in_x, lw_u16 in_y, lw_u16 in_z,
 	lw_u16 kern_x, lw_u16 kern_y, lw_u16 kern_num,
+	OSlwToolMatrixConvMethodNUM conv_method,
 	ParaType *pin, ParaType *pout,
 	ParaType *pWe, ParaType *pBi,
 	OSlwNNinitFunType pfun,
@@ -1643,7 +1647,7 @@ void* OSlwToolBPnnConvAppend
 			in_x, in_y, in_z,
 			kern_x, kern_y, kern_num,
 			1,
-			'v',
+			conv_method,
 			pBPnn->Train.mini_batch_max,
 			pmem,
 			info
@@ -1708,7 +1712,7 @@ void* OSlwToolBPnnConvAppend
 	pfc->initd1 = d1;
 	pfc->initd2 = d2;
 
-	_NN_FULL_CON_CHIP_ALLAC_1();
+	_NN_FULL_CON_CHIP_ALLAC_1(pBPnn, pfc);
 
 	//pBPnn->ParaGroupNum++;
 
@@ -1732,7 +1736,7 @@ void* OSlwToolBPnnPoolAppend
 	OSlwToolNNLayerPoolSTU *pPL;
 	OSlwToolDListNodeSTU *pln1;
 	OSlwToolNNSubLayerBasicSTU **ppLIST1, **pptail;
-	LwMatRowType in_col;
+	LwMatColType in_col;
 
 
 	OSLW_assert(!(pBPnn));

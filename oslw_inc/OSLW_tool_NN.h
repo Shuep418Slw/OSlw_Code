@@ -1,4 +1,4 @@
-/*(Ver.=0.94)
+/*(Ver.=0.95)
  * OSLW_tool.h
  *
  *  Created on: 2017-11-13
@@ -327,7 +327,12 @@ typedef enum {
 	OSlwToolNNSubLayerKind_Pool='P',
 	OSlwToolNNSubLayerKind_BasicRnn = 'R',
 	OSlwToolNNSubLayerKind_GruRnn = 'G',
-	OSlwToolNNSubLayerKind_LNorm = 'L'
+	OSlwToolNNSubLayerKind_LNorm = 'L',
+	OSlwToolNNSubLayerKind_Shift = 's',
+	OSlwToolNNSubLayerKind_Split='S',
+	OSlwToolNNSubLayerKind_Mix = 'M',
+	OSlwToolNNSubLayerKind_Extend = 'E',
+	OSlwToolNNSubLayerKind_Pad = 'p'
 }OSlwToolNNSubLayerKind;
 
 //神经网络层的基类
@@ -381,9 +386,6 @@ typedef struct OSLW_TOOL_NN_LAYER_FULL_CONNECTION_STRUCT
 	void *pr;//
 	ParaType initd1, initd2;//
 	
-	
-
-
 	//偏置初始化（如果以下指针不为NULL 就调用权重初始化函数）
 	//优先级为 _BiasInitFun>_BiasInit>pfun
 	ParaType(*_BiasInitFun)();//偏置初始化函数 可以为NULL
@@ -398,12 +400,20 @@ typedef struct OSLW_TOOL_NN_LAYER_FULL_CONNECTION_STRUCT
 OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerFullConNew(
 	ParaType *pin,//输入指针 为NULL则分配 
 	ParaType *pout,//输出指针 为NULL则分配 
-	lw_u16 InCol,//权重的行 = 输入的行
-	lw_u16 OutCol,//权重的列 = 输出的行
+	LwMatColType InCol,//权重的行 = 输入的行
+	LwMatColType OutCol,//权重的列 = 输出的行
 	lw_u16 max_mini_batch,//最大minibatch
 	OSlwMemoryBasicSTU *pmem//内存分配结构体
 );
 
+OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerShiftNew(
+	ParaType *pin,
+	ParaType *pout,
+	LwMatColType Col,
+	LwMatColType weight_len,
+	lw_u16 max_mini_batch,
+	OSlwMemoryBasicSTU *pmem
+);
 
 typedef struct OSLW_TOOL_NN_LAYER_CONVOLUTION_STRUCT{
 	OSlwToolNNLayerFullConSTU databasic;//借用全连接类 作为基类
@@ -413,6 +423,7 @@ typedef struct OSLW_TOOL_NN_LAYER_CONVOLUTION_STRUCT{
 	lw_u16 conv_kernal_z;//卷积核的高度 == 输入图像的高度
 	lw_u16 conv_kernal_num;//卷积核的数量 == 输出图像的高度
 	lw_u16 move_delt;
+	OSlwToolMatrixConvMethodNUM ConvMethod : 16;
 	//ParaType *DataRes;//保留数据
 }OSlwToolNNLayerConvSTU;
 
@@ -459,7 +470,7 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerConvNew(
 	lw_u16 in_x, lw_u16 in_y, lw_u16 in_z,//输入图像维度 长 宽 高
 	lw_u16 kern_x, lw_u16 kern_y, lw_u16 kern_num,//卷积核维度 长 宽 高
 	lw_u16 move_delt,//移动间隔 默认1
-	lw_u8 move_method,//移动模式
+	OSlwToolMatrixConvMethodNUM move_method,//移动模式
 	lw_u16 max_mini_batch,//最大 minibatch
 	OSlwMemoryBasicSTU *pmem,//内存分配指针
 	lw_u32 info[4]//下一层信息 分别为 输出图像 长 宽 高 总长度(用于与全连接连接）
@@ -567,14 +578,14 @@ typedef struct OSLW_TOOL_NN_LAYER_RECURRENT_CELL_BASIC_STRUCT {
 	lw_u32 FlowDataLen;
 }OSlwToolNNLayerRnnCellBasicSTU;
 
-typedef void* (*OSlwToolNNLayerRnnCellNewFunType)(ParaType *,lw_u16,lw_u16,lw_u16,void *,void *);
+typedef void* (*OSlwToolNNLayerRnnCellNewFunType)(ParaType *, LwMatColType, LwMatColType,lw_u16,void *,void *);
 
 
 
 void* OSlwToolNNLayerRnnCellNew(
 	ParaType *pout,
-	lw_u16 in_size,//这个是CELL的输入大小 对应应该是RNN的输入+输出
-	lw_u16 out_size,
+	LwMatColType in_size,//这个是CELL的输入大小 对应应该是RNN的输入+输出
+	LwMatColType out_size,
 	lw_u16 max_min_batch,
 	OSlwToolNNLayerActFunSTU *ptem,
 	OSlwMemoryBasicSTU *pmem
@@ -616,8 +627,8 @@ typedef struct OSLW_TOOL_NN_LAYER_RECURRENT_LNORM_CELL_STRUCT {
 
 void* OSlwToolNNLayerRnnCellLNormNew(
 	ParaType *pout,
-	lw_u16 in_size,//这个是CELL的输入大小 对应应该是RNN的输入+输出
-	lw_u16 out_size,
+	LwMatColType in_size,//这个是CELL的输入大小 对应应该是RNN的输入+输出
+	LwMatColType out_size,
 	lw_u16 max_min_batch,
 	OSlwToolNNLayerActFunSTU *ptem,
 	OSlwMemoryBasicSTU *pmem
@@ -638,8 +649,8 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerBasicRnnNew(
 	ParaType *pin,
 	ParaType *pout,
 	ParaType *pOut_t_1,
-	lw_u16 InCol,
-	lw_u16 OutCol,
+	LwMatColType InCol,
+	LwMatColType OutCol,
 	lw_u16 max_mini_batch,
 	lw_u8 NeedTrainFlag,
 	OSlwToolNNLayerRnnCellNewFunType new_cell_fun,
@@ -687,8 +698,8 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerGruRnnNew(
 	ParaType *pUpdateGateOut,
 	ParaType *pCoreCellOut,
 	ParaType *pOutT_1,
-	lw_u16 InCol,
-	lw_u16 OutCol,
+	LwMatColType InCol,
+	LwMatColType OutCol,
 	lw_u16 max_mini_batch,
 	lw_u8 NeedTrainFlag,
 	OSlwToolNNLayerRnnCellNewFunType new_cell_fun,
@@ -698,6 +709,99 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerGruRnnNew(
 
 
 
+typedef struct OSLW_TOOL_NN_LAYER_SPILT_STRUCT {
+	OSlwToolNNSubLayerBasicSTU basic;
+	LwMatColType ShapeList[4];
+	ParaType **OutList;
+	LwMatColType *SplitList;
+	lw_u8 OutNum;
+	lw_u8 Indim;
+}OSlwToolNNLayerSplitSTU;
+
+OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerSplitNew(
+	ParaType *pin,//输入指针 为NULL则分配 
+	ParaType **poutList,//输出指针列表 为NULL则分配 
+	lw_u16 Dim, // 输入量的维度
+	LwMatColType *ShapeList,//输入量的形状
+	lw_u16 SplitNum,//要切成的块数量
+	LwMatColType *SplitList,//具体的切法
+	lw_u16 max_mini_batch,//最大 minibatch
+	OSlwMemoryBasicSTU *pmem//内存分配指针
+);
+
+typedef struct OSLW_TOOL_NN_LAYER_MIX_STRUCT {
+	OSlwToolNNSubLayerBasicSTU basic;
+	LwMatColType ShapeList[4];
+	ParaType **InList;
+	LwMatColType *MixList;
+	lw_u8 InNum;
+	lw_u8 Outdim;
+}OSlwToolNNLayerMixSTU;
+
+OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerMixNew(
+	ParaType **pinList,//输入指针列表 为NULL则分配 
+	ParaType *pout,//输出指针列表 为NULL则分配 
+	lw_u16 Dim, // 输出量的维度
+	LwMatColType *ShapeList,//输出量的形状
+	lw_u16 MixNum,//块数量
+	LwMatColType *MixList,//具体的切法
+	lw_u16 max_mini_batch,//最大 minibatch
+	OSlwMemoryBasicSTU *pmem//内存分配指针
+);
+
+typedef enum {
+	OSlwToolNNPad_Constant=0,
+	OSlwToolNNPad_Reflect=1
+}OSlwToolNNPadNUM;
+
+typedef struct OSLW_TOOL_NN_LAYER_PAD_STRUCT {
+	OSlwToolNNSubLayerBasicSTU basic;
+	LwMatColType ShapeList[4];
+	LwMatColType Padlist[4];
+	lw_u8 PadLen;
+	lw_u8 IOdim : 4;
+	OSlwToolNNPadNUM PadMethod : 4;
+}OSlwToolNNLayerPadSTU;
+
+
+OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerPadNew(
+	ParaType *pin,//输入指针 为NULL则分配 
+	ParaType *pout,//输出指针 为NULL则分配 
+	lw_u8 Dim, // IO的维度
+	LwMatColType *ShapeList,//输出量的形状
+	LwMatColType *PadList,//Pad的方法 1维或者2维
+	lw_u16 max_mini_batch,//最大 minibatch
+	OSlwToolNNPadNUM method,
+	OSlwMemoryBasicSTU *pmem,//内存分配指针
+	lw_u32 info[4]
+);
+
+
+typedef enum {
+	OSlwToolNNExtend_Nearest = 0,
+	OSlwToolNNExtend_Linear = 1
+}OSlwToolNNExtendNUM;
+
+typedef struct OSLW_TOOL_NN_LAYER_EXTEND_STRUCT {
+	OSlwToolNNSubLayerBasicSTU basic;
+	LwMatColType ShapeList[4];
+	LwMatColType Extlist[2];
+	lw_u8 ExtLen;
+	lw_u8 IOdim : 4;
+	OSlwToolNNExtendNUM ExtendMethod : 4;
+}OSlwToolNNLayerExtendSTU;
+
+OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerExtendNew(
+	ParaType *pin,//输入指针 为NULL则分配 
+	ParaType *pout,//输出指针 为NULL则分配 
+	lw_u8 Dim, // IO的维度
+	LwMatColType *ShapeList,//输出量的形状
+	LwMatColType *ExtList,//扩展的方法 1维或者2维
+	lw_u16 max_mini_batch,//最大 minibatch
+	OSlwToolNNExtendNUM method,
+	OSlwMemoryBasicSTU *pmem,//内存分配指针
+	lw_u32 info[4]
+);
 
 
 typedef struct OSLW_TOOL_NN_LAYER_ACT_FUN_SELU_STRUCT
@@ -710,7 +814,7 @@ typedef struct OSLW_TOOL_NN_LAYER_ACT_FUN_SELU_STRUCT
 OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerActFunNew(
 	ParaType *pin,//输入指针 为NULL则分配 
 	ParaType *pout,//输出指针 为NULL则分配 
-	lw_u16 Col,//列数
+	LwMatColType Col,//列数
 	lw_u16 max_mini_batch,//最大minibatch
 	OSlwMemoryBasicSTU *pmem,//内存分配结构体
 	OSlwToolNNLayerActFunSTU *pTemplet,//激活函数模板
@@ -754,7 +858,7 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerLNormNew(
 	ParaType *pout,
 	ParaType *pmean,
 	ParaType *pvar,
-	lw_u16 Col,
+	LwMatColType Col,
 	lw_u16 max_mini_batch,
 	OSlwMemoryBasicSTU *pmem
 );
@@ -784,6 +888,9 @@ lw_ptr OSlwToolBPnnLayerFullConDataInit(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRU
 lw_ptr OSlwToolBPnnLayerFullConCopy(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB1, struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB2);
 lw_ptr OSlwToolBPnnLayerFullConSoftReplace(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB1, struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB2, ParaType Raido);
 
+lw_ptr OSlwToolBPnnLayerShiftForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolBPnnLayerShiftBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+
 //卷积层函数
 lw_ptr OSlwToolBPnnLayerConvForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
 lw_ptr OSlwToolBPnnLayerConvBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
@@ -809,6 +916,25 @@ lw_ptr OSlwToolBPnnLayerGruRnnClear(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *
 //layer norm函数
 lw_ptr OSlwToolNNLayerLNormForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
 lw_ptr OSlwToolNNLayerLNormBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+
+//切分层函数
+lw_ptr OSlwToolNNLayerSplitForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolNNLayerSplitBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+
+
+//混合层函数
+lw_ptr OSlwToolNNLayerMixForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolNNLayerMixBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+
+//pad
+lw_ptr OSlwToolNNLayerPadForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolNNLayerPadBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+
+
+//扩展层
+lw_ptr OSlwToolNNLayerExtendForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolNNLayerExtendBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+
 
 extern OSlwToolNNLayerActFunSTU _OSlwToolNNSigmoid;
 extern OSlwToolNNLayerActFunSTU *LwSigmoid;
@@ -966,6 +1092,10 @@ typedef struct OSLW_TOOL_NN_TRAIN_STRUCT {
 	//L2正则化
 	ParaType L2Regu;
 
+	//梯度限幅
+	ParaType DeltLimitMax;
+	ParaType DeltLimitMin;
+
 	ParaType Beta1, Beta1T;
 	ParaType Beta2, Beta2T;
 	ParaType Epsi;
@@ -984,7 +1114,8 @@ typedef struct OSLW_TOOL_NN_TRAIN_STRUCT {
 
 	struct
 	{
-		OSlwToolNNNeedTrainNum NeedTrain : 4;
+		OSlwToolNNNeedTrainNum NeedTrain : 2;
+		lw_u16 EnableDeltLimit : 2;
 		//OSlwToolNNTrainUpdateMethodNum UpdateMethod : 2;
 		OSlwToolNNTrainStatusNum Status : 4;
 		OSlwToolNNMemoryMethodNum MemoryMethod : 4;
@@ -1056,14 +1187,14 @@ else\
 }while (0)
 
 
-#define _NN_FULL_CON_CHIP_ALLAC_1() do{\
-if (pBPnn->Train.Flag.MemoryMethod == OSlwToolNNMemoryMethod_Chip)\
+#define _NN_FULL_CON_CHIP_ALLAC_1(P_BPNN,P_FC) do{\
+if ((P_BPNN)->Train.Flag.MemoryMethod == OSlwToolNNMemoryMethod_Chip)\
 {\
-	pfc->Weight.a = pWe == NULL ? pmem->Malloc(pmem, PARA_MEM_CAL(pfc->Weight.length)) : pWe;\
-	pfc->Bias.a = pBi == NULL ? pmem->Malloc(pmem, PARA_MEM_CAL(pfc->Bias.length)) : pBi;\
-	if (pBPnn->Train.Flag.NeedTrain == OSlwToolNNNeedTrain_Need)\
+	(P_FC)->Weight.a = pWe == NULL ? pmem->Malloc(pmem, PARA_MEM_CAL((P_FC)->Weight.length)) : pWe;\
+	(P_FC)->Bias.a = pBi == NULL ? pmem->Malloc(pmem, PARA_MEM_CAL((P_FC)->Bias.length)) : pBi;\
+	if ((P_BPNN)->Train.Flag.NeedTrain == OSlwToolNNNeedTrain_Need)\
 	{\
-		pnode1->NNmalloc(pnode1, NULL, pmem->Malloc(pmem, pnode1->sizeofdata * (lw_u32)(pBPnn->Train._MemAllocCoff)));\
+		(P_FC->basic).NNmalloc((void *)P_FC, NULL, pmem->Malloc(pmem, (P_FC->basic).sizeofdata * (lw_u32)((P_BPNN)->Train._MemAllocCoff)));\
 	}\
 }\
 }while(0)
@@ -1086,7 +1217,7 @@ if (pBPnn->Train.Flag.MemoryMethod == OSlwToolNNMemoryMethod_Chip)\
 void* OSlwToolBPnnFullConAppend
 (
 	OSlwToolBPnnSTU *pBPnn,
-	lw_u16 in_col, lw_u16 out_col,
+	LwMatColType in_col, LwMatColType out_col,
 	ParaType *pin, ParaType *pout,
 	ParaType *pWe, ParaType *pBi,
 	OSlwNNinitFunType pfun,
@@ -1101,6 +1232,7 @@ void* OSlwToolBPnnConvAppend
 	OSlwToolBPnnSTU *pBPnn,
 	lw_u16 in_x, lw_u16 in_y, lw_u16 in_z,
 	lw_u16 kern_x, lw_u16 kern_y, lw_u16 kern_num,
+	OSlwToolMatrixConvMethodNUM conv_method,
 	ParaType *pin, ParaType *pout,
 	ParaType *pWe, ParaType *pBi,
 	OSlwNNinitFunType pfun,
@@ -1125,7 +1257,7 @@ void* OSlwToolBPnnPoolAppend
 void* OSlwToolBPnnBasicRnnAppend
 (
 	OSlwToolBPnnSTU *pBPnn,
-	lw_u16 in_col, lw_u16 out_col,
+	LwMatColType in_col, LwMatColType out_col,
 	ParaType *pin, ParaType *pout,
 	ParaType *pWe, ParaType *pBi,
 	OSlwNNinitFunType pfun,
@@ -1139,7 +1271,7 @@ void* OSlwToolBPnnBasicRnnAppend
 void* OSlwToolBPnnGruRnnAppend
 (
 	OSlwToolBPnnSTU *pBPnn,
-	lw_u16 in_col, lw_u16 out_col,
+	LwMatColType in_col, LwMatColType out_col,
 	ParaType *pin, ParaType *pout,
 	ParaType *pWe, ParaType *pBi,
 	OSlwNNinitFunType pfun,
@@ -1153,11 +1285,35 @@ void* OSlwToolBPnnGruRnnAppend
 void* OSlwToolBPnnLNormAppend
 (
 	OSlwToolBPnnSTU *pBPnn,
-	lw_u16 in_col,
+	LwMatColType in_col,
 	ParaType *pin, ParaType *pout,
 	ParaType *pWe, ParaType *pBi,
 	ParaType *pmean, ParaType *pvar,
 	OSlwMemoryBasicSTU *pmem
+);
+
+void* OSlwToolBPnnPadAppend
+(
+	OSlwToolBPnnSTU *pBPnn,
+	lw_u8 Dim, // IO的维度
+	LwMatColType *ShapeList,//输出量的形状
+	LwMatColType *PadList,//Pad的方法 1维或者2维
+	ParaType *pin, ParaType *pout,
+	OSlwToolNNPadNUM method,
+	OSlwMemoryBasicSTU *pmem,
+	lw_u32 info[4]
+);
+
+void* OSlwToolBPnnExtendAppend
+(
+	OSlwToolBPnnSTU *pBPnn,
+	lw_u8 Dim, // IO的维度
+	LwMatColType *ShapeList,//输出量的形状
+	LwMatColType *ExtList,//Ext的方法
+	ParaType *pin, ParaType *pout,
+	OSlwToolNNExtendNUM method,
+	OSlwMemoryBasicSTU *pmem,
+	lw_u32 info[4]
 );
 
 

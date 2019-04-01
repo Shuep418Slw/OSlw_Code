@@ -1,4 +1,4 @@
-/*(Ver.=0.94)
+/*(Ver.=0.95)
 * OSLW_tool.c
 *
 *  Created on: 2017-7-14
@@ -20,6 +20,9 @@ void OSlwToolMatrixInitial(OSlwToolMatrixSTU *m, LwMatRowType row, LwMatColType 
 
     m->length = row*col;
 }
+
+
+
 
 
 OSLW_TOOL_FUN(
@@ -197,14 +200,39 @@ OSLW_TOOL_FUN(
 	OSlwToolMatrixMpy
 )
 {
-	lw_u16 i, j, k, row, col, row1;
-	ParaType sum, *_s, *_m1, *_m2, *_m1buf;
+    register LwMatColType j, k, row, col, row1;
+	register LwMatLenType i;
+	register ParaType temp, *_s, *_m1, *_m2, *_m1buf, *_sbuf, *_m2buf;
 	OSLW_assert(!(s));
 	OSLW_assert(!(m1));
 	OSLW_assert(!(m2));
 
 	if (s->row == m1->row && s->col == m2->col && m1->col == m2->row)//满足相乘条件
 	{
+#if L1_L2_CACHE_OPTIM == 1
+		row = s->row;
+		col = s->col;
+		row1 = m2->row;
+		_sbuf = s->a;
+		_m1buf = m1->a;
+		_m2buf = m2->a;
+
+		LW_MAT_CLR(s);
+
+		for (i = 0, _m1 = _m1buf; i < row; ++i)
+		{
+			for (j = 0, _m2 = _m2buf; j < row1; ++j, ++_m1)
+			{
+				temp = *_m1;
+				for (k = 0, _s = _sbuf; k < col; ++k, ++_m2, ++_s)
+				{
+					*_s = _ParaAdd(*_s, _ParaMpy(temp, *_m2));
+				}
+			}
+			_sbuf = _s;
+		}
+
+#else
 		row = s->row;
 		col = m2->col;
 		row1 = m2->row;
@@ -219,17 +247,21 @@ OSLW_TOOL_FUN(
 				//_m1=m1->a+i*m1->col;//m1的指针归位 m1归位于[n,1]
 				_m1 = _m1buf;
 				_m2 = m2->a + j;//m2的指针归位 m2归位于[1,n]
-				sum = _ParaFrom(0);
+				temp = _ParaFrom(0);
 				for (k = 0;k<row1;k++)
 				{
-					sum = _ParaAdd(sum, _ParaMpy(*_m1, *_m2));
+					temp = _ParaAdd(temp, _ParaMpy(*_m1, *_m2));
 					_m1++;
 					_m2 += col;
 				}//行向量*列向量
-				*_s++ = sum;
+				*_s++ = temp;
 			}
 			_m1buf += m1->col;//m1的指针归位 m1归位于[n,1]
 		}
+
+#endif // L1_L2_CACHE_OPTIM == 1
+			
+
 	}
 	else if ((m1->length == 1 || m2->length == 1) && (s->length == m1->length || s->length == m2->length) && s->length)
 	{
@@ -238,15 +270,15 @@ OSLW_TOOL_FUN(
 		{
 			i = m2->length;
 			_m1 = m2->a;
-			sum = *(m1->a);
+			temp = *(m1->a);
 		}
 		else
 		{
 			i = m1->length;
 			_m1 = m1->a;
-			sum = *(m2->a);
+			temp = *(m2->a);
 		}
-		while (i--) *_s++ = _ParaMpy(sum, *_m1++);
+		while (i--) *_s++ = _ParaMpy(temp, *_m1++);
 	}
 	else
 	{
@@ -409,6 +441,9 @@ OSLW_TOOL_FUN(OSlwMartixResNum, OSlwToolMatrixCmp,
               OSlwToolMatrixCmp
              )
 {
+	OSLW_assert(!(s));
+	OSLW_assert(!(m));
+
     if (pbuf == NULL)
     {
         if (s->length == m->length && (s->a) && (m->a))
@@ -504,19 +539,19 @@ OSLW_TOOL_FUN(OSlwToolMatrixSTU*, OSlwToolMatrixSet,
               OSlwToolMatrixSet
              )
 {
-    register lw_u16 i = 0;
+    register LwMatLenType i = 0;
     register ParaType *ps;
     OSLW_assert(!(s));
     if (a)//如果定义a 相当于复制构造函数
     {
-        /*(Ver.=0.94)
+        /*(Ver.=0.95)
         for (i = 0; i < s->length; i++)
         {
         s->a[i] = a->a[i];
         }
         */
 
-        /*(Ver.=0.94)
+        /*(Ver.=0.95)
         i = s->length;
         ps = s->a;
         pa = a->a;
@@ -538,7 +573,7 @@ OSLW_TOOL_FUN(OSlwToolMatrixSTU*, OSlwToolMatrixSet,
     }
     else//使用常量初始化
     {
-        /*(Ver.=0.94)
+        /*(Ver.=0.95)
         for (i = 0; i < s->length; i++)
         {
         s->a[i] = data;
@@ -633,10 +668,6 @@ OSLW_TOOL_FUN(OSlwToolMatrixSTU*, OSlwToolMatrixJoin,
 
 	return s;
 }
-
-
-
-
 
 
 
@@ -956,133 +987,134 @@ OSLW_TOOL_FUN(OSlwToolMatrixSTU*, OSlwToolMatrixMPYA,
 OSlwToolMatrixMPYA
 )
 {
-	lw_u16 i, j, k, row, col, row1;
-	ParaType sum, *_s, *_x, *_we, *_xbuf, *_bi;
-	ParaType _we_a, _bi_a;
-	ParaType stas;
-	OSLW_assert(!(s));
-	OSLW_assert(!(x));
-	OSLW_assert(!(we));
-	OSLW_assert(!(bi));
-
-	//神经网络前向传播
-	if (s->row == x->row && s->col == we->col && x->col == we->row && s->length == bi->length)//满足相乘条件
-	{
-		row = s->row;
-		col = we->col;
-		row1 = we->row;
-		_s = s->a;
-		_xbuf = x->a;
-		_bi = bi->a;
-
-		for (i = 0; i<s->row; i++)
-		{
-			for (j = 0; j<s->col; j++)
-			{
-
-				//_x=x->a+i*x->col;//x的指针归位 x归位于[n,1]
-				_x = _xbuf;
-				_we = we->a + j;//we的指针归位 we归位于[1,n]
-				sum = _ParaFrom(0);
-				for (k = 0; k<row1; k++)
-				{
-					sum = _ParaAdd(sum, _ParaMpy(*_x, *_we));
-					_x++;
-					_we += col;
-				}//行向量*列向量
-				*_s++ = _ParaAdd(sum, *_bi);
-				_bi++;
-			}
-			_xbuf += x->col;//x的指针归位 x归位于[n,1]
-		}
-	}
 	//
-	else if((bi->col == bi->row && bi->row == bi->length && bi->length >= 2) && (s->row == x->row && s->col == we->col && x->col == we->row))//特殊统计命令
-	{
-		row = s->row;
-		col = we->col;
-		row1 = we->row;
-		_s = s->a;
-		_xbuf = x->a;
-		stas = _ParaFint(0);
+	//lw_u16 i, j, k, row, col, row1;
+	//ParaType sum, *_s, *_x, *_we, *_xbuf, *_bi;
+	//ParaType _we_a, _bi_a;
+	//ParaType stas;
+	//OSLW_assert(!(s));
+	//OSLW_assert(!(x));
+	//OSLW_assert(!(we));
+	//OSLW_assert(!(bi));
 
-		for (i = 0; i<s->row; i++)
-		{
-			for (j = 0; j<s->col; j++)
-			{
+	////神经网络前向传播
+	//if (s->row == x->row && s->col == we->col && x->col == we->row && s->length == bi->length)//满足相乘条件
+	//{
+	//	row = s->row;
+	//	col = we->col;
+	//	row1 = we->row;
+	//	_s = s->a;
+	//	_xbuf = x->a;
+	//	_bi = bi->a;
 
-				//_x=x->a+i*x->col;//x的指针归位 x归位于[n,1]
-				_x = _xbuf;
-				_we = we->a + j;//we的指针归位 we归位于[1,n]
-				sum = _ParaFrom(0);
-				for (k = 0; k<row1; k++)
-				{
-					sum = _ParaAdd(sum, _ParaMpy(*_x, *_we));
-					_x++;
-					_we += col;
-				}//行向量*列向量
-				*_s++ = sum;
+	//	for (i = 0; i<s->row; i++)
+	//	{
+	//		for (j = 0; j<s->col; j++)
+	//		{
 
-				stas = _ParaAdd(stas, sum);//统计累加
+	//			//_x=x->a+i*x->col;//x的指针归位 x归位于[n,1]
+	//			_x = _xbuf;
+	//			_we = we->a + j;//we的指针归位 we归位于[1,n]
+	//			sum = _ParaFrom(0);
+	//			for (k = 0; k<row1; k++)
+	//			{
+	//				sum = _ParaAdd(sum, _ParaMpy(*_x, *_we));
+	//				_x++;
+	//				_we += col;
+	//			}//行向量*列向量
+	//			*_s++ = _ParaAdd(sum, *_bi);
+	//			_bi++;
+	//		}
+	//		_xbuf += x->col;//x的指针归位 x归位于[n,1]
+	//	}
+	//}
+	////
+	//else if((bi->col == bi->row && bi->row == bi->length && bi->length >= 2) && (s->row == x->row && s->col == we->col && x->col == we->row))//特殊统计命令
+	//{
+	//	row = s->row;
+	//	col = we->col;
+	//	row1 = we->row;
+	//	_s = s->a;
+	//	_xbuf = x->a;
+	//	stas = _ParaFint(0);
 
-			}
-			_xbuf += x->col;//x的指针归位 x归位于[n,1]
-		}
+	//	for (i = 0; i<s->row; i++)
+	//	{
+	//		for (j = 0; j<s->col; j++)
+	//		{
 
-		bi->a[0] = _ParaDiv(stas, _ParaFrom(s->length));//计算平均值
+	//			//_x=x->a+i*x->col;//x的指针归位 x归位于[n,1]
+	//			_x = _xbuf;
+	//			_we = we->a + j;//we的指针归位 we归位于[1,n]
+	//			sum = _ParaFrom(0);
+	//			for (k = 0; k<row1; k++)
+	//			{
+	//				sum = _ParaAdd(sum, _ParaMpy(*_x, *_we));
+	//				_x++;
+	//				_we += col;
+	//			}//行向量*列向量
+	//			*_s++ = sum;
 
-	}
+	//			stas = _ParaAdd(stas, sum);//统计累加
 
-	else if (s->length == x->length && we->length ==1)
-	{
-		//矩阵s=数字w*矩阵x+矩阵b
-		if (bi->length == s->length)
-		{
-			_we_a = *(we->a);
-			_bi = bi->a;
-			_s = s->a;
-			_xbuf = x->a;
-			i = s->length;
+	//		}
+	//		_xbuf += x->col;//x的指针归位 x归位于[n,1]
+	//	}
 
-			while (i--)
-			{
-				*_s = _ParaAdd(*_bi, _ParaMpy((*_xbuf), _we_a));
-				
-				_s++;
-				_xbuf++;
-				_bi++;
+	//	bi->a[0] = _ParaDiv(stas, _ParaFrom(s->length));//计算平均值
 
-			}
+	//}
+
+	//else if (s->length == x->length && we->length ==1)
+	//{
+	//	//矩阵s=数字w*矩阵x+矩阵b
+	//	if (bi->length == s->length)
+	//	{
+	//		_we_a = *(we->a);
+	//		_bi = bi->a;
+	//		_s = s->a;
+	//		_xbuf = x->a;
+	//		i = s->length;
+
+	//		while (i--)
+	//		{
+	//			*_s = _ParaAdd(*_bi, _ParaMpy((*_xbuf), _we_a));
+	//			
+	//			_s++;
+	//			_xbuf++;
+	//			_bi++;
+
+	//		}
 
 
-		}
-		//矩阵s=数字w*矩阵x+数字b
-		else if (bi->length == 1)
-		{
-			_we_a = *(we->a);
-			_bi_a = *(bi->a);
-			_s = s->a;
-			_xbuf = x->a;
+	//	}
+	//	//矩阵s=数字w*矩阵x+数字b
+	//	else if (bi->length == 1)
+	//	{
+	//		_we_a = *(we->a);
+	//		_bi_a = *(bi->a);
+	//		_s = s->a;
+	//		_xbuf = x->a;
 
-			i = s->length;
-			while (i--)
-			{
-				*_s = _ParaAdd(_bi_a, _ParaMpy((*_xbuf), _we_a));
-				_s++;
-				_xbuf++;
+	//		i = s->length;
+	//		while (i--)
+	//		{
+	//			*_s = _ParaAdd(_bi_a, _ParaMpy((*_xbuf), _we_a));
+	//			_s++;
+	//			_xbuf++;
 
-			}
+	//		}
 
-		}
-		else
-		{
-			OSLW_assert(1);
-		}
-	}
-	else
-	{
-		OSLW_assert(1);
-	}
+	//	}
+	//	else
+	//	{
+	//		OSLW_assert(1);
+	//	}
+	//}
+	//else
+	//{
+	//	OSLW_assert(1);
+	//}
 
 
 	return s;
@@ -1096,48 +1128,8 @@ OSLW_TOOL_FUN(
 	OSlwToolMatrixWeXBi
 )
 {
-	register lw_u16 i, j, k, row, col, row1;
-	register ParaType sum, *_s, *_x, *_we, *_web, *_xb, *_bi;
-	register ParaType _we_a, _bi_a;
-
-	OSLW_assert(!(s));
-	OSLW_assert(!(x));
-	OSLW_assert(!(we));
-	OSLW_assert(!(bi));
-
-	//神经网络前向传播
-	if (s->row == we->row && s->col == x->col && we->col == x->row && s->row == bi->length)//满足神经网络前向条件
-	{
-		row = s->row;
-		col = x->col;
-		row1 = x->row;
-		_s = s->a;
-		_xb = x->a;
-		_web = we->a;
-		_bi = bi->a;
-
-		for (i = 0; i<row; i++)
-		{
-			for (j = 0; j<col; j++)
-			{
-				_we = _web;
-				_x = _xb + j;
-				sum = _ParaFrom(0);
-				for (k = 0; k<row1; k++)
-				{
-					sum = _ParaAdd(sum, _ParaMpy(*_x, *_we));
-					_we++;
-					_x += col;
-				}//行向量*列向量
-				*_s++ = _ParaAdd(sum, *_bi);				
-			}			
-			_bi++;
-			_web += we->col;
-
-		}
-	}
-
-	return s;
+	OSLW_assert(1);
+	return NULL;
 }
 
 OSLW_TOOL_FUN(
@@ -1147,6 +1139,69 @@ OSLW_TOOL_FUN(
 	OSlwToolMatrixXWeBi
 )
 {
+#if L1_L2_CACHE_OPTIM == 1
+	//register LwMatLenType i, j, k, row, col, row1;
+	//register ParaType temp, *_s, *_sbuf, *_x, *_we, *_web, *_xb, *_bi, *_bibuf;
+	
+	register LwMatColType j, k, row, col, row1;
+	register LwMatLenType i;
+	register ParaType temp, *_s, *_m1, *_m2, *_m1buf, *_sbuf, *_m2buf, *_bibuf, *_bi;
+
+	OSLW_assert(!(s));
+	OSLW_assert(!(x));
+	OSLW_assert(!(we));
+	OSLW_assert(!(bi));
+
+	//神经网络前向传播
+	if (s->col == we->col && s->row == x->row && we->row == x->col && s->col == bi->length)//满足神经网络前向条件
+	{
+		row = s->row;
+		col = s->col;
+		row1 = x->col;
+		_bibuf = bi->a;
+
+
+		_sbuf = s->a;
+		_m1buf = x->a;
+		_m2buf = we->a;
+
+
+		//先载入偏置
+
+		if (_bibuf)
+		{
+			for (i = 0, _s=_sbuf; i < row; i++)
+			{
+				for (j = 0, _bi = _bibuf; j < col; j++)
+				{
+					*_s++ = *_bi++;
+				}
+			}
+		}
+		else
+		{
+			LW_MAT_CLR(s);
+		}
+
+
+
+		for (i = 0, _m1 = _m1buf; i < row; ++i)
+		{
+			for (j = 0, _m2 = _m2buf; j < row1; ++j, ++_m1)
+			{
+				temp = *_m1;
+				for (k = 0, _s = _sbuf; k < col; ++k, ++_m2, ++_s)
+				{
+					*_s = _ParaAdd(*_s, _ParaMpy(temp, *_m2));
+				}
+			}
+			_sbuf = _s;
+		}
+	}
+
+
+
+#else
 	register lw_u16 i, j, k, row, col, row1;
 	register ParaType sum, *_s, *_x, *_we, *_web, *_xb, *_bi;
 	register ParaType *_we_a, *_bi_a;
@@ -1194,6 +1249,10 @@ OSLW_TOOL_FUN(
 
 		}
 	}
+
+#endif
+
+
 	return s;
 }
 
@@ -1204,8 +1263,141 @@ OSLW_TOOL_FUN(
 	OSlwToolMatrixTurnMpy
 )
 {
-	register lw_u16 i, j, k, row, col, row1;
-	register lw_u16 m1d1, m1d3, m2d2, m2d3;
+
+#if L1_L2_CACHE_OPTIM == 1
+
+	OSLW_assert(!(s));
+	OSLW_assert(!(m1));
+	OSLW_assert(!(m2));
+
+	switch (flag)
+	{
+	case 0://都不用转置
+		LW_MAT_CLR(s);
+	case 4:
+		if (s->row == m1->row && s->col == m2->col && m1->col == m2->row)
+		{
+			register LwMatLenType i, j, k, row = s->row, col = s->col, row1 = m2->row;
+			register ParaType temp, *_s, *_m1, *_m2, *_m1buf= m1->a, *_sbuf= s->a, *_m2buf= m2->a;
+
+			for (i = 0, _m1 = _m1buf; i < row; ++i)
+			{
+				for (j = 0, _m2 = _m2buf; j < row1; ++j, ++_m1)
+				{
+					temp = *_m1;
+					for (k = 0, _s = _sbuf; k < col; ++k, ++_m2, ++_s)
+					{
+						*_s = _ParaAdd(*_s, _ParaMpy(temp, *_m2));
+					}
+				}
+				_sbuf = _s;
+			}
+
+		}
+		else
+		{
+			OSLW_assert(1);
+			return NULL;
+		}
+		break;
+	case 1://m2转置
+		LW_MAT_CLR(s);		
+	case 5:
+		if (s->row == m1->row && s->col == m2->row && m1->col == m2->col)
+		{
+			register LwMatLenType i, j, k, row = s->row, col = s->col, row1 = m1->col;
+			register ParaType temp, *_s, *_m1, *_m2, *_m1buf = m1->a, *_sbuf = s->a, *_m2buf = m2->a;
+
+			for (i = 0, _s = _sbuf; i < row; ++i)
+			{
+				for (j = 0, _m2 = _m2buf; j < col; ++j,++_s)
+				{
+					temp = _ParaFint(0);
+					for (k = 0, _m1 = _m1buf; k < row1; ++k, ++_m2,++_m1)
+					{
+						temp = _ParaAdd(temp, _ParaMpy(*_m1, *_m2));
+					}
+
+					*_s = _ParaAdd(*_s, temp);
+				}
+				_m1buf = _m1;
+			}
+		}
+		else
+		{
+			OSLW_assert(1);
+			return NULL;
+		}
+		break;
+
+
+
+	case 2://m1转置
+		LW_MAT_CLR(s);
+	case 6:
+		if (s->row == m1->col && s->col == m2->col && m1->row == m2->row)
+		{
+			register LwMatLenType i, j, k, row = s->row, col = s->col, row1 = m2->row;
+			register ParaType temp, *_s, *_m1, *_m2, *_m1buf = m1->a, *_sbuf = s->a, *_m2buf = m2->a;
+
+			for (i = 0, _m1 = _m1buf; i < row1; ++i)
+			{
+				for (j = 0, _s = _sbuf; j < row; ++j, ++_m1)
+				{	
+					temp = *_m1;
+					for (k = 0,_m2=_m2buf; k < col; ++k, ++_s, ++_m2)
+					{
+						*_s = _ParaAdd(*_s, _ParaMpy(temp, *_m2));
+					}
+				}
+				_m2buf = _m2;
+			}
+
+		}
+		else
+		{
+			OSLW_assert(1);
+			return NULL;
+		}
+		break;
+
+	case 3://都转置
+		LW_MAT_CLR(s);
+	case 7:
+		if (s->row == m1->col && s->col == m2->row && m1->row == m2->col)
+		{
+			register LwMatLenType i, j, k, row = s->row, col = s->col, row1 = m1->row;
+			register ParaType temp, *_s, *_m1, *_m2, *_m1buf = m1->a, *_sbuf1 = s->a, *_sbuf2 = s->a, *_m2buf = m2->a;
+
+			for (i = 0, _m2 = _m2buf; i < col; ++i, ++_sbuf2)
+			{
+				for (j = 0, _m1 = _m1buf; j < row1; ++j, ++_m2)
+				{
+					temp = *_m2;
+					for (k = 0, _s = _sbuf2; k < row; ++k, ++_m1, _s += col)
+					{
+						*_s = _ParaAdd(*_s, _ParaMpy(temp, *_m1));
+					}
+				}
+
+				
+			}
+		}
+		else
+		{
+			OSLW_assert(1);
+			return NULL;
+		}
+		break;
+
+	default:
+		OSLW_assert(1);
+		break;
+	}
+#else
+
+	register LwMatLenType i, j, k, row, col, row1;
+	register LwMatLenType m1d1, m1d3, m2d2, m2d3;
 	register ParaType sum, *_s, *_m1, *_m2, *_m1b, *_m2b;
 	register ParaType _we_a, _bi_a;
 
@@ -1314,7 +1506,7 @@ OSLW_TOOL_FUN(
 					_m1 += m1d3;
 					_m2 += m2d3;
 				}//行向量*列向量
-				*_s =_ParaAdd(*_s,sum);
+				*_s = _ParaAdd(*_s, sum);
 				_s++;
 				_m2b += m2d2;
 			}
@@ -1346,11 +1538,10 @@ OSLW_TOOL_FUN(
 			_m2b = m2->a;
 		}
 	}
-
+#endif
 
 
 	return s;
-
 }
 
 
@@ -1363,14 +1554,14 @@ OSLW_TOOL_FUN(
 		OSlwToolMatrixSTU *m2,//被卷积 
 		lw_u16 move_x, lw_u16 move_y,//横向纵向移动距离
 		lw_u8 EqualModel, //赋值模式 1:直接复制 0:相加
-		lw_u8 MoveModel, //移动模式 's'/'f'
+		OSlwToolMatrixConvMethodNUM MoveModel, //移动模式 'v'/'f'
 		lw_u8 KernalModel, //核模式 0/180 180+‘f’=数学二维卷积
 		ParaType *fast_buf//快速卷积内存区
 	),
 	OSlwToolMatrixConv2
 )
 {
-	lw_u8 model_flag = ((MoveModel == 's') << 1) | (KernalModel == 0);
+	lw_u8 model_flag = ((MoveModel == OSlwToolMatrixConvMethod_Valid) << 1) | (KernalModel == 0);
 	
 	ParaType sum_buf, temp;
 
@@ -1534,8 +1725,9 @@ OSLW_TOOL_FUN(
 		lw_u16 in_high,//输入高度 
 		lw_u16 out_high,//输出高度
 		lw_u16 move_x, lw_u16 move_y,//横向纵向移动距离
+		OSlwToolMatrixConvMethodNUM conv_method,
 		lw_u8 FD_1_or_BK_0,//前向传递或者反向传递
-		ParaType *fast_buf//核 区域
+		ParaType *fast_buf//缓冲区
 		),
 	OSlwToolMatrixConvFastMultCh
 )
@@ -1757,6 +1949,7 @@ OSLW_TOOL_FUN(void*, OSlwToolMatrixVectShift,
 	LwMatRowType i, _r;
 	LwMatColType j, _c;
 	ParaType *ya, *xa, *wa, *ba, *wa_b, *ba_b;
+	ParaType temp_w, temp_b;
 	OSLW_assert(!(y));
 	OSLW_assert(!(we));
 	OSLW_assert(!(x));
@@ -1767,11 +1960,26 @@ OSLW_TOOL_FUN(void*, OSlwToolMatrixVectShift,
 		xa = x->a;
 		wa_b = we->a;
 		ba_b = bi->a;
-		for (i = 0, _r = y->row, _c = y->col; i < _r; i++)
+		if (we->length==1)
 		{
-			for (j = 0, wa = wa_b, ba = ba_b; j < _c; ++j, ++ya, ++wa, ++xa, ++ba)
+			temp_w = *wa_b;
+			temp_b = *ba_b;
+			for (i = 0, _r = y->row, _c = y->col; i < _r; i++)
 			{
-				*ya = _ParaAdd(_ParaMpy(*wa, *xa), *ba);
+				for (j = 0; j < _c; ++j, ++ya, ++xa)
+				{
+					*ya = _ParaAdd(_ParaMpy(temp_w, *xa), temp_b);
+				}
+			}
+		}
+		else
+		{
+			for (i = 0, _r = y->row, _c = y->col; i < _r; i++)
+			{
+				for (j = 0, wa = wa_b, ba = ba_b; j < _c; ++j, ++ya, ++wa, ++xa, ++ba)
+				{
+					*ya = _ParaAdd(_ParaMpy(*wa, *xa), *ba);
+				}
 			}
 		}
 	}
@@ -1780,11 +1988,26 @@ OSLW_TOOL_FUN(void*, OSlwToolMatrixVectShift,
 		ya = y->a;
 		xa = x->a;
 		wa_b = we->a;
-		for (i = 0, _r = y->row, _c = y->col; i < _r; i++)
+		if (we->length == 1)
 		{
-			for (j = 0, wa = wa_b; j < _c; ++j, ++ya, ++wa, ++xa)
+			temp_w = *wa_b;
+			temp_b = *ba_b;
+			for (i = 0, _r = y->row, _c = y->col; i < _r; i++)
 			{
-				*ya = _ParaMpy(*wa, *xa);
+				for (j = 0; j < _c; ++j, ++ya, ++xa)
+				{
+					*ya = _ParaMpy(temp_w, *xa);
+				}
+			}
+		}
+		else
+		{
+			for (i = 0, _r = y->row, _c = y->col; i < _r; i++)
+			{
+				for (j = 0, wa = wa_b; j < _c; ++j, ++ya, ++wa, ++xa)
+				{
+					*ya = _ParaMpy(*wa, *xa);
+				}
 			}
 		}
 	}

@@ -1,4 +1,4 @@
-/*(Ver.=0.94)
+/*(Ver.=0.95)
  * OSLW_gift.h
  *
  *  Created on: 2017-7-14
@@ -263,4 +263,4 @@ typedef OSlwGiftPostmanSTU LwPostman;
 
 #define LwSendGiFg OSLW_GIFT_SG_SF
 
-#endif /*(Ver.=0.94) OSLW_GIFT_H_ */
+#endif /*(Ver.=0.95) OSLW_GIFT_H_ */

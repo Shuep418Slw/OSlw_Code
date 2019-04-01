@@ -1,4 +1,4 @@
-/*(Ver.=0.94)
+/*(Ver.=0.95)
  * OSLW_tool.h
  *
  *  Created on: 2017-11-27
@@ -17,7 +17,7 @@
 #include "OSLW_memory.h"
 #if !(OSLW_SIMPLE_LEVEL >= 2)
 
-/*(Ver.=0.94)
+/*(Ver.=0.95)
 数据结构:
 例如	状态 3*2（一共3种状态 每一种状态2个特征量）
 		动作 2*4 （一共4种动作 每一个动作2种操作）---由于C语言是按照先列再行的方式存储 所以对应的是转置 既动作矩阵实际是4*2 
@@ -139,7 +139,7 @@ typedef void (*pBornFunType)(struct OSLW_TOOL_Q_RL_BASIC_STRUCT *pQRLB);
 
 
 
-/*(Ver.=0.94)
+/*(Ver.=0.95)
 //Q-learing的顺序是先决策,再运行环境,再学习，所以是off-policy
 //
 //Slast------------>Snow-------->.........
@@ -164,7 +164,7 @@ typedef struct OSLW_TOOL_Q_LEARNING_STRUCT{
 }OSlwToolQLearningSTU;
 
 
-/*(Ver.=0.94)
+/*(Ver.=0.95)
 //sarsa 是直接学习action 所以是on-policy
 //
 //Slast------------>Snow-------->.........
@@ -219,7 +219,7 @@ void OSlwToolQLearningParaInitial
 	pBornFunType pBornfun//环境初始化函数指针
 );
 
-/*(Ver.=0.94)
+/*(Ver.=0.95)
 
 void OSlwToolQLearningStaticInitial
 	(
@@ -349,7 +349,7 @@ lw_u16 OSlwToolDQNetExpReplaySample(OSlwToolDQNetExpReplaySTU *pExpRe);
 #define OSLW_TOOL_DQN_EXP_ACTION_SIZE(EXP_STU) (sizeof(ParaType)*(EXP_STU).Action_Col)
 
 #define OSLW_TOOL_DQN_EXP_FRAME_SIZE(EXP_STU) (\
-	sizeof(OSlwToolDQNetExpReplayFrameSTU) +/*(Ver.=0.94)节点长度*/\
+	sizeof(OSlwToolDQNetExpReplayFrameSTU) +/*(Ver.=0.95)节点长度*/\
 	(OSLW_TOOL_DQN_EXP_STATE_SIZE(EXP_STU)<<1) + \
 	OSLW_TOOL_DQN_EXP_REWARD_SIZE(EXP_STU) + \
 	OSLW_TOOL_DQN_EXP_ACTION_SIZE(EXP_STU) \

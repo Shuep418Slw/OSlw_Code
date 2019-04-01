@@ -1,4 +1,4 @@
-/*(Ver.=0.94)
+/*(Ver.=0.95)
  * OSLW_tool.h
  *
  *  Created on: 2017-11-13

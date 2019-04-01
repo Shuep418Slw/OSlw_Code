@@ -1,4 +1,4 @@
-/*(Ver.=0.94)
+/*(Ver.=0.95)
  * OSLW_tool.c
  *
  *  Created on: 2017-11-13
@@ -625,7 +625,7 @@ void OSlwToolBPnnReguInitial(OSlwToolBPnnSTU *pBPnn, OSlwToolNNReguTypeNUM ReguT
 
 }
 
-/*(Ver.=0.94)
+/*(Ver.=0.95)
 //对网络减肥
 //dropout 效果不好
 OSlwToolBPnnSTU* OSlwToolBPnnDropOutStart(OSlwToolBPnnSTU *_pBPnn)
@@ -957,7 +957,7 @@ OSlwToolBPnnSTU *OSlwToolBPnnErrCalu(OSlwToolBPnnSTU *pBPnn)
 }
 
 
-/*(Ver.=0.94)
+/*(Ver.=0.95)
 //旧版本
 //后向传播
 OSlwToolBPnnSTU *OSlwToolBPnnUpdate(OSlwToolBPnnSTU *_pBPnn)
@@ -1896,6 +1896,7 @@ void* OSlwToolNNLayerSimpleRecover
 			pBPnn,
 			(*pSimpleBak).info[0],(*pSimpleBak).info[1],(*pSimpleBak).info[2],
 			(*pSimpleBak).info[3],(*pSimpleBak).info[4],(*pSimpleBak).info[5],
+			(*pSimpleBak).info[5],
 			in,out,
 			NULL,NULL,
 			NULL, NULL, 0, 0,

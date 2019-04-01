@@ -1,4 +1,4 @@
-/*(Ver.=0.94)
+/*(Ver.=0.95)
 * OSLW_tool.h
 *
 *  Created on: 2017-7-25
@@ -39,6 +39,7 @@ typedef enum
 	OSlwMartixRes_Error
 
 }OSlwMartixResNum;
+
 
 void OSlwToolMatrixInitial(OSlwToolMatrixSTU *m, LwMatRowType row, LwMatColType col, ParaType *a);
 
@@ -124,26 +125,29 @@ OSLW_TOOL_FUN_STATEMENT(void*, OSlwToolMatrixConv2,
 	OSlwToolMatrixSTU *s, //目标的
 	OSlwToolMatrixSTU *m_kernal, //卷积核
 	OSlwToolMatrixSTU *m2,//被卷积 
-	lw_u16 move_x,lw_u16 move_y,//横向纵向移动距离
+	lw_u16 move_x, lw_u16 move_y,//横向纵向移动距离
 	lw_u8 EqualModel, //赋值模式 1:直接复制 0:相加
-	lw_u8 MoveModel, //移动模式 's'/'f'
+	OSlwToolMatrixConvMethodNUM MoveModel, //移动模式 'v'/'f'
 	lw_u8 KernalModel, //核模式 0/180 180+‘f’=数学二维卷积
 	ParaType *fast_buf//快速卷积内存区
-	))
+	)
+)
 
 //只计算一个batch
 OSLW_TOOL_FUN_STATEMENT(void*, OSlwToolMatrixConvFastMultCh,
 (
 	OSlwToolMatrixSTU *m_out, //输出 row-col 代表一个通道 length代表真正大小
-	OSlwToolMatrixSTU *m_kernal, //卷积核 row-col 代表一个通道
+	OSlwToolMatrixSTU *m_kernal, //卷积核 row-col 代表一个通道 length 代表一个核真正大小 [2,2,4] row:2 col:2 length:16
 	OSlwToolMatrixSTU *m_in,//被卷积 row-col 代表一个通道
 	OSlwToolMatrixSTU *bias,//偏置 row-col-length 无所谓
 	lw_u16 in_high,//输入高度 
 	lw_u16 out_high,//输出高度
 	lw_u16 move_x, lw_u16 move_y,//横向纵向移动距离
+	OSlwToolMatrixConvMethodNUM conv_method,
 	lw_u8 FD_1_or_BK_0,//前向传递或者反向传递
 	ParaType *fast_buf//核 区域
-))
+	)
+)
 
 
 OSLW_TOOL_FUN_STATEMENT(void*, OSlwToolMatrixMoments,
@@ -256,7 +260,51 @@ OSLW_TOOL_FUN_STATEMENT(
 	else {while (_L_2--) *_p_D++=0;}\
 }while(0)
 
+#define LW_WHILE_MEMSET(P,I,DATA) \
+while ((I)--)\
+	*(P)++ = DATA;
+
+#define LW_WHILE_MEMCPY(P,Q,I) \
+while ((I)--)\
+	*(P)++ = *(Q)++;
+
+
 #endif
+
+
+static inline ParaType _OSlwToolMathExp256(ParaType _x)
+{
+
+#if OSLW_GLOBAL_MATH_TYPE==OSLW_GLOBAL_MATH_Q
+	register ParaType x = _ParaFrom(1) + (_x >> 8);
+#else
+	register ParaType x = _ParaFrom(1) + _ParaDiv(_x, _ParaFint(256));
+#endif
+
+	x = _ParaMpy(x, x);x = _ParaMpy(x, x);x = _ParaMpy(x, x);
+	x = _ParaMpy(x, x);x = _ParaMpy(x, x);x = _ParaMpy(x, x);
+	x = _ParaMpy(x, x);x = _ParaMpy(x, x);
+
+	return x;
+}
+
+
+static	inline ParaType _OSlwToolMathExp1024(ParaType _x)
+{
+
+#if OSLW_GLOBAL_MATH_TYPE==OSLW_GLOBAL_MATH_Q
+	register ParaType x = _ParaFrom(1) + (_x >> 10);
+#else
+	register ParaType x = _ParaFrom(1) + _ParaDiv(_x, _ParaFint(1024));
+#endif
+
+	x = _ParaMpy(x, x);x = _ParaMpy(x, x);x = _ParaMpy(x, x);
+	x = _ParaMpy(x, x);x = _ParaMpy(x, x);x = _ParaMpy(x, x);
+	x = _ParaMpy(x, x);x = _ParaMpy(x, x);x = _ParaMpy(x, x);
+	x = _ParaMpy(x, x);
+
+	return x;
+}
 
 
 #endif //OSLW_TOOL_IMPORT_MATH || OSLW_TOOL_IMPORT_ALL

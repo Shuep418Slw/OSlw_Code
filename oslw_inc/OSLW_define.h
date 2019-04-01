@@ -1,4 +1,4 @@
-/*(Ver.=0.94)
+/*(Ver.=0.95)
  * OSLW_define.h
  *
  *  Created on: 2017-7-14
@@ -205,7 +205,7 @@ typedef enum{
 	#define _ParaCos(A) (cosf(A))
 	#define _ParaTan(A) (sinf(A)/cosf(A))		
 	#define _ParaSqrt(A) (sqrtf(A))
-	#define _ParaExp(A) (expf(A))
+	#define _ParaExp(A) (_OSlwToolMathExp1024(A))
 	#define _ParaAbs(A) (A > 0.0f?A:-A)		
 	#define _ParaPow(A,B) (powf((A),(B)))
 	#define _ParaCeil(A) (ceilf((A)))
@@ -581,6 +581,6 @@ typedef union OSLW_CORE_GROUP_UNION{
 }OSlwCoreGroupUN;
 
 
-#endif /*(Ver.=0.94) OSLW_DEFINE_H_ */
+#endif /*(Ver.=0.95) OSLW_DEFINE_H_ */
 
 

@@ -1,4 +1,4 @@
-/*(Ver.=0.94)
+/*(Ver.=0.95)
  * OSLW_tool.c
  *
  *  Created on: 2019-01-22
@@ -155,8 +155,8 @@ ParaType * OSlwToolNNLayerRnnCellParaInit(struct OSLW_TOOL_NN_LAYER_RECURRENT_CE
 
 void* OSlwToolNNLayerRnnCellNew(
 	ParaType *pout,
-	lw_u16 in_size,//这个是CELL的输入大小 对应应该是RNN的输入+输出
-	lw_u16 out_size,
+	LwMatColType in_size,//这个是CELL的输入大小 对应应该是RNN的输入+输出
+	LwMatColType out_size,
 	lw_u16 max_min_batch,
 	OSlwToolNNLayerActFunSTU *ptem,
 	OSlwMemoryBasicSTU *pmem
@@ -333,8 +333,8 @@ ParaType * OSlwToolNNLayerRnnCellLNormParaInit(struct OSLW_TOOL_NN_LAYER_RECURRE
 
 void* OSlwToolNNLayerRnnCellLNormNew(
 	ParaType *pout,
-	lw_u16 in_size,//这个是CELL的输入大小 对应应该是RNN的输入+输出
-	lw_u16 out_size,
+	LwMatColType in_size,//这个是CELL的输入大小 对应应该是RNN的输入+输出
+	LwMatColType out_size,
 	lw_u16 max_min_batch,
 	OSlwToolNNLayerActFunSTU *ptem,
 	OSlwMemoryBasicSTU *pmem
@@ -593,8 +593,8 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerBasicRnnNew(
 	ParaType *pin,
 	ParaType *pout,
 	ParaType *pOut_t_1,
-	lw_u16 InCol,
-	lw_u16 OutCol,
+	LwMatColType InCol,
+	LwMatColType OutCol,
 	lw_u16 max_mini_batch,
 	lw_u8 NeedTrainFlag,
 	OSlwToolNNLayerRnnCellNewFunType new_cell_fun,
@@ -688,7 +688,7 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerBasicRnnNew(
 void* OSlwToolBPnnBasicRnnAppend
 (
 	OSlwToolBPnnSTU *pBPnn,
-	lw_u16 in_col, lw_u16 out_col,
+	LwMatColType in_col, LwMatColType out_col,
 	ParaType *pin, ParaType *pout,
 	ParaType *pWe, ParaType *pBi,
 	OSlwNNinitFunType pfun,
@@ -1168,8 +1168,8 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerGruRnnNew(
 	ParaType *pUpdateGateOut,
 	ParaType *pCoreCellOut,
 	ParaType *pOutT_1,
-	lw_u16 InCol,
-	lw_u16 OutCol,
+	LwMatColType InCol,
+	LwMatColType OutCol,
 	lw_u16 max_mini_batch,
 	lw_u8 NeedTrainFlag,
 	OSlwToolNNLayerRnnCellNewFunType new_cell_fun,
@@ -1277,7 +1277,7 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerGruRnnNew(
 void* OSlwToolBPnnGruRnnAppend
 (
 	OSlwToolBPnnSTU *pBPnn,
-	lw_u16 in_col, lw_u16 out_col,
+	LwMatColType in_col, LwMatColType out_col,
 	ParaType *pin, ParaType *pout,
 	ParaType *pWe, ParaType *pBi,
 	OSlwNNinitFunType pfun,

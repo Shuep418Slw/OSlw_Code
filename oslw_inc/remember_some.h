@@ -38,4 +38,24 @@ random部分修改了RMIN与RMAX位置 现在使用前小后大
 修改rest为nap
 修改OSlwTic与Toc的测试方式
 
+
+0.95版本 2019/04/01
+修改矩阵部分部分代码 在树莓派zerow上提高一倍效率
+
+增加split层，用以分割数据（可反向传递，没有append函数）
+增加mix层，用以混合(相加)数据（可反向传递，没有append函数）
+增加pad层，已经实现constant模式（可反向传递，有append函数）
+增加extend层，已经实现nearest模式（可反向传递，有append函数）
+
+修改shift层的new函数，shift层的权重与输入维度独立
+
+修改CNN的append函数，可以设定VALID之外的模式（VALID之外模式尚未实现）
+
+增加梯度（修改量）限幅功能
+
+修改sigmoid与tanh函数实现方法 采用三次样条插值替代 提高速度
+
+增加快速exp函数实现方法(包含256点低精度与1024点中等精度)
+
+
 */

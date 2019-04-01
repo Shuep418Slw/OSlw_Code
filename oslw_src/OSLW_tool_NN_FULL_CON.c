@@ -1,4 +1,4 @@
-/*(Ver.=0.94)
+/*(Ver.=0.95)
  * OSLW_tool.c
  *
  *  Created on: 2019-01-22
@@ -20,8 +20,8 @@
 OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerFullConNew(
 	ParaType *pin,
 	ParaType *pout,
-	lw_u16 InCol,
-	lw_u16 OutCol,
+	LwMatColType InCol,
+	LwMatColType OutCol,
 	lw_u16 max_mini_batch,
 	OSlwMemoryBasicSTU *pmem
 )
@@ -356,10 +356,13 @@ lw_ptr OSlwToolBPnnLayerFullConBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRU
 
 }
 
+#define LIMIT_DELT(x,MX,MN) do{if((x)>(MX)) (x)=(MX);\
+else if((x)<(MN)) (x)=(MN);}while(0)
+
 
 lw_ptr OSlwToolBPnnLayerFullConUpdate(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB)
 {
-	register lw_u32 i, all_batch_count;
+    register lw_u32 i, all_batch_count;
 	register ParaType k, _div_m;
 	register ParaType *_mw, *_mwd;
 	register ParaType *_mb, *_mbd;
@@ -371,6 +374,8 @@ lw_ptr OSlwToolBPnnLayerFullConUpdate(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT
 	ParaType vbbuf, ubbuf, vwbuf, uwbuf;
 	ParaType bbuf, wbuf;
 	ParaType l2regu_k;
+	ParaType temp;
+	ParaType DeltMax, DeltMin;
 
 	OSLW_assert(!(pNNSLB));
 	pfc = (OSlwToolNNLayerFullConSTU *)pNNSLB;
@@ -385,30 +390,64 @@ lw_ptr OSlwToolBPnnLayerFullConUpdate(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT
 
 	l2regu_k = _ParaFint(1) - _ParaDiv(_ParaMpy(pNNSLB->nl, pNNSLB->LamdaL2), _ParaFint(all_batch_count));
 
+	DeltMax = pBPnn->Train.DeltLimitMax;
+	DeltMin = pBPnn->Train.DeltLimitMin;
+
 	switch (pBPnn->Train.Flag.Optim)
 	{
 	case OSlwToolNNOptim_GradDesc:
 		k = _ParaDiv(_ParaMpy(pBPnn->_nl_factor, pNNSLB->nl), _ParaFint(all_batch_count));
-		//单纯梯度下降法
-		for (i = 0; i < pfc->Bias.length; i++, _mw++, _mwd++, _mb++, _mbd++)
-		{
-			*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), _ParaMpy(k, *_mwd));
-			*_mb = _ParaAdd(*_mb, _ParaMpy(k, *_mbd));
-			*_mwd = _ParaFint(0);
-			*_mbd = _ParaFint(0);
-		}
 
-		//少循环一点是一点
-		i = pfc->Weight.length - pfc->Bias.length;
-		while (i--)
+		if (!(pBPnn->Train.Flag.EnableDeltLimit))
 		{
-			*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), _ParaMpy(k, *_mwd));
-			*_mwd = _ParaFint(0);
-			_mw++;
-			_mwd++;
-			
-		}
+			//单纯梯度下降法
+			for (i = 0; i < pfc->Bias.length; i++, _mw++, _mwd++, _mb++, _mbd++)
+			{
+				*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), _ParaMpy(k, *_mwd));
+				*_mb = _ParaAdd(*_mb, _ParaMpy(k, *_mbd));
+				*_mwd = _ParaFint(0);
+				*_mbd = _ParaFint(0);
+			}
 
+			//少循环一点是一点
+			i = pfc->Weight.length - pfc->Bias.length;
+			while (i--)
+			{
+				*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), _ParaMpy(k, *_mwd));
+				*_mwd = _ParaFint(0);
+				_mw++;
+				_mwd++;
+
+			}
+		}
+		else
+		{
+			//单纯梯度下降法
+			for (i = 0; i < pfc->Bias.length; i++, _mw++, _mwd++, _mb++, _mbd++)
+			{
+				temp = _ParaMpy(k, *_mwd);
+				LIMIT_DELT(temp, DeltMax, DeltMin);
+				*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), temp);
+				temp = _ParaMpy(k, *_mbd);
+				LIMIT_DELT(temp, DeltMax, DeltMin);
+				*_mb = _ParaAdd(*_mb, temp);
+				*_mwd = _ParaFint(0);
+				*_mbd = _ParaFint(0);
+			}
+
+			//少循环一点是一点
+			i = pfc->Weight.length - pfc->Bias.length;
+			while (i--)
+			{
+				temp = _ParaMpy(k, *_mwd);
+				LIMIT_DELT(temp, DeltMax, DeltMin);
+				*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), temp);
+				*_mwd = _ParaFint(0);
+				_mw++;
+				_mwd++;
+
+			}
+		}
 
 		break;
 
@@ -421,40 +460,75 @@ lw_ptr OSlwToolBPnnLayerFullConUpdate(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT
 		k = _ParaMpy(pBPnn->_nl_factor, pNNSLB->nl);
 		_div_m = _ParaDiv(_ParaFrom(1) , _ParaFint(all_batch_count));
 
-		//动量法
-		for (i = 0; i < pfc->Bias.length; i++, _mw++, _mwd++, _vw++, _mb++, _mbd++, _vb++)
+		if (!(pBPnn->Train.Flag.EnableDeltLimit))
 		{
-			//计算出的梯度要先除以batch
-			wbuf = _ParaMpy(*_mwd , _div_m);
-			bbuf = _ParaMpy(*_mbd , _div_m);
+			//动量法
+			for (i = 0; i < pfc->Bias.length; i++, _mw++, _mwd++, _vw++, _mb++, _mbd++, _vb++)
+			{
+				//计算出的梯度要先除以batch
+				wbuf = _ParaMpy(*_mwd, _div_m);
+				bbuf = _ParaMpy(*_mbd, _div_m);
 
-			//动量法 v=0.9v+0.1d
-			*_vw = _ParaMpy(*_vw , b1) + _ParaMpy(wbuf ,nb1);
-			*_vb = _ParaMpy(*_vb , b1) + _ParaMpy(bbuf ,nb1);
+				//动量法 v=0.9v+0.1d
+				*_vw = _ParaMpy(*_vw, b1) + _ParaMpy(wbuf, nb1);
+				*_vb = _ParaMpy(*_vb, b1) + _ParaMpy(bbuf, nb1);
 
-			//w=w+v
-			*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), _ParaMpy(k, *_vw));
-			*_mb = _ParaAdd(*_mb, _ParaMpy(k, *_vb));
+				//w=w+v
+				*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), _ParaMpy(k, *_vw));
+				*_mb = _ParaAdd(*_mb, _ParaMpy(k, *_vb));
+				*_mwd = _ParaFint(0);
+				*_mbd = _ParaFint(0);
+			}
+			i = pfc->Weight.length - pfc->Bias.length;
+			while (i--)
+			{
+				wbuf = _ParaMpy(*_mwd, _div_m);
+				*_vw = _ParaMpy(*_vw, b1) + _ParaMpy(wbuf, nb1);
+				*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), _ParaMpy(k, *_vw));
+				*_mwd = _ParaFint(0);
+				_mw++;
+				_mwd++;
+				_vw++;
 
-			*_mwd = _ParaFint(0);
-			*_mbd = _ParaFint(0);
-			
-
+			}
 		}
-
-		i = pfc->Weight.length - pfc->Bias.length;
-		while (i--)
+		else
 		{
-			wbuf = _ParaMpy(*_mwd , _div_m);
-			*_vw = _ParaMpy(*_vw , b1) + _ParaMpy(wbuf ,nb1);
-			*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), _ParaMpy(k, *_vw));
-			*_mwd = _ParaFint(0);
-			_mw++;
-			_mwd++;
-			_vw++;
-		
-		}
+			//动量法
+			for (i = 0; i < pfc->Bias.length; i++, _mw++, _mwd++, _vw++, _mb++, _mbd++, _vb++)
+			{
+				//计算出的梯度要先除以batch
+				wbuf = _ParaMpy(*_mwd, _div_m);
+				bbuf = _ParaMpy(*_mbd, _div_m);
 
+				//动量法 v=0.9v+0.1d
+				*_vw = _ParaMpy(*_vw, b1) + _ParaMpy(wbuf, nb1);
+				*_vb = _ParaMpy(*_vb, b1) + _ParaMpy(bbuf, nb1);
+
+				//w=w+v
+				temp = _ParaMpy(k, *_vw);LIMIT_DELT(temp, DeltMax, DeltMin);
+				*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k),temp);
+
+				temp = _ParaMpy(k, *_vb);LIMIT_DELT(temp, DeltMax, DeltMin);
+				*_mb = _ParaAdd(*_mb, temp);
+				*_mwd = _ParaFint(0);
+				*_mbd = _ParaFint(0);
+			}
+			i = pfc->Weight.length - pfc->Bias.length;
+			while (i--)
+			{
+				wbuf = _ParaMpy(*_mwd, _div_m);
+				*_vw = _ParaMpy(*_vw, b1) + _ParaMpy(wbuf, nb1);
+
+				temp = _ParaMpy(k, *_vw);LIMIT_DELT(temp, DeltMax, DeltMin);
+				*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), _ParaMpy(k, *_vw));
+				*_mwd = _ParaFint(0);
+				_mw++;
+				_mwd++;
+				_vw++;
+
+			}
+		}
 
 		break;
 
@@ -468,38 +542,52 @@ lw_ptr OSlwToolBPnnLayerFullConUpdate(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT
 		k = _ParaMpy(pBPnn->_nl_factor, pNNSLB->nl);
 		_div_m = _ParaDiv(_ParaFrom(1) , _ParaFint(all_batch_count));
 
-		//RMS
-		for (i = 0; i < pfc->Bias.length; i++, _mw++, _mwd++, _uw++, _mb++, _mbd++,_ub++)
+
+		if (!(pBPnn->Train.Flag.EnableDeltLimit))
 		{
-			//计算出的梯度要先除以batch
-			wbuf = _ParaMpy(*_mwd , _div_m);
-			bbuf = _ParaMpy(*_mbd , _div_m);
+			//RMS
+			for (i = 0; i < pfc->Bias.length; i++, _mw++, _mwd++, _uw++, _mb++, _mbd++, _ub++)
+			{
+				//计算出的梯度要先除以batch
+				wbuf = _ParaMpy(*_mwd, _div_m);
+				bbuf = _ParaMpy(*_mbd, _div_m);
 
-			//RMS法u=0.9u+0.1d*d
-			*_uw = _ParaMpy(*_uw , b2) + _ParaMpy(_ParaMpy(wbuf , wbuf) , nb2);
-			*_ub = _ParaMpy(*_ub , b2) + _ParaMpy(_ParaMpy(bbuf , bbuf) , nb2);
+				//RMS法u=0.9u+0.1d*d
+				*_uw = _ParaMpy(*_uw, b2) + _ParaMpy(_ParaMpy(wbuf, wbuf), nb2);
+				*_ub = _ParaMpy(*_ub, b2) + _ParaMpy(_ParaMpy(bbuf, bbuf), nb2);
 
-			*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), _ParaMpy(k, _ParaDiv(wbuf , (e + _ParaSqrt(*_uw)))));
-			*_mb = _ParaAdd(*_mb, _ParaMpy(k, _ParaDiv(bbuf , (e + _ParaSqrt(*_ub)))));
-			
-			*_mwd = _ParaFint(0);
-			*_mbd = _ParaFint(0);
+				temp = _ParaMpy(k, _ParaDiv(wbuf, (e + _ParaSqrt(*_uw))));LIMIT_DELT(temp, DeltMax, DeltMin);
+				*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), temp);
+
+				temp = _ParaMpy(k, _ParaDiv(bbuf, (e + _ParaSqrt(*_ub))));LIMIT_DELT(temp, DeltMax, DeltMin);
+				*_mb = _ParaAdd(*_mb, temp);
+
+				*_mwd = _ParaFint(0);
+				*_mbd = _ParaFint(0);
+			}
+
+			//少循环一点是一点
+			i = pfc->Weight.length - pfc->Bias.length;
+			while (i--)
+			{
+				wbuf = _ParaMpy(*_mwd, _div_m);
+				*_uw = _ParaMpy(*_uw, b2) + _ParaMpy(_ParaMpy(wbuf, wbuf), nb2);
+				temp = _ParaMpy(k, _ParaDiv(wbuf, (e + _ParaSqrt(*_uw))));LIMIT_DELT(temp, DeltMax, DeltMin);
+				*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), temp);
+
+
+				*_mwd = _ParaFint(0);
+				_mw++;
+				_mwd++;
+				_uw++;
+
+			}
+		}
+		else
+		{
+
 		}
 
-		//少循环一点是一点
-		i = pfc->Weight.length - pfc->Bias.length;
-		while (i--)
-		{
-			wbuf = _ParaMpy(*_mwd, _div_m);
-			*_uw = _ParaMpy(*_uw, b2) + _ParaMpy(_ParaMpy(wbuf, wbuf), nb2);
-
-			*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), _ParaMpy(k, _ParaDiv(wbuf, (e + _ParaSqrt(*_uw)))));
-			*_mwd = _ParaFint(0);
-			_mw++;
-			_mwd++;
-			_uw++;
-			
-		}
 
 		break;
 
@@ -521,52 +609,105 @@ lw_ptr OSlwToolBPnnLayerFullConUpdate(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT
 		k = _ParaMpy(pBPnn->_nl_factor, pNNSLB->nl);
 		_div_m = _ParaDiv(_ParaFrom(1) , _ParaFint(all_batch_count));
 
-		//adam
-		for (i = 0; i < pfc->Bias.length; i++,_mw++, _mwd++, _uw++, _vw++, _mb++, _mbd++, _ub++,_vb++)
+		if (!(pBPnn->Train.Flag.EnableDeltLimit))
 		{
-			//计算出的梯度要先除以batch
-			wbuf = _ParaMpy(*_mwd , _div_m);
-			bbuf = _ParaMpy(*_mbd , _div_m);
+			//adam
+			for (i = 0; i < pfc->Bias.length; i++, _mw++, _mwd++, _uw++, _vw++, _mb++, _mbd++, _ub++, _vb++)
+			{
+				//计算出的梯度要先除以batch
+				wbuf = _ParaMpy(*_mwd, _div_m);
+				bbuf = _ParaMpy(*_mbd, _div_m);
 
-			*_vw = _ParaMpy(*_vw , b1) + _ParaMpy(wbuf ,nb1);
-			*_vb = _ParaMpy(*_vb , b1) + _ParaMpy(bbuf ,nb1);
+				*_vw = _ParaMpy(*_vw, b1) + _ParaMpy(wbuf, nb1);
+				*_vb = _ParaMpy(*_vb, b1) + _ParaMpy(bbuf, nb1);
 
-			*_uw = _ParaMpy(*_uw , b2) + _ParaMpy(_ParaMpy(wbuf , wbuf) , nb2);
-			*_ub = _ParaMpy(*_ub , b2) + _ParaMpy(_ParaMpy(bbuf , bbuf) , nb2);
+				*_uw = _ParaMpy(*_uw, b2) + _ParaMpy(_ParaMpy(wbuf, wbuf), nb2);
+				*_ub = _ParaMpy(*_ub, b2) + _ParaMpy(_ParaMpy(bbuf, bbuf), nb2);
 
-			vwbuf = _ParaDiv(*_vw , b1t);
-			uwbuf = _ParaDiv(*_uw , b2t);
-			vbbuf = _ParaDiv(*_vb , b1t);
-			ubbuf = _ParaDiv(*_ub , b2t);
+				vwbuf = _ParaDiv(*_vw, b1t);
+				uwbuf = _ParaDiv(*_uw, b2t);
+				vbbuf = _ParaDiv(*_vb, b1t);
+				ubbuf = _ParaDiv(*_ub, b2t);
 
-			*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), _ParaMpy(k, _ParaDiv(vwbuf , (e + _ParaSqrt(uwbuf)))));
-			*_mb = _ParaAdd(*_mb, _ParaMpy(k, _ParaDiv(vbbuf , (e + _ParaSqrt(ubbuf)))));
+				*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), _ParaMpy(k, _ParaDiv(vwbuf, (e + _ParaSqrt(uwbuf)))));
+				*_mb = _ParaAdd(*_mb, _ParaMpy(k, _ParaDiv(vbbuf, (e + _ParaSqrt(ubbuf)))));
 
-			*_mwd = _ParaFint(0);
-			*_mbd = _ParaFint(0);
+				*_mwd = _ParaFint(0);
+				*_mbd = _ParaFint(0);
+			}
+
+			//少循环一点是一点
+			i = pfc->Weight.length - pfc->Bias.length;
+			while (i--)
+			{
+				wbuf = _ParaMpy(*_mwd, _div_m);
+
+				*_vw = _ParaMpy(*_vw, b1) + _ParaMpy(wbuf, nb1);
+				*_uw = _ParaMpy(*_uw, b2) + _ParaMpy(_ParaMpy(wbuf, wbuf), nb2);
+
+				vwbuf = _ParaDiv(*_vw, b1t);
+				uwbuf = _ParaDiv(*_uw, b2t);
+
+				*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), _ParaMpy(k, _ParaDiv(vwbuf, (e + _ParaSqrt(uwbuf)))));
+				*_mwd = _ParaFint(0);
+				_mw++;
+				_mwd++;
+				_uw++;
+				_vw++;
+			}
+
 		}
-
-		//少循环一点是一点
-		i = pfc->Weight.length - pfc->Bias.length;
-		while (i--)
+		else
 		{
+			//adam
+			for (i = 0; i < pfc->Bias.length; i++, _mw++, _mwd++, _uw++, _vw++, _mb++, _mbd++, _ub++, _vb++)
+			{
+				//计算出的梯度要先除以batch
+				wbuf = _ParaMpy(*_mwd, _div_m);
+				bbuf = _ParaMpy(*_mbd, _div_m);
 
-			wbuf = _ParaMpy(*_mwd, _div_m);
+				*_vw = _ParaMpy(*_vw, b1) + _ParaMpy(wbuf, nb1);
+				*_vb = _ParaMpy(*_vb, b1) + _ParaMpy(bbuf, nb1);
 
-			*_vw = _ParaMpy(*_vw, b1) + _ParaMpy(wbuf, nb1);
-			*_uw = _ParaMpy(*_uw, b2) + _ParaMpy(_ParaMpy(wbuf, wbuf), nb2);
+				*_uw = _ParaMpy(*_uw, b2) + _ParaMpy(_ParaMpy(wbuf, wbuf), nb2);
+				*_ub = _ParaMpy(*_ub, b2) + _ParaMpy(_ParaMpy(bbuf, bbuf), nb2);
 
-			vwbuf = _ParaDiv(*_vw, b1t);
-			uwbuf = _ParaDiv(*_uw, b2t);
+				vwbuf = _ParaDiv(*_vw, b1t);
+				uwbuf = _ParaDiv(*_uw, b2t);
+				vbbuf = _ParaDiv(*_vb, b1t);
+				ubbuf = _ParaDiv(*_ub, b2t);
+				temp = _ParaMpy(k, _ParaDiv(vwbuf, (e + _ParaSqrt(uwbuf))));LIMIT_DELT(temp, DeltMax, DeltMin);
+				*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), temp);
 
-			*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), _ParaMpy(k, _ParaDiv(vwbuf, (e + _ParaSqrt(uwbuf)))));
-			*_mwd = _ParaFint(0);
-			_mw++;
-			_mwd++;
-			_uw++;
-			_vw++;
+				temp = _ParaMpy(k, _ParaDiv(vbbuf, (e + _ParaSqrt(ubbuf))));LIMIT_DELT(temp, DeltMax, DeltMin);
+				*_mb = _ParaAdd(*_mb, temp);
 
-			
+				*_mwd = _ParaFint(0);
+				*_mbd = _ParaFint(0);
+			}
+
+			//少循环一点是一点
+			i = pfc->Weight.length - pfc->Bias.length;
+			while (i--)
+			{
+				wbuf = _ParaMpy(*_mwd, _div_m);
+
+				*_vw = _ParaMpy(*_vw, b1) + _ParaMpy(wbuf, nb1);
+				*_uw = _ParaMpy(*_uw, b2) + _ParaMpy(_ParaMpy(wbuf, wbuf), nb2);
+
+				vwbuf = _ParaDiv(*_vw, b1t);
+				uwbuf = _ParaDiv(*_uw, b2t);
+
+				temp = _ParaMpy(k, _ParaDiv(vwbuf, (e + _ParaSqrt(uwbuf))));LIMIT_DELT(temp, DeltMax, DeltMin);
+				*_mw = _ParaAdd(_ParaMpy(*_mw, l2regu_k), temp);
+
+				*_mwd = _ParaFint(0);
+				_mw++;
+				_mwd++;
+				_uw++;
+				_vw++;
+			}
+
 		}
 		break;
 
@@ -790,7 +931,7 @@ lw_ptr OSlwToolBPnnLayerFullConSoftReplace(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_S
 void* OSlwToolBPnnFullConAppend
 (
 	OSlwToolBPnnSTU *pBPnn,
-	lw_u16 in_col, lw_u16 out_col,
+	LwMatColType in_col, LwMatColType out_col,
 	ParaType *pin, ParaType *pout,
 	ParaType *pWe, ParaType *pBi,
 	OSlwNNinitFunType pfun,
@@ -813,7 +954,8 @@ void* OSlwToolBPnnFullConAppend
 	{
 		_NN_GET_IN(pBPnn, pin);
 
-		pnode1 = OSlwToolNNLayerFullConNew(
+		pnode1 = OSlwToolNNLayerFullConNew
+		(
 			pin, NULL,
 			in_col, out_col,
 			pBPnn->Train.mini_batch_max,
@@ -871,7 +1013,7 @@ void* OSlwToolBPnnFullConAppend
 	pfc->initd1 = d1;
 	pfc->initd2 = d2;
 
-	_NN_FULL_CON_CHIP_ALLAC_1();
+	_NN_FULL_CON_CHIP_ALLAC_1(pBPnn, pfc);
 
 	//pBPnn->ParaGroupNum++;
 	return ppLIST1;
@@ -882,7 +1024,8 @@ void* OSlwToolBPnnFullConAppend
 OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerShiftNew(
 	ParaType *pin,
 	ParaType *pout,
-	lw_u16 Col,
+	LwMatColType Col,
+	LwMatColType weight_len,
 	lw_u16 max_mini_batch,
 	OSlwMemoryBasicSTU *pmem
 )
@@ -893,25 +1036,25 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerShiftNew(
 
 	//分配节点内存
 	node = pmem->Calloc(pmem, sizeof(OSlwToolNNLayerFullConSTU));
-	node->basic.NN_Kind = OSlwToolNNSubLayerKind_FullCon;
+	node->basic.NN_Kind = OSlwToolNNSubLayerKind_Shift;
 
 
 	//设置参数
 	node->Bias.row = 1;
-	node->Bias.col = Col;
-	node->Bias.length = Col;
+	node->Bias.col = weight_len;
+	node->Bias.length = weight_len;
 
 	node->DeltB.row = 1;
-	node->DeltB.col = Col;
-	node->DeltB.length = Col;
+	node->DeltB.col = weight_len;
+	node->DeltB.length = weight_len;
 
 	node->Weight.row = 1;
-	node->Weight.col = Col;
-	node->Weight.length = Col;
+	node->Weight.col = weight_len;
+	node->Weight.length = weight_len;
 
 	node->DeltW.row = 1;
-	node->DeltW.col = Col;
-	node->DeltW.length = Col;
+	node->DeltW.col = weight_len;
+	node->DeltW.length = weight_len;
 
 	//设置输入
 
@@ -935,8 +1078,8 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerShiftNew(
 
 
 	//成员函数
-	node->basic.Forward = OSlwToolBPnnLayerFullConForward;
-	node->basic.Backward = OSlwToolBPnnLayerFullConBackward;
+	node->basic.Forward = OSlwToolBPnnLayerShiftForward;
+	node->basic.Backward = OSlwToolBPnnLayerShiftBackward;
 
 
 	node->basic.Update = OSlwToolBPnnLayerFullConUpdate;
@@ -966,6 +1109,7 @@ lw_ptr OSlwToolBPnnLayerShiftForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT 
 	//记录当前minibatch
 	pNNSLB->out.row = mini_b_num;
 	pNNSLB->in.row = mini_b_num;
+
 
 	pOSlwToolMatrixVectShift(
 		&(pNNSLB->out),
@@ -1007,6 +1151,7 @@ lw_ptr OSlwToolBPnnLayerShiftBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT
 	//采用叠加方法
 	if (pNNSLB->pNN->Train.Flag.NeedTrain == OSlwToolNNNeedTrain_Need)
 	{
+		//****只完成了权重为列向量的反向传递****
 		//dw=sum(in.*out,2)
 		pOSlwToolMatrixDotSum(&(pfc->DeltW), &(pNNSLB->in), &(pNNSLB->out), 0x12);
 		//db = sum(out, 1);按列求和

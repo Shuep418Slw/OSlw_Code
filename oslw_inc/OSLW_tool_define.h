@@ -4,6 +4,8 @@
 //ALL IMPORT
 #define OSLW_TOOL_IMPORT_ALL 1
 
+#define L1_L2_CACHE_OPTIM 1
+
 
 //basic tool
 #define OSLW_TOOL_IMPORT_SLIP_WIN 1
@@ -54,5 +56,14 @@
 
 #define OSLW_TOOL_FUN_STATEMENT(KIND,NAME,PARA) KIND NAME PARA;typedef KIND (*p##NAME##FunType) PARA;extern p##NAME##FunType p##NAME;
 #define OSLW_TOOL_FUN(KIND,NAME,PARA,RNAME) p##NAME##FunType p##NAME = RNAME;KIND NAME PARA
+
+
+typedef enum {
+
+	OSlwToolMatrixConvMethod_Valid = 'v',
+	OSlwToolMatrixConvMethod_Full = 'f'
+
+}OSlwToolMatrixConvMethodNUM;
+
 
 #endif // OSLW_TOOL_DEFINE_H_

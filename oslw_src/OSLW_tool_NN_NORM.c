@@ -1,4 +1,4 @@
-/*(Ver.=0.94)
+/*(Ver.=0.95)
  * OSLW_tool.c
  *
  *  Created on: 2019-02-04
@@ -235,7 +235,7 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerLNormNew(
 	ParaType *pout,
 	ParaType *pmean,
 	ParaType *pvar,
-	lw_u16 Col,
+	LwMatColType Col,
 	lw_u16 max_mini_batch,
 	OSlwMemoryBasicSTU *pmem
 )
@@ -326,7 +326,7 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerLNormNew(
 void* OSlwToolBPnnLNormAppend
 (
 	OSlwToolBPnnSTU *pBPnn,
-	lw_u16 in_col,
+	LwMatColType in_col,
 	ParaType *pin, ParaType *pout,
 	ParaType *pWe, ParaType *pBi,
 	ParaType *pmean,ParaType *pvar,
@@ -364,7 +364,7 @@ void* OSlwToolBPnnLNormAppend
 
 	OSlwToolBPnnLayerAppend(pBPnn, pln1, 1, ppLIST1);
 
-	_NN_FULL_CON_CHIP_ALLAC_1();
+	_NN_FULL_CON_CHIP_ALLAC_1(pBPnn, pfc);
 
 	return ppLIST1;
 }
