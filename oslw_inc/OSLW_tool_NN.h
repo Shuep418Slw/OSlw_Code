@@ -328,6 +328,7 @@ typedef enum {
 	OSlwToolNNSubLayerKind_BasicRnn = 'R',
 	OSlwToolNNSubLayerKind_GruRnn = 'G',
 	OSlwToolNNSubLayerKind_LNorm = 'L',
+	OSlwToolNNSubLayerKind_INorm = 'I',
 	OSlwToolNNSubLayerKind_Shift = 's',
 	OSlwToolNNSubLayerKind_Split='S',
 	OSlwToolNNSubLayerKind_Mix = 'M',
@@ -863,8 +864,49 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerLNormNew(
 	OSlwMemoryBasicSTU *pmem
 );
 
+typedef struct OSLW_TOOL_NN_INSTANCE_NORM_STRUCT {
+	OSlwToolNNLayerFullConSTU databasic;//借用全连接类 作为基类
+	ParaType *pMean;
+	ParaType *pVar;
+	LwMatColType in_x, in_y, in_z;
+}OSlwToolNNLayerINormSTU;
 
 
+ParaType _OSlwToolNNLayerInForwordSub(
+	ParaType *in,
+	ParaType *out,
+	ParaType *we,
+	ParaType *bi,
+	ParaType mean,
+	ParaType var,
+	LwMatColType x_mpy_y
+);
+
+
+ParaType _OSlwToolNNLayerInBackwordSub(
+	ParaType *in,
+	ParaType *out,
+	ParaType *we,
+	ParaType *bi,
+	ParaType *dwe,
+	ParaType *dbi,
+	ParaType mean,
+	ParaType div,
+	LwMatColType x_mpy_y,
+	ParaType *pBuf
+);
+
+OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerINormNew(
+	ParaType *pin,
+	ParaType *pout,
+	ParaType *pmean,
+	ParaType *pvar,
+	LwMatColType in_x,
+	LwMatColType in_y,
+	LwMatColType in_z,
+	lw_u16 max_mini_batch,
+	OSlwMemoryBasicSTU *pmem
+);
 
 
 //层缺省函数
@@ -916,6 +958,11 @@ lw_ptr OSlwToolBPnnLayerGruRnnClear(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *
 //layer norm函数
 lw_ptr OSlwToolNNLayerLNormForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
 lw_ptr OSlwToolNNLayerLNormBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+
+//Instance norm函数
+lw_ptr OSlwToolNNLayerINormForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+lw_ptr OSlwToolNNLayerINormBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);
+
 
 //切分层函数
 lw_ptr OSlwToolNNLayerSplitForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num);

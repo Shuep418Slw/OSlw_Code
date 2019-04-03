@@ -159,7 +159,7 @@ ParaType _OSlwToolNNLayerLnBackwordSub(
 
 lw_ptr OSlwToolNNLayerLNormForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
-	register lw_u16 i;
+	register LwMatRowType i;
 	OSlwToolNNLayerLNormSTU *pln;
 
 	OSLW_assert(!(pNNSLB));
@@ -371,6 +371,194 @@ void* OSlwToolBPnnLNormAppend
 
 
 
+
+ParaType _OSlwToolNNLayerInForwordSub(
+	ParaType *in,
+	ParaType *out,
+	ParaType *we,
+	ParaType *bi,
+	ParaType mean,
+	ParaType var,
+	LwMatColType x_mpy_y
+)
+{
+
+	ParaType _dim;
+	ParaType k, b;
+
+	OSLW_assert(!(out));
+	OSLW_assert(!(in));
+	OSLW_assert(!(we));
+	OSLW_assert(!(bi));
+
+	_dim = _ParaDiv(_ParaFint(1), _ParaSqrt(_ParaAdd(var, _ParaFrom(1e-6))));
+	k = _ParaMpy(*we, _dim);
+	b = _ParaSub(*bi, _ParaMpy(k, mean));
+
+
+	while (x_mpy_y--)
+	{
+		*out++ = _ParaAdd(b, _ParaMpy(*in++, k));
+	}
+
+	return _dim;
+
+
+
+
+}
+
+
+ParaType _OSlwToolNNLayerInBackwordSub(
+	ParaType *in,
+	ParaType *out,
+	ParaType *we,
+	ParaType *bi,
+	ParaType *dwe,
+	ParaType *dbi,
+	ParaType mean,
+	ParaType div,
+	LwMatColType x_mpy_y,
+	ParaType *pBuf
+)
+{
+
+	OSLW_assert(1);
+
+}
+
+OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerINormNew(
+	ParaType *pin,
+	ParaType *pout,
+	ParaType *pmean,
+	ParaType *pvar,
+	LwMatColType in_x,
+	LwMatColType in_y,
+	LwMatColType in_z,
+	lw_u16 max_mini_batch,
+	OSlwMemoryBasicSTU *pmem
+)
+{
+	OSlwToolNNLayerFullConSTU *node;
+	OSlwToolNNLayerINormSTU *pIn;
+	lw_u32 in_len, out_len;
+	OSLW_assert(!(pmem));
+
+	//分配节点内存
+	node = pmem->Calloc(pmem, sizeof(OSlwToolNNLayerINormSTU));
+	pIn = (void *)node;
+
+	node->basic.NN_Kind = OSlwToolNNSubLayerKind_INorm;
+
+	pIn->in_x = in_x;
+	pIn->in_y = in_y;
+	pIn->in_z = in_z;
+
+	//设置参数
+	node->Bias.row = 1;
+	node->Bias.col = in_z;
+	node->Bias.length = in_z;
+
+	node->DeltB.row = 1;
+	node->DeltB.col = in_z;
+	node->DeltB.length = in_z;
+
+	in_len = max_mini_batch * in_x*in_y*in_z;
+	out_len = in_len;
+
+	node->Weight.row = 1;
+	node->Weight.col = in_z;
+	node->Weight.length = in_z;
+
+	node->DeltW.row = 1;
+	node->DeltW.col = in_z;
+	node->DeltW.length = node->Weight.length;
+
+	//设置输入
+
+	if (pin == NULL)
+	{
+		pin = pmem->Malloc(pmem, PARA_MEM_CAL(in_len));
+	}
+	OSlwToolMatrixInitial(&(node->basic.in), max_mini_batch, in_x*in_y*in_z, pin);
+
+	//设置输出
+	if (pout == NULL)
+	{
+		pout = pmem->Malloc(pmem, PARA_MEM_CAL(out_len));
+	}
+	OSlwToolMatrixInitial(&(node->basic.out), max_mini_batch, in_x*in_y*in_z, pout);
+
+	pIn->pMean = pmean == NULL ? pmem->Malloc(pmem, PARA_MEM_CAL(max_mini_batch*in_z)) : pmean;
+	pIn->pVar = pvar == NULL ? pmem->Malloc(pmem, PARA_MEM_CAL(max_mini_batch*in_z)) : pvar;
+	
+	node->basic.FlowData.uData = PARA_MEM_CAL(in_z);
+
+	//计算要分配的内存大小
+	node->basic.sizeofdata = PARA_MEM_CAL(node->Weight.length) + PARA_MEM_CAL(node->Bias.length);
+
+
+	//成员函数
+	node->basic.Forward = OSlwToolNNLayerINormForward;
+	node->basic.Backward = OSlwToolNNLayerINormBackward;
+	node->basic.DataInit = OSlwToolBPnnLayerFullConDataInit;
+
+	node->basic.Update = OSlwToolBPnnLayerFullConUpdate;
+	node->basic.NNmalloc = OSlwToolBPnnLayerFullConNNmalloc;
+	node->basic.Clear = OSlwToolBPnnLayerFullConClear;
+	node->basic.Copy = OSlwToolBPnnLayerFullConCopy;
+	node->basic.SoftReplace = OSlwToolBPnnLayerFullConSoftReplace;
+
+	return (OSlwToolNNSubLayerBasicSTU *)node;
+
+}
+
+lw_ptr OSlwToolNNLayerINormForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
+{
+
+	register lw_u32 i, j;
+	OSlwToolNNLayerINormSTU *pIn;
+	OSlwMat in_mat;
+	register ParaType *pin, *pout;
+	OSLW_assert(!(mini_b_num));
+	OSLW_assert(!(pNNSLB));
+
+	pIn = (void *)pNNSLB;
+	OSlwMatInit(&in_mat, mini_b_num*pIn->in_z, pIn->in_x*pIn->in_y, pNNSLB->in.a);
+
+	pin = pNNSLB->in.a;
+	pout = pNNSLB->out.a;
+
+	pOSlwToolMatrixMoments(&(in_mat), pIn->pMean, pIn->pVar, 1);
+
+	for (i = 0; i < in_mat.row; i++)
+	{
+		j = i%in_mat.col;
+
+		pIn->pVar[i] = _OSlwToolNNLayerInForwordSub(
+			pin, pout,
+			pIn->databasic.Weight.a + j, pIn->databasic.Bias.a + j,
+			pIn->pMean[i], pIn->pVar[i],
+			in_mat.col
+		);
+
+		pin += in_mat.col;
+		pout += in_mat.col;
+	}
+
+
+	return mini_b_num;
+}
+
+
+
+lw_ptr OSlwToolNNLayerINormBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
+{
+
+
+	OSLW_assert(1);
+	return mini_b_num;
+}
 
 #endif // OSLW_TOOL_IMPORT_NN_BPnn || OSLW_TOOL_IMPORT_ALL
 
