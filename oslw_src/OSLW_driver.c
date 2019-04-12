@@ -1,4 +1,4 @@
-/*(Ver.=0.95)
+/*(Ver.=0.96)
  * OSLW_driver.c
  *
  *  Created on: 2017-7-25
@@ -9,7 +9,7 @@
 //#include "usart.h"
 //#include "OLED.h"
 //#include "led.h"
-/*(Ver.=0.95)
+/*(Ver.=0.96)
 void OSlwCommunTransmit(OSlwCommunSTU *pc)
 {
 
@@ -41,7 +41,7 @@ void OSlwDriverShow_Clr(OSlwShowSTU *pS,lw_u8 cmd,void *pbuf)
 
 void OSlwDriverShowDrawParaDate(OSlwShowPvtParaCtrlSTU *psppc,lw_u8 pos,lw_u8 len,OSlwParameterSTU *pp,void *pbuf)
 {
-    /*(Ver.=0.95)
+    /*(Ver.=0.96)
     lw_u8 str[20];
     if(pbuf==NULL)
     	if(pp->pExtParameter)

@@ -1,4 +1,4 @@
-/*(Ver.=0.95)
+/*(Ver.=0.96)
  * OSLW_define.h
  *
  *  Created on: 2017-7-14
@@ -581,6 +581,6 @@ typedef union OSLW_CORE_GROUP_UNION{
 }OSlwCoreGroupUN;
 
 
-#endif /*(Ver.=0.95) OSLW_DEFINE_H_ */
+#endif /*(Ver.=0.96) OSLW_DEFINE_H_ */
 
 

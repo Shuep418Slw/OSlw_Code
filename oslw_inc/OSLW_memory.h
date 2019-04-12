@@ -1,4 +1,4 @@
-/*(Ver.=0.95)
+/*(Ver.=0.96)
  * OSLW_memory.h
  *
  *  Created on: 2017-7-14
@@ -204,4 +204,4 @@ lw_u8 _##NAME##_heap[OSLW_MEM_LIST_LEN(LEN,NUM)]; \
 
 
 
-#endif /*(Ver.=0.95) OSLW_MEMORY_H_ */
+#endif /*(Ver.=0.96) OSLW_MEMORY_H_ */

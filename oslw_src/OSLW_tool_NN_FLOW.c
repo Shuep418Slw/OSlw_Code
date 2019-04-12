@@ -1,4 +1,4 @@
-/*(Ver.=0.95)
+/*(Ver.=0.96)
  * OSLW_tool.c
  *
  *  Created on: 2019-03-16
@@ -1003,7 +1003,7 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerExtendNew(
 {
 	OSlwToolNNLayerExtendSTU *node;
 	LwMatLenType i;
-	LwMatColType _len;
+	LwMatColType _len = 1;
 
 	OSLW_assert(Dim>4);
 	OSLW_assert(Dim<2);

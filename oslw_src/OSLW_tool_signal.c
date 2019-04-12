@@ -1,4 +1,4 @@
-/*(Ver.=0.95)
+/*(Ver.=0.96)
 * OSLW_tool.c
 *
 *  Created on: 2018-02-22

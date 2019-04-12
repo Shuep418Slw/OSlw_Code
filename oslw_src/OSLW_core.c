@@ -1,4 +1,4 @@
-/*(Ver.=0.95)
+/*(Ver.=0.96)
  * OSLW_core.c
  *
  *  Created on: 2017-7-14
@@ -85,7 +85,7 @@ void OSlwTaskDispatch(OSlwCoreSTU *_pOS)
             //二分法
             for (pOS->n2_Dispatch = 0; pOS->n2_Dispatch < __OSLW_LOG2_TASK_NUM - 2; pOS->n2_Dispatch++)//二分法折半到4 直接switch case
             {
-                /*(Ver.=0.95)
+                /*(Ver.=0.96)
                 	TASK_NUM == 8 为例
                 	ReadyFlagGroup=0b10010010
                 	ReadyFlagGroup & 0b00001111 相当于取出低4位
@@ -372,7 +372,7 @@ void OSlwCoreInitial(OSlwCoreSTU *pOS)
 #endif
     pOS->TimerAppendFun = OSlwTimerAppend;
     pOS->TaskAppendFun = OSlwTaskAppend;
-    /*(Ver.=0.95)
+    /*(Ver.=0.96)
     #if !(OSLW_SIMPLE_MODE)
     pOS->ClockCBFun=OSlwClockCallBack;
     pOS->DispatchFun=OSlwTaskDispatch;
@@ -406,7 +406,7 @@ void OSlwCoreInitial(OSlwCoreSTU *pOS)
     OSlwTaskAppend(pOS, &(pOS->OSlwInlineTaskBoring));//空闲任务追加
 
 
-    /*(Ver.=0.95)
+    /*(Ver.=0.96)
     	OSlwTaskInit(
     			&OSlwInlineTaskParameter,
     			1,
@@ -417,7 +417,7 @@ void OSlwCoreInitial(OSlwCoreSTU *pOS)
     			);
     	OSlwTaskAppend(pOS,&OSlwInlineTaskParameter);//参数管理任务
     */
-/*(Ver.=0.95)
+/*(Ver.=0.96)
     for(i=0; i<OSLW_CORE_PARA_PAGE_NUM; i++)
     {
 
@@ -585,7 +585,7 @@ OSlwCoreSTU *OSlwTaskAppend(OSlwCoreSTU *pOS,OSlwTaskSTU *pta)
 //<输入说明>pOS:this num:参数列表编号 常见有0(输入寄存器参数) 1(保持寄存器参数) *p:参数指针</输入说明>
 //<输出说明>this</输出说明>
 //------------------------------------------
-/*(Ver.=0.95)
+/*(Ver.=0.96)
 OSlwCoreSTU* OSlwParaAppend(OSlwCoreSTU *pOS,lw_u8 num,struct OSLW_PARAMETER_STRUCT *p)
 {
 
@@ -611,7 +611,7 @@ OSlwCoreSTU* OSlwParaAppend(OSlwCoreSTU *pOS,lw_u8 num,struct OSLW_PARAMETER_STR
 */
 
 
-/*(Ver.=0.95)
+/*(Ver.=0.96)
 OSlwCoreSTU* OSlwParaAppend(OSlwCoreSTU *pOS,lw_u8 PageId,OSlwParameterSTU *pP)
 {
     OSlwParaListCtrlSTU *pPLC;
@@ -728,7 +728,7 @@ void _quicksort (void *const pbase, size_t total_elems, size_t size,_compar_fn c
     const size_t max_thresh = MAX_THRESH * size;
 
     if (total_elems == 0)
-        /*(Ver.=0.95) Avoid lossage with unsigned arithmetic below.  */
+        /*(Ver.=0.96) Avoid lossage with unsigned arithmetic below.  */
         return;
 
     if (total_elems > MAX_THRESH)
@@ -789,24 +789,24 @@ jump_over:
             if ((size_t) (right_ptr - lo) <= max_thresh)
             {
                 if ((size_t) (hi - left_ptr) <= max_thresh)
-                    /*(Ver.=0.95) Ignore both small partitions. */
+                    /*(Ver.=0.96) Ignore both small partitions. */
                     POP (lo, hi);
                 else
-                    /*(Ver.=0.95) Ignore small left partition. */
+                    /*(Ver.=0.96) Ignore small left partition. */
                     lo = left_ptr;
             }
             else if ((size_t) (hi - left_ptr) <= max_thresh)
-                /*(Ver.=0.95) Ignore small right partition. */
+                /*(Ver.=0.96) Ignore small right partition. */
                 hi = right_ptr;
             else if ((right_ptr - lo) > (hi - left_ptr))
             {
-                /*(Ver.=0.95) Push larger left partition indices. */
+                /*(Ver.=0.96) Push larger left partition indices. */
                 PUSH (lo, right_ptr);
                 lo = left_ptr;
             }
             else
             {
-                /*(Ver.=0.95) Push larger right partition indices. */
+                /*(Ver.=0.96) Push larger right partition indices. */
                 PUSH (left_ptr, hi);
                 hi = right_ptr;
             }

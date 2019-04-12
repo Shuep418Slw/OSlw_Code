@@ -1,4 +1,4 @@
-/*(Ver.=0.95)
+/*(Ver.=0.96)
  * OSLW_tool.c
  *
  *  Created on: 2017-11-13
@@ -252,7 +252,7 @@ ParaType OSlwToolRandomChaosKentFun(void *pRand,ParaType Rmin,ParaType Rmax)
     OSlwToolRandomChaosKentSTU *p=(OSlwToolRandomChaosKentSTU *) pRand;
     OSLW_assert(!pRand);
 
-    /*(Ver.=0.95)
+    /*(Ver.=0.96)
     if(p->x <= p->a)
     {
         p->x=_ParaDiv(p->x,p->a);

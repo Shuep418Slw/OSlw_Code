@@ -1,3 +1,11 @@
+/*(Ver.=0.96)
+* OSLW_define.h
+*
+*  Created on: 2018-7-14
+*      Author: slw
+*/
+
+
 #ifndef OSLW_TOOL_DEFINE_H_
 #define OSLW_TOOL_DEFINE_H_
 
@@ -5,6 +13,23 @@
 #define OSLW_TOOL_IMPORT_ALL 1
 
 #define L1_L2_CACHE_OPTIM 1
+
+
+#define OSLW_USING_CBLAS 1
+
+
+#if defined(OSLW_USING_CBLAS) && OSLW_USING_CBLAS
+
+#include "cblas.h"
+	
+#if OSLW_GLOBAL_MATH_TYPE!=OSLW_GLOBAL_MATH_FLOAT
+
+#error "Math type must be float"
+
+#endif
+
+#endif
+
 
 
 //basic tool

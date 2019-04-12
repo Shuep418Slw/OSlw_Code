@@ -1,4 +1,4 @@
-/*(Ver.=0.95)
+/*(Ver.=0.96)
  * OSLW_tool.h
  *
  *  Created on: 2017-11-13
@@ -425,7 +425,7 @@ typedef struct OSLW_TOOL_NN_LAYER_CONVOLUTION_STRUCT{
 	lw_u16 conv_kernal_num;//卷积核的数量 == 输出图像的高度
 	lw_u16 move_delt;
 	OSlwToolMatrixConvMethodNUM ConvMethod : 16;
-	//ParaType *DataRes;//保留数据
+	lw_u16 im2col_flag;
 }OSlwToolNNLayerConvSTU;
 
 
@@ -476,6 +476,15 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerConvNew(
 	OSlwMemoryBasicSTU *pmem,//内存分配指针
 	lw_u32 info[4]//下一层信息 分别为 输出图像 长 宽 高 总长度(用于与全连接连接）
 );
+
+//设置卷积层为im2col模式
+OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerConvSetIm2Col(
+	OSlwToolNNSubLayerBasicSTU *pbase,
+	lw_u32 udata_sizeof_pdata,
+	void *pdata
+);
+
+
 
 typedef enum {
 

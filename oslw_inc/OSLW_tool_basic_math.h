@@ -1,4 +1,4 @@
-/*(Ver.=0.95)
+/*(Ver.=0.96)
 * OSLW_tool.h
 *
 *  Created on: 2017-7-25
@@ -17,8 +17,8 @@
 
 #if OSLW_TOOL_IMPORT_MATH || OSLW_TOOL_IMPORT_ALL
 
-typedef lw_u16 LwMatRowType;
-typedef lw_u16 LwMatColType;
+typedef lw_u32 LwMatRowType;
+typedef lw_u32 LwMatColType;
 typedef lw_u32 LwMatLenType;
 
 typedef struct OSLW_TOOL_MATRIX_STRUCT {
@@ -150,6 +150,22 @@ OSLW_TOOL_FUN_STATEMENT(void*, OSlwToolMatrixConvFastMultCh,
 )
 
 
+OSLW_TOOL_FUN_STATEMENT(
+	void*, OSlwToolMatrixConvFastMultChIm2ColFd,
+	(
+		OSlwToolMatrixSTU *m_out, //输出 row-col 代表一个通道 length代表真正大小
+		OSlwToolMatrixSTU *m_kernal, //卷积核 row-col 代表一个通道 length 代表一个核真正大小 [2,2,4] row:2 col:2 length:16
+		OSlwToolMatrixSTU *m_in,//被卷积 row-col 代表一个通道
+		OSlwToolMatrixSTU *bias,//偏置 row-col-length 无所谓
+		lw_u16 in_high,//输入高度 
+		lw_u16 out_high,//输出高度
+		lw_u16 move_x, lw_u16 move_y,//横向纵向移动距离
+		OSlwToolMatrixConvMethodNUM conv_method,
+		lw_u32 now_flow_len,//现实缓冲区的大小
+		ParaType *fast_buf//缓冲区
+		)
+)
+
 OSLW_TOOL_FUN_STATEMENT(void*, OSlwToolMatrixMoments,
 (
 	OSlwToolMatrixSTU *src, 
@@ -170,16 +186,16 @@ OSLW_TOOL_FUN_STATEMENT(void*, OSlwToolMatrixVectShift,
 OSLW_TOOL_FUN_STATEMENT(void*, OSlwToolMatrixDotSum,
 (
 	OSlwToolMatrixSTU *y,
-	OSlwToolMatrixSTU *x1,
-	OSlwToolMatrixSTU *x2,
-	lw_u8 dim
-	)
+OSlwToolMatrixSTU *x1,
+OSlwToolMatrixSTU *x2,
+lw_u8 dim
+)
 )
 
 OSLW_TOOL_FUN_STATEMENT(
 	OSlwToolMatrixSTU*,
-	OSlwToolMatrix_RATIO_ADD,
-	(OSlwToolMatrixSTU *s, ParaType a, OSlwToolMatrixSTU *m1, ParaType b, OSlwToolMatrixSTU *m2)
+OSlwToolMatrix_RATIO_ADD,
+(OSlwToolMatrixSTU *s, ParaType a, OSlwToolMatrixSTU *m1, ParaType b, OSlwToolMatrixSTU *m2)
 )
 
 
@@ -269,7 +285,52 @@ while ((I)--)\
 	*(P)++ = *(Q)++;
 
 
+
+#define LW_VEXTOR_DOT(SUM,P,Q,DIV,MOD) do{ \
+lw_u32 i=(DIV)\
+(SUM)=_ParaFint(0);\
+while (i--){\
+	(SUM)=_ParaAdd((SUM),_ParaMpy((P)[0],(Q)[0]));\
+	(SUM)=_ParaAdd((SUM),_ParaMpy((P)[1],(Q)[1]));\
+	(P)+=2;(Q)+=2;\
+}\
+i=(MOD);\
+while (i--)\
+(SUM)=_ParaAdd((SUM),_ParaMpy(*(P)++,*(Q)++));\
+while(0);
+
+
+#define LW_V_ADD_V_MPY_V(DST,S1,S2,DIV,MOD) do{ \
+lw_u32 i=(DIV)\
+while (i--){\
+	(DST)[0]=_ParaAdd((DST)[0],_ParaMpy((S1)[0],(S2)[0]));\
+	(DST)[1]=_ParaAdd((DST)[1],_ParaMpy((S1)[1],(S2)[1]));\
+	(S1)+=2;(S2)+=2;(DST)+=2;\
+}\
+i=(MOD);\
+while (i--)\
+*(DST)++=_ParaAdd(*(DST)++,_ParaMpy(*(S1)++,*(S2)++));\
+while(0);
+
+#define LW_V_EQU_V_MPY_V(DST,S1,S2,DIV,MOD) do{ \
+lw_u32 i=(DIV)\
+while (i--){\
+	(DST)[0]=(_ParaMpy((S1)[0],(S2)[0]);\
+	(DST)[1]=(_ParaMpy((S1)[1],(S2)[1]);\
+	(S1)+=2;(S2)+=2;(DST)+=2;\
+}\
+i=(MOD);\
+while (i--)\
+*(DST)++=_ParaAdd(*(DST)++,_ParaMpy(*(S1)++,*(S2)++));\
+while(0);
+
+
+
+
 #endif
+
+
+
 
 
 static inline ParaType _OSlwToolMathExp256(ParaType _x)

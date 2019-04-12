@@ -1,4 +1,4 @@
-/*(Ver.=0.95)
+/*(Ver.=0.96)
  * OSLW_communication.h
  *
  *  Created on: 2017-7-26
@@ -53,4 +53,4 @@ extern void OSlwModBusTransmit(void *pc);
 #define MODBUS_CONNECT_UINT8_TO_UINT16(A,B) (((lw_u32)(A))<<8)+B
 #define MODBUS_CONNECT_INT8_TO_INT16(A,B) (((lw_32)(A))<<8)+B
 
-#endif /*(Ver.=0.95) OSLW_COMMUN_H_ */
+#endif /*(Ver.=0.96) OSLW_COMMUN_H_ */

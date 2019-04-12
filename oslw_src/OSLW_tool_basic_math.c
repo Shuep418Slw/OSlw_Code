@@ -1,4 +1,4 @@
-/*(Ver.=0.95)
+/*(Ver.=0.96)
 * OSLW_tool.c
 *
 *  Created on: 2017-7-14
@@ -49,10 +49,11 @@ OSLW_TOOL_FUN(
     //if(s->row == m1->row && s->row == m2->row && s->col == m1->col && s->col == m2->col)
     if (s->length == m1->length && m1->length == m2->length)
     {
-        while (d--)
-        {
-            *ps++ = _ParaAdd(*pm1++, *pm2++);
-        }
+		while (d--)
+		{
+			*ps++ = _ParaAdd(*pm1++, *pm2++);
+		}
+
     }
     else if(s->length == m1->length && m2->length == 1)
     {
@@ -209,13 +210,32 @@ OSLW_TOOL_FUN(
 
 	if (s->row == m1->row && s->col == m2->col && m1->col == m2->row)//满足相乘条件
 	{
+
+#if defined(OSLW_USING_CBLAS) && OSLW_USING_CBLAS
+
+
+		cblas_sgemm(
+			CblasRowMajor, 
+			CblasNoTrans, CblasNoTrans, 
+			s->row, s->col, m1->col, 
+			_ParaFint(1), m1->a, m1->col, 
+			m2->a, m2->col, 
+			_ParaFint(0), s->a, s->col
+		);
+
+
+#else
 #if L1_L2_CACHE_OPTIM == 1
+		lw_u32 div8, mod8;
+
 		row = s->row;
 		col = s->col;
 		row1 = m2->row;
 		_sbuf = s->a;
 		_m1buf = m1->a;
 		_m2buf = m2->a;
+
+		div8 = col / 8, mod8 = col % 8;
 
 		LW_MAT_CLR(s);
 
@@ -224,10 +244,28 @@ OSLW_TOOL_FUN(
 			for (j = 0, _m2 = _m2buf; j < row1; ++j, ++_m1)
 			{
 				temp = *_m1;
-				for (k = 0, _s = _sbuf; k < col; ++k, ++_m2, ++_s)
+				for (k = 0, _s = _sbuf; k < div8; ++k)
+				{
+					_s[0] = _ParaAdd(_s[0], _ParaMpy(temp, _m2[0]));
+					_s[1] = _ParaAdd(_s[1], _ParaMpy(temp, _m2[1]));
+					_s[2] = _ParaAdd(_s[2], _ParaMpy(temp, _m2[2]));
+					_s[3] = _ParaAdd(_s[3], _ParaMpy(temp, _m2[3]));
+
+					_s[4] = _ParaAdd(_s[4], _ParaMpy(temp, _m2[4]));
+					_s[5] = _ParaAdd(_s[5], _ParaMpy(temp, _m2[5]));
+					_s[6] = _ParaAdd(_s[6], _ParaMpy(temp, _m2[6]));
+					_s[7] = _ParaAdd(_s[7], _ParaMpy(temp, _m2[7]));
+
+					_m2 += 8;
+					_s += 8;
+
+				}
+
+				for (k = 0; k < mod8; ++k, ++_m2, ++_s)
 				{
 					*_s = _ParaAdd(*_s, _ParaMpy(temp, *_m2));
 				}
+
 			}
 			_sbuf = _s;
 		}
@@ -260,7 +298,7 @@ OSLW_TOOL_FUN(
 		}
 
 #endif // L1_L2_CACHE_OPTIM == 1
-			
+#endif
 
 	}
 	else if ((m1->length == 1 || m2->length == 1) && (s->length == m1->length || s->length == m2->length) && s->length)
@@ -544,14 +582,14 @@ OSLW_TOOL_FUN(OSlwToolMatrixSTU*, OSlwToolMatrixSet,
     OSLW_assert(!(s));
     if (a)//如果定义a 相当于复制构造函数
     {
-        /*(Ver.=0.95)
+        /*(Ver.=0.96)
         for (i = 0; i < s->length; i++)
         {
         s->a[i] = a->a[i];
         }
         */
 
-        /*(Ver.=0.95)
+        /*(Ver.=0.96)
         i = s->length;
         ps = s->a;
         pa = a->a;
@@ -573,7 +611,7 @@ OSLW_TOOL_FUN(OSlwToolMatrixSTU*, OSlwToolMatrixSet,
     }
     else//使用常量初始化
     {
-        /*(Ver.=0.95)
+        /*(Ver.=0.96)
         for (i = 0; i < s->length; i++)
         {
         s->a[i] = data;
@@ -882,19 +920,31 @@ OSlwToolMatrixSum
 	switch (dim)
 	{
 	case 0x00:
+
+#if defined(OSLW_USING_CBLAS) && OSLW_USING_CBLAS
+		_sum=cblas_sasum(l, s, 1);
+#else
+
 		while (l--)
 		{
 			_sum = _ParaAdd(_sum, *s++);
 		}
+#endif
+
 		break;
 
 	case 0x10:
 		OSLW_assert(!(DST));
 		d = DST->a;
+#if defined(OSLW_USING_CBLAS) && OSLW_USING_CBLAS
+		_sum = cblas_sasum(l, s, 1);
+#else
 		while (l--)
 		{
 			_sum = _ParaAdd(_sum, *s++);
 		}
+#endif
+
 		*d = _ParaAdd(*d, _sum);
 		break;
 
@@ -906,11 +956,16 @@ OSlwToolMatrixSum
 		while (r--)
 		{
 			i = c;
+
+#if defined(OSLW_USING_CBLAS) && OSLW_USING_CBLAS
+			_sum = cblas_sasum(i, s, 1);
+			s += i;
+#else
 			_sum = _ParaFrom(0);
 			while (i--)
-			{
 				_sum = _ParaAdd(_sum, *s++);
-			}
+#endif
+
 			*d++ = _sum;
 		}
 		break;
@@ -922,8 +977,17 @@ OSlwToolMatrixSum
 		while (r--)
 		{
 			i = c;
+
+#if defined(OSLW_USING_CBLAS) && OSLW_USING_CBLAS
+			_sum = cblas_sasum(i, s, 1);
+			s += i;
+#else
 			_sum = _ParaFrom(0);
-			while (i--) _sum = _ParaAdd(_sum, *s++);
+			while (i--)
+				_sum = _ParaAdd(_sum, *s++);
+#endif
+
+
 			*d = _ParaAdd(*d, _sum);
 			++d;
 		}
@@ -937,6 +1001,10 @@ OSlwToolMatrixSum
 		while (j--)
 		{
 			i = r;
+#if defined(OSLW_USING_CBLAS) && OSLW_USING_CBLAS
+			_sum = cblas_sasum(i, s, c);
+			++s;
+#else
 			_sum = _ParaFrom(0);
 			si = s++;
 			while (i--)
@@ -944,6 +1012,8 @@ OSlwToolMatrixSum
 				_sum = _ParaAdd(_sum, *si);
 				si += c;
 			}
+#endif
+
 			*d++ = _sum;
 		}
 		break;
@@ -956,6 +1026,10 @@ OSlwToolMatrixSum
 		while (j--)
 		{
 			i = r;
+#if defined(OSLW_USING_CBLAS) && OSLW_USING_CBLAS
+			_sum = cblas_sasum(i, s, c);
+			++s;
+#else
 			_sum = _ParaFrom(0);
 			si = s++;
 			while (i--)
@@ -963,7 +1037,7 @@ OSlwToolMatrixSum
 				_sum = _ParaAdd(_sum, *si);
 				si += c;
 			}
-
+#endif
 			*d = _ParaAdd(*d, _sum);
 			++d;
 		}
@@ -1139,6 +1213,64 @@ OSLW_TOOL_FUN(
 	OSlwToolMatrixXWeBi
 )
 {
+
+#if defined(OSLW_USING_CBLAS) && OSLW_USING_CBLAS
+	register LwMatColType j, k, row, col, row1;
+	register LwMatLenType i;
+	register ParaType temp, *_s, *_m1, *_m2, *_m1buf, *_sbuf, *_m2buf, *_bibuf, *_bi;
+	
+	OSLW_assert(!(s));
+	OSLW_assert(!(x));
+	OSLW_assert(!(we));
+	OSLW_assert(!(bi));
+
+	if (s->col == we->col && s->row == x->row && we->row == x->col && s->col == bi->length)//满足神经网络前向条件
+	{
+		row = s->row;
+		col = s->col;
+		row1 = x->col;
+		_bibuf = bi->a;
+
+
+		_sbuf = s->a;
+		_m1buf = x->a;
+		_m2buf = we->a;
+
+
+		//先载入偏置
+
+		if (_bibuf)
+		{
+			for (i = 0, _s = _sbuf; i < row; i++)
+			{
+				for (j = 0, _bi = _bibuf; j < col; j++)
+				{
+					*_s++ = *_bi++;
+				}
+			}
+		}
+		else
+		{
+			LW_MAT_CLR(s);
+		}
+
+
+		cblas_sgemm(
+			CblasRowMajor,
+			CblasNoTrans, CblasNoTrans,
+			s->row, s->col, we->row,
+			_ParaFint(1), x->a, x->col,
+			we->a, we->col,
+			_ParaFint(1), s->a, s->col
+		);
+
+
+	}
+
+
+#else
+
+
 #if L1_L2_CACHE_OPTIM == 1
 	//register LwMatLenType i, j, k, row, col, row1;
 	//register ParaType temp, *_s, *_sbuf, *_x, *_we, *_web, *_xb, *_bi, *_bibuf;
@@ -1252,6 +1384,8 @@ OSLW_TOOL_FUN(
 
 #endif
 
+#endif
+
 
 	return s;
 }
@@ -1263,6 +1397,171 @@ OSLW_TOOL_FUN(
 	OSlwToolMatrixTurnMpy
 )
 {
+#if defined(OSLW_USING_CBLAS) && OSLW_USING_CBLAS
+	OSLW_assert(!(s));
+	OSLW_assert(!(m1));
+	OSLW_assert(!(m2));
+
+
+	switch (flag)
+	{
+	case 0://都不用转置
+		if (s->row == m1->row && s->col == m2->col && m1->col == m2->row)
+		{
+
+			cblas_sgemm(
+				CblasRowMajor,
+				CblasNoTrans, CblasNoTrans,
+				s->row, s->col, m2->row,
+				_ParaFint(1), m1->a, m1->col,
+				m2->a, m2->col,
+				_ParaFint(0), s->a, s->col
+			);
+
+		}
+		else
+		{
+			OSLW_assert(1);
+			return NULL;
+		}
+	case 4:
+		if (s->row == m1->row && s->col == m2->col && m1->col == m2->row)
+		{
+			cblas_sgemm(
+				CblasRowMajor,
+				CblasNoTrans, CblasNoTrans,
+				s->row, s->col, m2->row,
+				_ParaFint(1), m1->a, m1->col,
+				m2->a, m2->col,
+				_ParaFint(1), s->a, s->col
+			);
+
+		}
+		else
+		{
+			OSLW_assert(1);
+			return NULL;
+		}
+		break;
+	case 1://m2转置
+		if (s->row == m1->row && s->col == m2->row && m1->col == m2->col)
+		{
+			cblas_sgemm(
+				CblasRowMajor,
+				CblasNoTrans, CblasTrans,
+				s->row, s->col, m1->col,
+				_ParaFint(1), m1->a, m1->col,
+				m2->a, m2->col,
+				_ParaFint(0), s->a, s->col
+			);
+
+		}
+		else
+		{
+			OSLW_assert(1);
+			return NULL;
+		}
+	case 5:
+		if (s->row == m1->row && s->col == m2->row && m1->col == m2->col)
+		{
+			cblas_sgemm(
+				CblasRowMajor,
+				CblasNoTrans, CblasTrans,
+				s->row, s->col, m1->col,
+				_ParaFint(1), m1->a, m1->col,
+				m2->a, m2->col,
+				_ParaFint(1), s->a, s->col
+			);
+		}
+		else
+		{
+			OSLW_assert(1);
+			return NULL;
+		}
+		break;
+
+
+
+	case 2://m1转置
+		if (s->row == m1->col && s->col == m2->col && m1->row == m2->row)
+		{
+			cblas_sgemm(
+				CblasRowMajor,
+				CblasTrans, CblasNoTrans,
+				s->row, s->col, m1->col,
+				_ParaFint(1), m1->a, m1->col,
+				m2->a, m2->col,
+				_ParaFint(0), s->a, s->col
+			);	
+
+		}
+		else
+		{
+			OSLW_assert(1);
+			return NULL;
+		}
+	case 6:
+		if (s->row == m1->col && s->col == m2->col && m1->row == m2->row)
+		{
+			cblas_sgemm(
+				CblasRowMajor,
+				CblasTrans, CblasNoTrans,
+				s->row, s->col, m1->col,
+				_ParaFint(1), m1->a, m1->col,
+				m2->a, m2->col,
+				_ParaFint(1), s->a, s->col
+			);
+		}
+		else
+		{
+			OSLW_assert(1);
+			return NULL;
+		}
+		break;
+
+	case 3://都转置
+		if (s->row == m1->col && s->col == m2->row && m1->row == m2->col)
+		{
+			cblas_sgemm(
+				CblasRowMajor,
+				CblasTrans, CblasNoTrans,
+				s->row, s->col, m1->row,
+				_ParaFint(1), m1->a, m1->col,
+				m2->a, m2->col,
+				_ParaFint(0), s->a, s->col
+			);
+
+		}
+		else
+		{
+			OSLW_assert(1);
+			return NULL;
+		}
+	case 7:
+		if (s->row == m1->col && s->col == m2->row && m1->row == m2->col)
+		{
+			cblas_sgemm(
+				CblasRowMajor,
+				CblasTrans, CblasNoTrans,
+				s->row, s->col, m1->row,
+				_ParaFint(1), m1->a, m1->col,
+				m2->a, m2->col,
+				_ParaFint(1), s->a, s->col
+			);
+		}
+		else
+		{
+			OSLW_assert(1);
+			return NULL;
+		}
+		break;
+
+	default:
+		OSLW_assert(1);
+		break;
+	}
+
+#else
 
 #if L1_L2_CACHE_OPTIM == 1
 
@@ -1540,6 +1839,7 @@ OSLW_TOOL_FUN(
 	}
 #endif
 
+#endif
 
 	return s;
 }
@@ -1745,6 +2045,7 @@ OSLW_TOOL_FUN(
 	ParaType *m_r, *m_c, *m_p, *m_px, *m_py;
 	ParaType *pbuf, *pbuf2;
 
+	lw_32 div2, mod2;
 
 	o_a = m_out->a;
 	out_r = m_out->row;
@@ -1760,22 +2061,33 @@ OSLW_TOOL_FUN(
 	//先加上偏置
 	if (bias)
 	{
-		l = m_out->col*m_out->row;
-		for (i = 0; i < out_high; i++)
+		if (bias->a)
 		{
-			temp = bias->a[i];
-			for ( j = 0; j < l; j++)
+			l = m_out->col*m_out->row;
+			for (i = 0; i < out_high; i++)
 			{
-				*o_a++ = temp;
+				temp = bias->a[i];
+				for (j = 0; j < l; j++)
+				{
+					*o_a++ = temp;
+				}
 			}
+
+			o_a = m_out->a;
+		}
+		else
+		{
+			LW_MAT_CLR(m_out);
 		}
 
-		o_a = m_out->a;
+
 	}
 	else
 	{
 		LW_MAT_CLR(m_out);
 	}
+
+	div2 = kern_len / 2, mod2 = kern_len % 2;
 
 	if (FD_1_or_BK_0)
 	{
@@ -1796,12 +2108,33 @@ OSLW_TOOL_FUN(
 							*pbuf++ = *m_p++;
 
 				//求和
+				
 				for (k = 0, k_p = k_a,o_pic=o_a; k < out_high; k++, o_pic += out_jump)
 				{
-					for (sum_buf = _ParaFint(0), pbuf = fast_buf, l = 0; l < kern_len; l++)
+					//for (sum_buf = _ParaFint(0), pbuf = fast_buf, l = 0; l < kern_len; l++)
+					//{
+					//	sum_buf+= _ParaMpy(*k_p++, *pbuf++);
+					//}
+#if defined(OSLW_USING_CBLAS) && OSLW_USING_CBLAS
+
+					sum_buf = cblas_sdot(kern_len, k_p, 1, fast_buf, 1);
+					k_p += kern_len;
+
+#else
+					for (sum_buf = _ParaFint(0), pbuf = fast_buf, l = 0; l < div2; l++)
 					{
-						sum_buf+= _ParaMpy(*k_p++, *pbuf++);
+						sum_buf += _ParaMpy(k_p[0], pbuf[0]);
+						sum_buf += _ParaMpy(k_p[1], pbuf[1]);
+						k_p += 2;
+						pbuf += 2;
 					}
+
+					l = mod2;
+					while (l--)
+					{
+						sum_buf += _ParaMpy(*k_p++, *pbuf++);
+					}
+#endif
 					(*o_pic) += sum_buf;
 				}
 
@@ -1872,6 +2205,148 @@ OSLW_TOOL_FUN(
 }
 
 
+//只计算一个batch
+OSLW_TOOL_FUN(
+	void*, OSlwToolMatrixConvFastMultChIm2ColFd,
+	(
+		OSlwToolMatrixSTU *m_out, //输出 row-col 代表一个通道 length代表真正大小
+		OSlwToolMatrixSTU *m_kernal, //卷积核 row-col 代表一个通道 length 代表一个核真正大小 [2,2,4] row:2 col:2 length:16
+		OSlwToolMatrixSTU *m_in,//被卷积 row-col 代表一个通道
+		OSlwToolMatrixSTU *bias,//偏置 row-col-length 无所谓
+		lw_u16 in_high,//输入高度 
+		lw_u16 out_high,//输出高度
+		lw_u16 move_x, lw_u16 move_y,//横向纵向移动距离
+		OSlwToolMatrixConvMethodNUM conv_method,
+		lw_u32 now_flow_len,//现实缓冲区的大小
+		ParaType *fast_buf//缓冲区
+		),
+	OSlwToolMatrixConvFastMultChIm2ColFd
+)
+{
+
+	lw_32 i, j, k, l, n;
+	lw_32 out_r, out_c;
+	lw_32 sum_jump1, sum_jump2, out_jump, kern_len;
+	lw_32 kern_r, kern_c, kern_one_len;
+	lw_32 in_r, in_c;
+
+	lw_u32 col_count = 0, col_cmax, im2col_one_len;
+
+	ParaType temp, sum_buf;
+	ParaType *o_a;
+	ParaType *k_a, *k_p, *k_p2;
+	ParaType *m_r, *m_c, *m_p, *m_px, *m_py;
+	ParaType *pbuf, *pbuf2;
+
+	o_a = m_out->a;
+	out_r = m_out->row;
+	out_c = m_out->col;
+	kern_r = m_kernal->row;
+	kern_c = m_kernal->col;
+	in_r = m_in->row;
+	in_c = m_in->col;
+	k_a = m_kernal->a;
+	kern_len = m_kernal->length;
+	kern_one_len = kern_c*kern_r;
+	im2col_one_len = (kern_one_len*in_high);
+	col_cmax = now_flow_len / im2col_one_len;
+	col_cmax = col_cmax >= (out_c*out_r) ? (out_c*out_r) : col_cmax;
+	OSLW_assert(!(col_cmax));
+
+	//先加上偏置
+	if (bias)
+	{
+		if (bias->a)
+		{
+			l = m_out->col*m_out->row;
+			for (i = 0; i < out_high; i++)
+			{
+				temp = bias->a[i];
+				for (j = 0; j < l; j++)
+				{
+					*o_a++ = temp;
+				}
+			}
+
+			o_a = m_out->a;
+		}
+		else
+		{
+			LW_MAT_CLR(m_out);
+		}
+	}
+	else
+	{
+		LW_MAT_CLR(m_out);
+	}
+
+	move_y *= m_in->col;
+	sum_jump1 = m_in->col;
+	sum_jump2 = in_c*in_r;
+	out_jump = out_c*out_r;
+	pbuf = fast_buf;//得到缓冲区
+
+#if !(defined(OSLW_USING_CBLAS) && OSLW_USING_CBLAS)
+	OSLW_assert(1);
+#endif
+
+
+	for (i = 0, m_r = m_in->a; i < out_r; i++, m_r += move_y)
+	{
+		for (j = 0, m_c = m_r; j < out_c; j++, m_c += move_x)
+		{
+			//抠图
+			for (k = 0, m_py = m_c; k < in_high; k++, m_py += sum_jump2)
+				for (l = 0, m_px = m_py; l < kern_r; l++, m_px += sum_jump1)
+					for (n = 0, m_p = m_px; n < kern_c; n++)
+						*pbuf++ = *m_p++;
+
+			++col_count;
+			if (col_count==col_cmax)
+			{
+				col_count = 0;
+				pbuf = fast_buf;
+#if defined(OSLW_USING_CBLAS) && OSLW_USING_CBLAS
+				//计算矩阵乘法
+				cblas_sgemm(
+					CblasRowMajor,
+					CblasNoTrans, CblasTrans,
+					out_high, col_cmax, im2col_one_len,
+					_ParaFint(1), k_a, im2col_one_len,
+					pbuf, im2col_one_len,
+					_ParaFint(1), o_a, out_jump
+				);
+#endif
+				o_a += col_cmax;
+			}
+		}
+	}
+
+	if (col_count)
+	{
+		pbuf = fast_buf;
+#if defined(OSLW_USING_CBLAS) && OSLW_USING_CBLAS
+		//计算矩阵乘法
+		cblas_sgemm(
+			CblasRowMajor,
+			CblasNoTrans, CblasTrans,
+			out_high, col_count, im2col_one_len,
+			_ParaFint(1), k_a, im2col_one_len,
+			pbuf, im2col_one_len,
+			_ParaFint(1), o_a, out_jump
+		);
+#endif
+		o_a += col_cmax;
+	}
+
+
+	return m_out;
+}
+
+
+
+
+
 OSLW_TOOL_FUN(void*, OSlwToolMatrixMoments,
 (
 	OSlwToolMatrixSTU *src,
@@ -1901,11 +2376,16 @@ OSLW_TOOL_FUN(void*, OSlwToolMatrixMoments,
 		for ( i = 0; i < r; ++i)
 		{
 			p = pbase;
+			
 			//求和
-			for ( j = 0, _sum1=_ParaFrom(0); j < c; ++j,++p)
+
+			
+			for (j = 0, _sum1 = _ParaFrom(0); j < c; ++j, ++p)
 			{
 				_sum1 = _ParaAdd(_sum1, *p);
 			}
+
+
 			//求平均
 			_sum1 = _ParaMpy(_sum1, _div_m);
 			//保存均值

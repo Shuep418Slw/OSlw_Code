@@ -1,4 +1,4 @@
-/*(Ver.=0.95)
+/*(Ver.=0.96)
  * OSLW_tool.c
  *
  *  Created on: 2017-11-13
@@ -625,7 +625,7 @@ void OSlwToolBPnnReguInitial(OSlwToolBPnnSTU *pBPnn, OSlwToolNNReguTypeNUM ReguT
 
 }
 
-/*(Ver.=0.95)
+/*(Ver.=0.96)
 //对网络减肥
 //dropout 效果不好
 OSlwToolBPnnSTU* OSlwToolBPnnDropOutStart(OSlwToolBPnnSTU *_pBPnn)
@@ -957,7 +957,7 @@ OSlwToolBPnnSTU *OSlwToolBPnnErrCalu(OSlwToolBPnnSTU *pBPnn)
 }
 
 
-/*(Ver.=0.95)
+/*(Ver.=0.96)
 //旧版本
 //后向传播
 OSlwToolBPnnSTU *OSlwToolBPnnUpdate(OSlwToolBPnnSTU *_pBPnn)
@@ -1758,7 +1758,10 @@ void OSlwToolBPnnAllDataInit(OSlwToolBPnnSTU *pBPnn,OSlwMemoryBasicSTU *pMem)
 				ppNNL = node->Data.pData;
 				for (i = 0; i < node->Data.uData; i++)
 				{
-					ppNNL[i]->FlowData.pData = pFlowDataAddr;
+					if (ppNNL[i]->FlowData.pData==NULL)
+					{
+						ppNNL[i]->FlowData.pData = pFlowDataAddr;
+					}					
 				}
 				node = (OSlwToolDListNodeSTU *)node->con.pNext;
 			}
@@ -2098,7 +2101,7 @@ void OSlwToolBPnnLoadX(OSlwToolBPnnSTU *pBPnn, OSlwMat *xs)
 	LW_MAT_CPY(&(_x),xs);
 	
 	
-#elif OSLW_TOOL_NN_DATA_FRAME OSLW_TOOL_NN_D_FRAME_F
+#elif OSLW_TOOL_NN_DATA_FRAME == OSLW_TOOL_NN_D_FRAME_F
 		if (xs->col != pBPnn->x.row)
 	{
 		OSLW_assert(1);
@@ -2154,7 +2157,7 @@ void OSlwToolBPnnLoadY(OSlwToolBPnnSTU *pBPnn, OSlwMat *ys)
 	//先拷贝y到ref 再拷贝ys到ref
 	LW_PARA_JOIN(pBPnn->ref.a, pBPnn->y.a, pBPnn->Train.y_offset*ys->col, ys->a, ys->length);
 	
-#elif OSLW_TOOL_NN_DATA_FRAME OSLW_TOOL_NN_D_FRAME_F
+#elif OSLW_TOOL_NN_DATA_FRAME==OSLW_TOOL_NN_D_FRAME_F
 	OSLW_assert(1);
 #endif
 

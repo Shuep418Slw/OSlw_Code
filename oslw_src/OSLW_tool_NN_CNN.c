@@ -1,4 +1,4 @@
-/*(Ver.=0.95)
+/*(Ver.=0.96)
 * OSLW_tool.c
 *
 *  Created on: 2019-01-22
@@ -156,6 +156,50 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerConvNew(
 	return (OSlwToolNNSubLayerBasicSTU *)node;
 
 }
+
+OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerConvSetIm2Col(
+	OSlwToolNNSubLayerBasicSTU *pbase,
+	lw_u32 udata_sizeof_pdata,
+	void *pdata
+)
+{
+
+	OSlwToolNNLayerConvSTU *pconv=pbase;
+
+	OSLW_assert(!(pbase));
+
+#if !(defined(OSLW_USING_CBLAS) && OSLW_USING_CBLAS)
+	OSLW_assert(1);
+#endif
+
+	if (pdata==NULL && udata_sizeof_pdata ==0)
+	{
+		return;
+	}
+	else if (pdata!=NULL && udata_sizeof_pdata ==0)
+	{
+
+		pconv->im2col_flag = 1;
+		pbase->FlowData.pData = pdata;
+	}
+	else if(pdata==NULL && udata_sizeof_pdata !=0)
+	{
+		pconv->im2col_flag = 1;
+		pbase->FlowData.uData = udata_sizeof_pdata;
+	}
+	else
+	{
+		pconv->im2col_flag = 1;
+		pbase->FlowData.uData = udata_sizeof_pdata;
+		pbase->FlowData.pData = pdata;
+	}
+
+
+	return pbase;
+
+
+}
+
 
 #if OSLW_TOOL_NN_DATA_FRAME==OSLW_TOOL_NN_D_FRAME_F
 
@@ -632,22 +676,47 @@ lw_ptr OSlwToolBPnnLayerConvForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *
 	we.length *= pcv->conv_kernal_z;
 	out.length *= pcv->conv_kernal_z;
 
-	while (min_b--)
+
+	if (pcv->im2col_flag)
 	{
+		while (min_b--)
+		{
 
-		pOSlwToolMatrixConvFastMultCh(
-			&out, &we, &in, &(pfc->Bias),
-			pcv->conv_kernal_z, pcv->conv_kernal_num,
-			pcv->move_delt, pcv->move_delt,
-			pcv->ConvMethod,
-			1,
-			pfc->basic.FlowData.pData
-		);
+			OSlwToolMatrixConvFastMultChIm2ColFd(
+				&out, &we, &in, &(pfc->Bias),
+				pcv->conv_kernal_z, pcv->conv_kernal_num,
+				pcv->move_delt, pcv->move_delt,
+				pcv->ConvMethod,
+				pfc->basic.FlowData.uData / sizeof(ParaType),
+				pfc->basic.FlowData.pData
+			);
 
-		in.a += pfc->basic.in.col;
-		out.a += pfc->basic.out.col;
+			in.a += pfc->basic.in.col;
+			out.a += pfc->basic.out.col;
 
+		}
 	}
+	else
+	{
+		while (min_b--)
+		{
+			pOSlwToolMatrixConvFastMultCh(
+				&out, &we, &in, &(pfc->Bias),
+				pcv->conv_kernal_z, pcv->conv_kernal_num,
+				pcv->move_delt, pcv->move_delt,
+				pcv->ConvMethod,
+				1,
+				pfc->basic.FlowData.pData
+			);
+
+			in.a += pfc->basic.in.col;
+			out.a += pfc->basic.out.col;
+
+		}
+	}
+
+
+
 
 
 
@@ -1685,7 +1754,7 @@ void* OSlwToolBPnnConvAppend
 			in_x, in_y, in_z,
 			kern_x, kern_y, kern_num,
 			1,
-			's',
+			conv_method,
 			pBPnn->Train.mini_batch_max,
 			pmem,
 			info
