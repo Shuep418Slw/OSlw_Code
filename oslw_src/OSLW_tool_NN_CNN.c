@@ -164,7 +164,7 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerConvSetIm2Col(
 )
 {
 
-	OSlwToolNNLayerConvSTU *pconv=pbase;
+	OSlwToolNNLayerConvSTU *pconv=(void *)pbase;
 
 	OSLW_assert(!(pbase));
 
@@ -174,7 +174,7 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerConvSetIm2Col(
 
 	if (pdata==NULL && udata_sizeof_pdata ==0)
 	{
-		return;
+		return NULL;
 	}
 	else if (pdata!=NULL && udata_sizeof_pdata ==0)
 	{

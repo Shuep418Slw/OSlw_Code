@@ -15,7 +15,7 @@
 #define L1_L2_CACHE_OPTIM 1
 
 
-#define OSLW_USING_CBLAS 1
+//#define OSLW_USING_CBLAS 1
 
 
 #if defined(OSLW_USING_CBLAS) && OSLW_USING_CBLAS

@@ -51,7 +51,7 @@ _ParaFrom(0.000023128),_ParaFrom(-0.000454708), _ParaFrom(0.002989045), _ParaFro
 
 
 
-inline ParaType OSlwToolMathTanh(ParaType _x)
+ ParaType OSlwToolMathTanh(ParaType _x)
 {
 	register ParaType y;
 	register lw_u32 _i;
@@ -96,7 +96,7 @@ inline ParaType OSlwToolMathTanh(ParaType _x)
 }
 
 
-inline ParaType OSlwToolMathSigmoid(ParaType _x)
+ ParaType OSlwToolMathSigmoid(ParaType _x)
 {
 
 #if OSLW_GLOBAL_MATH_TYPE==OSLW_GLOBAL_MATH_Q

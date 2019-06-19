@@ -223,7 +223,7 @@ void *_OSlwNNLayerSplitOrMix(
 
 
 
-inline void *_OSlwNNLayerPad_1D_Constant_Forword(ParaType *in,ParaType *out,LwMatColType in_col,LwMatColType ext[2])
+  void *_OSlwNNLayerPad_1D_Constant_Forword(ParaType *in,ParaType *out,LwMatColType in_col,LwMatColType ext[2])
 {
 	register LwMatColType i;
 	i = ext[0];
@@ -236,7 +236,7 @@ inline void *_OSlwNNLayerPad_1D_Constant_Forword(ParaType *in,ParaType *out,LwMa
 	return out;
 }
 
-inline void *_OSlwNNLayerPad_1D_Constant_Backword(ParaType *in, ParaType *out, LwMatColType in_col, LwMatColType ext[2])
+  void *_OSlwNNLayerPad_1D_Constant_Backword(ParaType *in, ParaType *out, LwMatColType in_col, LwMatColType ext[2])
 {
 	register LwMatColType i;
 	i = in_col;
@@ -246,7 +246,7 @@ inline void *_OSlwNNLayerPad_1D_Constant_Backword(ParaType *in, ParaType *out, L
 }
 
 
-inline void *_OSlwNNLayerPad_2D_Constant_Forword(ParaType *in, ParaType *out, LwMatColType in_col[2], LwMatColType ext[4])
+  void *_OSlwNNLayerPad_2D_Constant_Forword(ParaType *in, ParaType *out, LwMatColType in_col[2], LwMatColType ext[4])
 {
 	register LwMatColType i, j;
 	//ÏÈÇå¿Õ
@@ -271,7 +271,7 @@ inline void *_OSlwNNLayerPad_2D_Constant_Forword(ParaType *in, ParaType *out, Lw
 	return out;
 }
 
-inline void *_OSlwNNLayerPad_2D_Constant_Backword(ParaType *in, ParaType *out, LwMatColType in_col[2], LwMatColType ext[4])
+  void *_OSlwNNLayerPad_2D_Constant_Backword(ParaType *in, ParaType *out, LwMatColType in_col[2], LwMatColType ext[4])
 {
 	register LwMatColType i, j, delt1;
 	delt1 = ext[2] + ext[3];
@@ -289,7 +289,7 @@ inline void *_OSlwNNLayerPad_2D_Constant_Backword(ParaType *in, ParaType *out, L
 }
 
 
-inline void *_OSlwNNLayerExtend_1D_Nearest_Forword(ParaType *in, ParaType *out, LwMatColType in_col, LwMatColType ext)
+ void *_OSlwNNLayerExtend_1D_Nearest_Forword(ParaType *in, ParaType *out, LwMatColType in_col, LwMatColType ext)
 {
 	register LwMatColType i, j;
 	ParaType temp;
@@ -304,7 +304,7 @@ inline void *_OSlwNNLayerExtend_1D_Nearest_Forword(ParaType *in, ParaType *out, 
 }
 
 
-inline void *_OSlwNNLayerExtend_1D_Nearest_Backword(ParaType *in, ParaType *out, LwMatColType in_col, LwMatColType ext)
+  void *_OSlwNNLayerExtend_1D_Nearest_Backword(ParaType *in, ParaType *out, LwMatColType in_col, LwMatColType ext)
 {
 	register LwMatColType i, j;
 	ParaType temp;
@@ -322,7 +322,7 @@ inline void *_OSlwNNLayerExtend_1D_Nearest_Backword(ParaType *in, ParaType *out,
 }
 
 
-inline void *_OSlwNNLayerExtend_2D_Nearest_Forword(ParaType *in, ParaType *out, LwMatColType in_col[2], LwMatColType ext[2])
+  void *_OSlwNNLayerExtend_2D_Nearest_Forword(ParaType *in, ParaType *out, LwMatColType in_col[2], LwMatColType ext[2])
 {
 	register LwMatColType i, j;
 
@@ -336,7 +336,7 @@ inline void *_OSlwNNLayerExtend_2D_Nearest_Forword(ParaType *in, ParaType *out, 
 	return out;
 }
 
-inline void *_OSlwNNLayerExtend_2D_Nearest_Backword(ParaType *in, ParaType *out, LwMatColType in_col[2], LwMatColType ext[2])
+  void *_OSlwNNLayerExtend_2D_Nearest_Backword(ParaType *in, ParaType *out, LwMatColType in_col[2], LwMatColType ext[2])
 {
 	register LwMatColType i, j, k, l;
 	register ParaType *_in = in;
@@ -514,7 +514,7 @@ lw_ptr OSlwToolNNLayerSplitForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *p
 	ParaType *_in;
 	
 	OSLW_assert(!(pNNSLB));
-	pspl = pNNSLB;
+	pspl = (void *)pNNSLB;
 	_in = pNNSLB->in.a;
 	split_delt = (pspl->Indim << 1);
 	split_l = pspl->SplitList;
@@ -544,7 +544,7 @@ lw_ptr OSlwToolNNLayerSplitBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *
 	ParaType *_in;
 
 	OSLW_assert(!(pNNSLB));
-	pspl = pNNSLB;
+	pspl = (void *)pNNSLB;
 	_in = pNNSLB->in.a;
 	split_delt = (pspl->Indim << 1);
 	split_l = pspl->SplitList;
@@ -647,7 +647,7 @@ lw_ptr OSlwToolNNLayerMixForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNN
 	ParaType *_out;
 
 	OSLW_assert(!(pNNSLB));
-	pmix = pNNSLB;
+	pmix = (void *)pNNSLB;
 	_out = pNNSLB->out.a;
 	out_split_delt = (pmix->Outdim << 1);
 	out_split_l = pmix->MixList;
@@ -681,7 +681,7 @@ lw_ptr OSlwToolNNLayerMixBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pN
 	ParaType *_out;
 
 	OSLW_assert(!(pNNSLB));
-	pmix = pNNSLB;
+	pmix = (void *)pNNSLB;
 	_out = pNNSLB->out.a;
 	out_split_delt = (pmix->Outdim << 1);
 	out_split_l = pmix->MixList;
@@ -840,7 +840,7 @@ lw_ptr OSlwToolNNLayerPadForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNN
 	ParaType *_in, *_out;
 	OSLW_assert(!(pNNSLB));
 
-	ppad = pNNSLB;
+	ppad = (void *)pNNSLB;
 	_in = pNNSLB->in.a;
 	_out = pNNSLB->out.a;
 
@@ -918,7 +918,7 @@ lw_ptr OSlwToolNNLayerPadBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pN
 	ParaType *_in, *_out;
 	OSLW_assert(!(pNNSLB));
 
-	ppad = pNNSLB;
+	ppad = (void *)pNNSLB;
 	_in = pNNSLB->in.a;
 	_out = pNNSLB->out.a;
 
@@ -1114,7 +1114,7 @@ lw_ptr OSlwToolNNLayerExtendForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *
 	ParaType *_in, *_out;
 	OSLW_assert(!(pNNSLB));
 
-	pEXT = pNNSLB;
+	pEXT = (void *)pNNSLB;
 	_in = pNNSLB->in.a;
 	_out = pNNSLB->out.a;
 
@@ -1132,7 +1132,7 @@ lw_ptr OSlwToolNNLayerExtendForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *
 
 			for (i = 0; i < len; i++)
 			{
-				_out = _OSlwNNLayerExtend_1D_Nearest_Forword(_in, _out, pEXT->ShapeList[1], pEXT->Extlist);
+				_out = _OSlwNNLayerExtend_1D_Nearest_Forword(_in, _out, pEXT->ShapeList[1], pEXT->Extlist[0]);
 				_in += delt_in;
 			}
 			break;
@@ -1192,7 +1192,7 @@ lw_ptr OSlwToolNNLayerExtendBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT 
 	ParaType *_in, *_out;
 	OSLW_assert(!(pNNSLB));
 
-	pEXT = pNNSLB;
+	pEXT = (void *)pNNSLB;
 	_in = pNNSLB->in.a;
 	_out = pNNSLB->out.a;
 
@@ -1210,7 +1210,7 @@ lw_ptr OSlwToolNNLayerExtendBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT 
 
 			for (i = 0; i < len; i++)
 			{
-				_out = _OSlwNNLayerExtend_1D_Nearest_Backword(_in, _out, pEXT->ShapeList[1], pEXT->Extlist);
+				_out = _OSlwNNLayerExtend_1D_Nearest_Backword(_in, _out, pEXT->ShapeList[1], pEXT->Extlist[0]);
 				_in += delt_in;
 			}
 			break;
