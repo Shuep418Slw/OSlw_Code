@@ -76,12 +76,12 @@ typedef struct OSLW_TASK_STRUCT{
 
 	
 #if !(OSLW_SIMPLE_MODE)	
-	_BP BreakPoint[OSLW_TASK_BREAKPOINT_DEEP];//断点列表 表示支持的函数嵌套次数
-	lw_8 Name[OSLW_TASK_NAME_LENGTH_MAX+1];//名字 长度由OSLW_TASK_NAME_LENGTH_MAX控制	
-	lw_u16 BreakPointReturn[OSLW_TASK_BREAKPOINT_DEEP];//断点返回表 表示各个断点的返回值
+	volatile _BP BreakPoint[OSLW_TASK_BREAKPOINT_DEEP];//断点列表 表示支持的函数嵌套次数
+	volatile lw_8 Name[OSLW_TASK_NAME_LENGTH_MAX+1];//名字 长度由OSLW_TASK_NAME_LENGTH_MAX控制	
+	volatile lw_u16 BreakPointReturn[OSLW_TASK_BREAKPOINT_DEEP];//断点返回表 表示各个断点的返回值
 	
 #else
-	_BP BreakPoint;
+	volatile _BP BreakPoint;
 #endif	
 
 
@@ -119,8 +119,8 @@ typedef struct OSLW_TASK_STRUCT{
 	
 
 	
-	lw_u32 SleepCount;//睡眠计数器
-	OSlwTaskGroupFlagSTU TaskGroupFlag;
+	volatile lw_u32 SleepCount;//睡眠计数器
+	volatile OSlwTaskGroupFlagSTU TaskGroupFlag;
 	//OSlwTaskPrivateMemorySTU PrivateMem;//任务私有存储器
 	struct OSLW_CORE_STRUCT *pOS;//操作系统指针 指向任务所属操作系统
 	
@@ -137,8 +137,8 @@ typedef struct OSLW_TASK_STRUCT{
 		(struct OSLW_TASK_STRUCT *pta, struct OSLW_TASK_STRUCT *pta_aim, OSlwGiftPostmanSTU *pGP, OSlwGiftUnitSTU *pgu, GiftPostmanStatusNUM method);
 #endif	
 */
-	lw_u8 TaskFrozenFlag : 1;
-	OSlwTaskStatusNUM TaskStatus : 7;//任务状态
+	volatile lw_u8 TaskFrozenFlag : 1;
+	volatile OSlwTaskStatusNUM TaskStatus : 7;//任务状态
 	
 	lw_u8 Priority;//优先级
 }OSlwTaskSTU;
