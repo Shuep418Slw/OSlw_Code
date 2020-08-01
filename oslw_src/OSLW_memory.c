@@ -1,4 +1,4 @@
-/*(Ver.=0.96)
+/*(Ver.=0.97)
  * OSLW_memory.c
  *
  *  Created on: 2017-7-14
@@ -52,6 +52,52 @@ void * OSlwMemoryGlobalCalloc(struct OSLW_MEMORY_BASIC_STRUCT *pMU, lw_u32 dsize
 	return p;
 }
 
+
+void *OSlwMemoryExAlloc(lw_mem pMU, lw_u32 dsize)
+{
+	OSLW_assert(!(pMU));
+	OSLW_assert(!(((OSlwMemoryExSTU *)pMU)->Malloc));
+	return (((OSlwMemoryExSTU *)pMU)->Malloc(dsize));
+}
+
+void *OSlwMemoryExCalloc(lw_mem pMU, lw_u32 dsize)
+{
+	OSLW_assert(!(pMU));
+	OSLW_assert(!(((OSlwMemoryExSTU *)pMU)->Calloc));
+	return (((OSlwMemoryExSTU *)pMU)->Calloc(dsize));
+}
+
+void *OSlwMemoryRealloc(lw_mem pMU,void *p, lw_u32 dsize)
+{
+	OSLW_assert(!(pMU));
+	OSLW_assert(!(((OSlwMemoryExSTU *)pMU)->ReAlloc));
+	return (((OSlwMemoryExSTU *)pMU)->ReAlloc(p, dsize));
+}
+
+void *OSlwMemoryExFree(lw_mem pMU,void *p)
+{
+	OSLW_assert(!(pMU));
+	OSLW_assert(!(((OSlwMemoryExSTU *)pMU)->Free));
+	((OSlwMemoryExSTU *)pMU)->Free(p);
+	return p;
+}
+
+void OSlwMemoryExInital(OSlwMemoryExSTU *pMU, void *malloc_fun, void *calloc_fun, void *free_fun, void *realloc_fun)
+{
+	OSLW_assert(!(pMU));
+	pMU->basic.Malloc = OSlwMemoryExAlloc;
+	pMU->basic.Calloc = OSlwMemoryExCalloc;
+	pMU->basic.ReAlloc = OSlwMemoryRealloc;
+	pMU->basic.Free = OSlwMemoryExFree;
+
+	pMU->Malloc = (void *(*)(lw_u32))malloc_fun;
+	pMU->Calloc = (void *(*)(lw_u32))calloc_fun;
+	pMU->Free = (void (*)(void *))free_fun;
+	pMU->ReAlloc = (void *(*)(void *, lw_u32))realloc_fun;
+
+
+}
+
 #if OSLW_MEMORY_IMPORT_MAP
 
 lw_32 OSlwMemoryMapInital
@@ -91,10 +137,10 @@ lw_32 OSlwMemoryMapInital
 	pMU->pMemInfoButtom = (void *)((size_t)pMU->MemInfo.pData + pMU->MemInfo.uData * sizeof(pMU->Mem.pData));
 
 
-    pMU->basic.Malloc=(void *)OSlwMemoryMapAlloc;
-    pMU->basic.Free=(void *)OSlwMemoryMapFree;
-    pMU->basic.ReAlloc = (void *)OSlwMemoryMapReAlloc;
-	pMU->basic.Calloc = (void *)OSlwMemoryGlobalCalloc;
+    (pMU->basic.Malloc)=(void *(*)(struct OSLW_MEMORY_BASIC_STRUCT *, lw_u32))OSlwMemoryMapAlloc;
+    pMU->basic.Free=(void *(*)(struct OSLW_MEMORY_BASIC_STRUCT *, void *))OSlwMemoryMapFree;
+    pMU->basic.ReAlloc = (void *(*)(struct OSLW_MEMORY_BASIC_STRUCT *, void *, lw_u32))OSlwMemoryMapReAlloc;
+	pMU->basic.Calloc = (void *(*)(struct OSLW_MEMORY_BASIC_STRUCT *, lw_u32))OSlwMemoryGlobalCalloc;
     pMU->basic.memMax = lenMem;//内存片总大小
     pMU->basic.memSurplus = pMU->basic.memMax;//剩余大小
 
@@ -131,7 +177,7 @@ void* OSlwMemoryMapAlloc(OSlwMemoryMapSTU *pMU,lw_u32 dsize)
     len = OSLW_MEM_SIZE_DIV(dsize, pMU->basic.MemSectionSize);
 
     //得到比用户预订内存要大的内存片数量
-    /*(Ver.=0.96)
+    /*(Ver.=0.97)
     if(len * pMU->MemSectionSize < dsize)
     	len++;
     	*/
@@ -233,7 +279,7 @@ static lw_32 _OSlwMemoryMapFind(OSlwMemoryMapSTU *pMU, void *p,lw_u16 *pLen,lw_u
 
 void * OSlwMemoryMapFree(OSlwMemoryMapSTU *pMU,void *p)
 {
-    /*(Ver.=0.96)
+    /*(Ver.=0.97)
     	lw_u8 **pinfoarr=pMU->MemInfo.pData;
     	lw_u8 **pMemInfoButtom;
     	lw_u8 FindFlag = 0;
@@ -325,13 +371,13 @@ void* OSlwMemoryMapReAlloc(OSlwMemoryMapSTU *pMU,void *p, lw_u32 dsize)
     //len = dsize / pMU->MemSectionSize;
     len = OSLW_MEM_SIZE_DIV(dsize, pMU->basic.MemSectionSize);
     //得到比用户预订内存要大的内存片数量
-    /*(Ver.=0.96)
+    /*(Ver.=0.97)
     if (len * pMU->MemSectionSize < dsize)
     	len++;
     */
 
 	//得到比用户预订内存要大的内存片数量
-	if (OSLW_MEM_SIZE_MPY(len, pMU->basic.MemSectionSize) < dsize)
+	if ((lw_u32)(OSLW_MEM_SIZE_MPY(len, pMU->basic.MemSectionSize)) < dsize)
 		len++;
     if (count >= len)//不需要重新分配
     {
@@ -406,10 +452,10 @@ lw_32 OSlwMemorySimpleInital(OSlwMemorySimpleSTU *pMU,
     OSLW_assert(!(pMem));
 
 
-    pMU->basic.Malloc = (void *)OSlwMemorySimpleAlloc;
-    pMU->basic.Free = (void *)OSlwMemorySimpleFree;
-    pMU->basic.ReAlloc = (void *)OSlwMemorySimpleReAlloc;
-	pMU->basic.Calloc = (void *)OSlwMemoryGlobalCalloc;
+    pMU->basic.Malloc = (void *(*)(struct OSLW_MEMORY_BASIC_STRUCT *, lw_u32))OSlwMemorySimpleAlloc;
+    pMU->basic.Free = (void *(*)(struct OSLW_MEMORY_BASIC_STRUCT *, void *))OSlwMemorySimpleFree;
+    pMU->basic.ReAlloc = (void *(*)(struct OSLW_MEMORY_BASIC_STRUCT *, void *, lw_u32))OSlwMemorySimpleReAlloc;
+	pMU->basic.Calloc = (void *(*)(struct OSLW_MEMORY_BASIC_STRUCT *, lw_u32))OSlwMemoryGlobalCalloc;
 
     //pMU->MemSectionSize = MemSize;
     OSlwMemorySizeInitial(&(pMU->basic.MemSectionSize), MemSize);
@@ -448,7 +494,7 @@ void * OSlwMemorySimpleAlloc(OSlwMemorySimpleSTU *pMU, lw_u32 dsize)
     //len = dsize / pMU->MemSectionSize;
     len = OSLW_MEM_SIZE_DIV(dsize, pMU->basic.MemSectionSize);
     //得到比用户预订内存要大的内存片数量
-    /*(Ver.=0.96)
+    /*(Ver.=0.97)
     if (len * pMU->MemSectionSize < dsize)
     	len++;
     */
@@ -518,10 +564,10 @@ lw_32 OSlwMemoryListInital(OSlwMemoryListSTU *pMU,
     OSLW_assert(!(sizeofmem));
 
 
-    pMU->basic.Malloc = (void *)OSlwMemoryListAlloc;
-    pMU->basic.Free = (void *)OSlwMemoryListFree;
-    pMU->basic.ReAlloc = (void *)OSlwMemoryListReAlloc;
-	pMU->basic.Calloc = (void *)OSlwMemoryGlobalCalloc;
+    pMU->basic.Malloc = (void *(*)(struct OSLW_MEMORY_BASIC_STRUCT *, lw_u32))OSlwMemoryListAlloc;
+    pMU->basic.Free = (void *(*)(struct OSLW_MEMORY_BASIC_STRUCT *, void *))OSlwMemoryListFree;
+    pMU->basic.ReAlloc = (void *(*)(struct OSLW_MEMORY_BASIC_STRUCT *, void *, lw_u32))OSlwMemoryListReAlloc;
+	pMU->basic.Calloc = (void *(*)(struct OSLW_MEMORY_BASIC_STRUCT *, lw_u32))OSlwMemoryGlobalCalloc;
     //pMU->MemSectionSize = MemSize;
 
     OSlwMemorySizeInitial(&(pMU->basic.MemSectionSize), MemSize);
@@ -566,7 +612,7 @@ void * OSlwMemoryListAlloc(OSlwMemoryListSTU *pMU, lw_u32 dsize)
 
     OSLW_assert(!(pMU));
     OSLW_assert(!(dsize));
-    /*(Ver.=0.96)
+    /*(Ver.=0.97)
     MemSectionSize = pMU->MemSectionSize;
     dsize += sizeof(OSlwMemoryListNodeSTU);
     len = dsize / MemSectionSize;
@@ -604,7 +650,7 @@ void * OSlwMemoryListAlloc(OSlwMemoryListSTU *pMU, lw_u32 dsize)
         if (buf1 >= dsize)//代表有剩余
         {
             q = (OSlwMemoryListNodeSTU *)(((size_t)p) + p->len);
-            /*(Ver.=0.96)
+            /*(Ver.=0.97)
             			q->con.pLast = (OSlwToolDListNodeConnectSTU *)p;
             			q->con.pNext = (OSlwToolDListNodeConnectSTU *)p->con.pNext;
 
@@ -751,3 +797,4 @@ void* OSlwMemoryListReAlloc(OSlwMemoryListSTU *pMU, void *p, lw_u32 dsize)
 }
 
 #endif //OSLW_MEMORY_IMPORT_LIST
+

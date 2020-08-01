@@ -1,4 +1,4 @@
-/*(Ver.=0.96)
+﻿/*(Ver.=0.97)
  * OSLW_tool.c
  *
  *  Created on: 2019-01-22
@@ -191,9 +191,9 @@ lw_ptr OSlwToolBPnnLayerFullConBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRU
 {
 
 	register lw_u16 buf1;
-	register lw_u16 i, j, col, row;
-	register ParaType _sum;
-	register ParaType *_out, *_db, *_out_b;
+	//register lw_u16 i, j, col, row;
+	//register ParaType _sum;
+	//register ParaType *_out, *_db, *_out_b;
 
 	register OSlwToolNNLayerFullConSTU *pfc;
 	OSLW_assert(!(pNNSLB));
@@ -265,13 +265,13 @@ lw_ptr OSlwToolBPnnLayerFullConBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRU
 	if (pNNSLB->pNN->Train.Flag.NeedTrain== OSlwToolNNNeedTrain_Need)
 	{
 		//dw=in'*out
-		pOSlwToolMatrixTurnMpy(&(pfc->DeltW), &(pNNSLB->in), &(pNNSLB->out), 6);
+		pOSlwToolMatrixTurnMpy(&(pfc->DeltW), &(pNNSLB->in), &(pNNSLB->out), 0x12);
 		//db = sum(out, 1);按列求和
 		pOSlwToolMatrixSum(&(pfc->DeltB), &(pNNSLB->out), 0x12);
 	}
 
 	//xd = out*w';
-	pOSlwToolMatrixTurnMpy(&(pNNSLB->in), &(pNNSLB->out), &(pfc->Weight), 1);
+	pOSlwToolMatrixTurnMpy(&(pNNSLB->in), &(pNNSLB->out), &(pfc->Weight), 0x01);
 
 
 	//还原
@@ -944,9 +944,9 @@ void* OSlwToolBPnnFullConAppend
 	
 	OSlwToolNNSubLayerBasicSTU *pnode1, *pnode2;
 	OSlwToolNNLayerFullConSTU *pfc;
-	OSlwToolDListNodeSTU *pln1, *pln2;
-	ParaType *pWreal, *pBreal;
-	OSlwToolNNSubLayerBasicSTU **ppLIST1, **ppLIST2, **pptail;
+	OSlwToolDListNodeSTU *pln1;
+	//ParaType *pWreal, *pBreal;
+	OSlwToolNNSubLayerBasicSTU **ppLIST1, **pptail;
 	OSLW_assert(!(pBPnn));
 	OSLW_assert(!(pmem));
 	
@@ -1132,9 +1132,9 @@ lw_ptr OSlwToolBPnnLayerShiftBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT
 {
 
 	register lw_u16 buf1;
-	register lw_u16 i, j, col, row;
-	register ParaType _sum;
-	register ParaType *_out, *_db, *_out_b;
+	//register lw_u16 i, j, col, row;
+	//register ParaType _sum;
+	//register ParaType *_out, *_db, *_out_b;
 
 	register OSlwToolNNLayerFullConSTU *pfc;
 	OSLW_assert(!(pNNSLB));

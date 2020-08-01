@@ -1,4 +1,4 @@
-/*(Ver.=0.96)
+/*(Ver.=0.97)
  * OSLW_tool.c
  *
  *  Created on: 2017-11-13
@@ -625,7 +625,7 @@ void OSlwToolBPnnReguInitial(OSlwToolBPnnSTU *pBPnn, OSlwToolNNReguTypeNUM ReguT
 
 }
 
-/*(Ver.=0.96)
+/*(Ver.=0.97)
 //对网络减肥
 //dropout 效果不好
 OSlwToolBPnnSTU* OSlwToolBPnnDropOutStart(OSlwToolBPnnSTU *_pBPnn)
@@ -957,7 +957,7 @@ OSlwToolBPnnSTU *OSlwToolBPnnErrCalu(OSlwToolBPnnSTU *pBPnn)
 }
 
 
-/*(Ver.=0.96)
+/*(Ver.=0.97)
 //旧版本
 //后向传播
 OSlwToolBPnnSTU *OSlwToolBPnnUpdate(OSlwToolBPnnSTU *_pBPnn)
@@ -1135,7 +1135,7 @@ OSlwToolBPnnSTU *OSlwToolBPnnDeltCalu(OSlwToolBPnnSTU *_pBPnn,lw_u16 _batch_inde
 				*pdnext = _ParaMpy(_div_sqrt_var, *pdx_n);
 				*pdnext = _ParaAdd(*pdnext, _ParaMpy(_factor_xn, *px_n));
 				*pdnext = _ParaSub(*pdnext, _sum_dmean);
-				//*pdnext = _ParaMpy(*pdnext, 0);
+				*pdnext = _ParaMpy(*pdnext, 0);
 				pdx_n++;
 				px_n++;
 				pdnext++;
@@ -1719,7 +1719,7 @@ void OSlwToolBPnnAllDataInit(OSlwToolBPnnSTU *pBPnn,OSlwMemoryBasicSTU *pMem)
 	OSlwToolDListNodeSTU *node;
 	OSlwToolNNSubLayerBasicSTU **ppNNL;
 	lw_u32 *pKind;
-	register lw_u32 i, count = 0, j;
+	register lw_u32 i, count = 0;
 	lw_u32 flowdatamax = 0;
 	void *pFlowDataAddr = NULL;
 	OSLW_assert(!(pBPnn));
@@ -1899,7 +1899,7 @@ void* OSlwToolNNLayerSimpleRecover
 			pBPnn,
 			(*pSimpleBak).info[0],(*pSimpleBak).info[1],(*pSimpleBak).info[2],
 			(*pSimpleBak).info[3],(*pSimpleBak).info[4],(*pSimpleBak).info[5],
-			(*pSimpleBak).info[5],
+			(OSlwToolMatrixConvMethodNUM)((*pSimpleBak).info[5]),
 			in,out,
 			NULL,NULL,
 			NULL, NULL, 0, 0,
@@ -1914,7 +1914,7 @@ void* OSlwToolNNLayerSimpleRecover
 			(*pSimpleBak).info[0],(*pSimpleBak).info[1],(*pSimpleBak).info[2],
 			(*pSimpleBak).info[3],(*pSimpleBak).info[4],
 			in,out,
-			(*pSimpleBak).info[5],
+			(OSlwToolNNPoolingMethodNUM)((*pSimpleBak).info[5]),
 			pmem,NULL
 		);
 		break;
@@ -2080,7 +2080,7 @@ void OSlwToolBPnnLoadX(OSlwToolBPnnSTU *pBPnn, OSlwMat *xs)
 
 	
 	
-	if (res < xs->row)
+	if (res < (lw_32)(xs->row))
 	{
 		//输入batch超过了最大
 		//调整输入矩阵

@@ -1,4 +1,4 @@
-/*(Ver.=0.96)
+ï»¿/*(Ver.=0.97)
  * OSLW_gift.c
  *
  *  Created on: 2017-7-14
@@ -11,10 +11,10 @@
 
 #if !(OSLW_SIMPLE_LEVEL >= 3)
 //------------------------------------------
-//<º¯ÊıÃû>OSlwGiftConciergeInitial</º¯ÊıÃû>
-//<¹¦ÄÜËµÃ÷>ÃÅÎÀ¹ÜÀíÏµÍ³ ³õÊ¼»¯</¹¦ÄÜËµÃ÷>
-//<ÊäÈëËµÃ÷>pgc:this</ÊäÈëËµÃ÷>
-//<Êä³öËµÃ÷>void</Êä³öËµÃ÷>
+//<å‡½æ•°å>OSlwGiftConciergeInitial</å‡½æ•°å>
+//<åŠŸèƒ½è¯´æ˜>é—¨å«ç®¡ç†ç³»ç»Ÿ åˆå§‹åŒ–</åŠŸèƒ½è¯´æ˜>
+//<è¾“å…¥è¯´æ˜>pgc:this</è¾“å…¥è¯´æ˜>
+//<è¾“å‡ºè¯´æ˜>void</è¾“å‡ºè¯´æ˜>
 //------------------------------------------
 
 
@@ -22,23 +22,23 @@ void OSlwGiftConciergeInitial(OSlwGiftConciergeSTU *pgc)
 {
 
     OSLW_assert(!pgc);
-    memset(pgc,0,sizeof(OSlwGiftConciergeSTU));//³õÊ¼»¯ÇåÁã
+    memset(pgc,0,sizeof(OSlwGiftConciergeSTU));//åˆå§‹åŒ–æ¸…é›¶
     OSlwToolDListInitial(&(pgc->giftR.List), 0, NULL);
 #if !(OSLW_SIMPLE_MODE)
-    pgc->giftR.MoveNextFun=OSlwGiftReceiveMoveNext;//Ë«ÏòÁ´±íÒÆ¶¯³ÉÔ±º¯Êı
-    pgc->giftR.SlipNextFun=OSlwGiftReceiveSlipNext;//»¬¶¯º¯Êı
-    pgc->giftR.AppendFun=OSlwGiftReceiveAppend;//×·¼Ó³ÉÔ±º¯Êı
+    pgc->giftR.MoveNextFun=OSlwGiftReceiveMoveNext;//åŒå‘é“¾è¡¨ç§»åŠ¨æˆå‘˜å‡½æ•°
+    pgc->giftR.SlipNextFun=OSlwGiftReceiveSlipNext;//æ»‘åŠ¨å‡½æ•°
+    pgc->giftR.AppendFun=OSlwGiftReceiveAppend;//è¿½åŠ æˆå‘˜å‡½æ•°
 #endif
-    pgc->giftR.pGC=pgc;//½ÓÊÕÆ÷ Ö¸Õë
+    pgc->giftR.pGC=pgc;//æ¥æ”¶å™¨ æŒ‡é’ˆ
 
     //OSlwGiftTransmitInitial(&(pgc->giftT));
 
-    // pgc->giftT.pGC=pgc;//·¢ËÍÆ÷ Ö¸Õë
+    // pgc->giftT.pGC=pgc;//å‘é€å™¨ æŒ‡é’ˆ
 
 }
 
 
-//Öğ½¥·ÅÆú ²ÉÓÃÄÚ´æ·ÖÅä»úÖÆ´úÌæ
+//é€æ¸æ”¾å¼ƒ é‡‡ç”¨å†…å­˜åˆ†é…æœºåˆ¶ä»£æ›¿
 #if 0
 void OSlwGiftTransmitInitial(OSlwGiftTransmitSTU *pgt)
 {
@@ -46,14 +46,14 @@ void OSlwGiftTransmitInitial(OSlwGiftTransmitSTU *pgt)
 
     OSLW_assert(!pgt);
 #if !(OSLW_SIMPLE_MODE)
-    pgt->IdleFun=OSlwGiftTransmitIdle;//µÃµ½¿ÕÏĞ³ÉÔ±Ë÷Òıº¯Êı
+    pgt->IdleFun=OSlwGiftTransmitIdle;//å¾—åˆ°ç©ºé—²æˆå‘˜ç´¢å¼•å‡½æ•°
 #endif
 
-    for(; n<OSLW_GIFT_POSTMAN_MAX; n++) //¿ìµİÔ±³õÊ¼»¯
+    for(; n<OSLW_GIFT_POSTMAN_MAX; n++) //å¿«é€’å‘˜åˆå§‹åŒ–
     {
         pgt->PostmanList[n].PostmanID = n;
-        pgt->PostmanList[n].Status = GiftPostmanStatus_Free;//ÉèÖÃ×´Ì¬Îª×ÔÓÉ
-        pgt->PostmanList[n].pGT = pgt;//¿ìµİÔ± ËùÊôÖ¸Õë³õÊ¼»¯
+        pgt->PostmanList[n].Status = GiftPostmanStatus_Free;//è®¾ç½®çŠ¶æ€ä¸ºè‡ªç”±
+        pgt->PostmanList[n].pGT = pgt;//å¿«é€’å‘˜ æ‰€å±æŒ‡é’ˆåˆå§‹åŒ–
     }
 
 }
@@ -61,10 +61,10 @@ void OSlwGiftTransmitInitial(OSlwGiftTransmitSTU *pgt)
 
 
 //------------------------------------------
-//<º¯ÊıÃû>OSlwGiftReceiveAppend</º¯ÊıÃû>
-//<¹¦ÄÜËµÃ÷>ÀñÎï·¢ËÍº¯Êı</¹¦ÄÜËµÃ÷>
-//<ÊäÈëËµÃ÷>pgr:this pgp:¿ìµİÔ±Ö¸Õë</ÊäÈëËµÃ÷>
-//<Êä³öËµÃ÷>Ë«ÏòÁ´±íÍ·²¿</Êä³öËµÃ÷>
+//<å‡½æ•°å>OSlwGiftReceiveAppend</å‡½æ•°å>
+//<åŠŸèƒ½è¯´æ˜>ç¤¼ç‰©å‘é€å‡½æ•°</åŠŸèƒ½è¯´æ˜>
+//<è¾“å…¥è¯´æ˜>pgr:this pgp:å¿«é€’å‘˜æŒ‡é’ˆ</è¾“å…¥è¯´æ˜>
+//<è¾“å‡ºè¯´æ˜>åŒå‘é“¾è¡¨å¤´éƒ¨</è¾“å‡ºè¯´æ˜>
 //------------------------------------------
 OSlwGiftPostmanSTU * OSlwGiftReceiveAppend(OSlwGiftReceiveSTU *pgr,OSlwGiftPostmanSTU *pgp)
 {
@@ -74,57 +74,57 @@ OSlwGiftPostmanSTU * OSlwGiftReceiveAppend(OSlwGiftReceiveSTU *pgr,OSlwGiftPostm
 
 #if 0
 
-    if(!(pgr->GiftNum))//ÅĞ¶Ïµ±Ç°ÀñÎïÊıÁ¿ÊÇ·ñ==0
-    {   //Îª0
+    if(!(pgr->GiftNum))//åˆ¤æ–­å½“å‰ç¤¼ç‰©æ•°é‡æ˜¯å¦==0
+    {   //ä¸º0
 
-        pgr->pHead=pgr->pTail=pgp;//Ê×Î²ÏàÍ¬
-        pgr->pHead->pPrior=NULL;//ÉÏÒ»¸öÎª¿Õ
+        pgr->pHead=pgr->pTail=pgp;//é¦–å°¾ç›¸åŒ
+        pgr->pHead->pPrior=NULL;//ä¸Šä¸€ä¸ªä¸ºç©º
     }
     else
-    {   //²»Îª0
-        pgr->pTail->pNext=pgp;//µ±Ç°Î²²¿µÄÏÂÒ»¸ö½ÓÉÏ
-        pgp->pPrior=pgr->pTail;//pgpµÄÇ°Ò»¸öÎªµ±Ç°Î²²¿
-        pgr->pTail=pgp;	//¸üĞÂÎ²²¿
+    {   //ä¸ä¸º0
+        pgr->pTail->pNext=pgp;//å½“å‰å°¾éƒ¨çš„ä¸‹ä¸€ä¸ªæ¥ä¸Š
+        pgp->pPrior=pgr->pTail;//pgpçš„å‰ä¸€ä¸ªä¸ºå½“å‰å°¾éƒ¨
+        pgr->pTail=pgp;	//æ›´æ–°å°¾éƒ¨
     }
 
-    pgp->pGT->PostmanFlag.all|=((lw_u64)1<<pgp->ID);//·¢ËÍ±êÖ¾×éÖÃÆğ
+    pgp->pGT->PostmanFlag.all|=((lw_u64)1<<pgp->ID);//å‘é€æ ‡å¿—ç»„ç½®èµ·
 
-    pgp->Status=GiftPostmanStatus_InDelivery;//¿ìµİÔ±×´Ì¬ÎªÕıÔÚÍ¶µİ
-    pgr->pTail->pNext=NULL;//Î²²¿ÏÂÒ»¸öÎª¿Õ
-    pgr->GiftMax++;//×î´óÊı++
-    pgr->GiftNum++;//ÀñÎïÊıÁ¿++
+    pgp->Status=GiftPostmanStatus_InDelivery;//å¿«é€’å‘˜çŠ¶æ€ä¸ºæ­£åœ¨æŠ•é€’
+    pgr->pTail->pNext=NULL;//å°¾éƒ¨ä¸‹ä¸€ä¸ªä¸ºç©º
+    pgr->GiftMax++;//æœ€å¤§æ•°++
+    pgr->GiftNum++;//ç¤¼ç‰©æ•°é‡++
 
-    return pgr->pHead;//·µ»ØÍ·²¿
+    return pgr->pHead;//è¿”å›å¤´éƒ¨
 #endif // 0
 
     pgr->List.AppendFUN(&(pgr->List), &(pgp->node));
 
-    //Öğ½¥·ÅÆú ²ÉÓÃÄÚ´æ·ÖÅä»úÖÆ´úÌæ
+    //é€æ¸æ”¾å¼ƒ é‡‡ç”¨å†…å­˜åˆ†é…æœºåˆ¶ä»£æ›¿
 #if 0
-    if(pgp->pGT)//ËµÃ÷ÊÇÓĞÖ÷ÓÊµİÔ±
+    if(pgp->pGT)//è¯´æ˜æ˜¯æœ‰ä¸»é‚®é€’å‘˜
     {
-        pgp->pGT->PostmanFlag.all |= ((lw_u64)1 << pgp->PostmanID);//·¢ËÍ±êÖ¾×éÖÃÆğ
-        if(pgp->Status!=GiftPostmanStatus_Free)//Èç¹û¿ìµİÔ± ×´Ì¬Îª×ÔÓÉ ²Å¿ÉÒÔ·ÅÈëµÈ´ıÁ´±í
+        pgp->pGT->PostmanFlag.all |= ((lw_u64)1 << pgp->PostmanID);//å‘é€æ ‡å¿—ç»„ç½®èµ·
+        if(pgp->Status!=GiftPostmanStatus_Free)//å¦‚æœå¿«é€’å‘˜ çŠ¶æ€ä¸ºè‡ªç”± æ‰å¯ä»¥æ”¾å…¥ç­‰å¾…é“¾è¡¨
         {
-            //Èç¹û²»Îª×ÔÓÉ
-            pgr->pGC->pta->pOS->CoreError=OSlwCoreError_GiftStatusError;//½«ÄÚºË´íÎó±êÖ¾ÖÃÆğ
-            return NULL;//·µ»ØNULL
+            //å¦‚æœä¸ä¸ºè‡ªç”±
+            pgr->pGC->pta->pOS->CoreError=OSlwCoreError_GiftStatusError;//å°†å†…æ ¸é”™è¯¯æ ‡å¿—ç½®èµ·
+            return NULL;//è¿”å›NULL
         }
 
     }
 #endif
 
-    pgp->Status = GiftPostmanStatus_InDelivery;//¿ìµİÔ±×´Ì¬ÎªÕıÔÚÍ¶µİ
+    pgp->Status = GiftPostmanStatus_InDelivery;//å¿«é€’å‘˜çŠ¶æ€ä¸ºæ­£åœ¨æŠ•é€’
     return pgp;
 
 }
 
 
 //------------------------------------------
-//<º¯ÊıÃû>OSlwGiftReceiveMoveNext</º¯ÊıÃû>
-//<¹¦ÄÜËµÃ÷>ÀñÎï½ÓÊÕÆ÷ÒÆ¶¯ ÓÃÓÚ do{...}while(..move..)Ñ­»·</¹¦ÄÜËµÃ÷>
-//<ÊäÈëËµÃ÷>pgr:this</ÊäÈëËµÃ÷>
-//<Êä³öËµÃ÷>µ±Ç°Í·²¿</Êä³öËµÃ÷>
+//<å‡½æ•°å>OSlwGiftReceiveMoveNext</å‡½æ•°å>
+//<åŠŸèƒ½è¯´æ˜>ç¤¼ç‰©æ¥æ”¶å™¨ç§»åŠ¨ ç”¨äº do{...}while(..move..)å¾ªç¯</åŠŸèƒ½è¯´æ˜>
+//<è¾“å…¥è¯´æ˜>pgr:this</è¾“å…¥è¯´æ˜>
+//<è¾“å‡ºè¯´æ˜>å½“å‰å¤´éƒ¨</è¾“å‡ºè¯´æ˜>
 //------------------------------------------
 OSlwGiftPostmanSTU * OSlwGiftReceiveMoveNext(OSlwGiftReceiveSTU *pgr)
 {
@@ -134,46 +134,46 @@ OSlwGiftPostmanSTU * OSlwGiftReceiveMoveNext(OSlwGiftReceiveSTU *pgr)
 
     OSLW_assert(!pgr);
 
-    if(pgr->List.NowLen<=1)//Èç¹ûÊıÁ¿ÒÑ¾­Îª0 ²»ÓÃÔÙÒÆ¶¯
+    if(pgr->List.NowLen<=1)//å¦‚æœæ•°é‡å·²ç»ä¸º0 ä¸ç”¨å†ç§»åŠ¨
     {
         return NULL;
     }
 #if 0
-    p=pgr->pHead;//È¡µÃÍ¬²½
-    if(pgr->GiftNum==1)//Èç¹ûÊıÁ¿ÒÑ¾­==1
+    p=pgr->pHead;//å–å¾—åŒæ­¥
+    if(pgr->GiftNum==1)//å¦‚æœæ•°é‡å·²ç»==1
     {
-        pgr->pHead=NULL;//ÊÍ·ÅÍ·²¿
-        pgr->pTail=NULL;//ÊÍ·ÅÎ²²¿
-        q=NULL;//·µ»ØNULL ÒòÎª²ÉÓÃdo {}while() Ñ­»·
+        pgr->pHead=NULL;//é‡Šæ”¾å¤´éƒ¨
+        pgr->pTail=NULL;//é‡Šæ”¾å°¾éƒ¨
+        q=NULL;//è¿”å›NULL å› ä¸ºé‡‡ç”¨do {}while() å¾ªç¯
     }
     else
     {
-        pgr->pHead=p->pNext;//Í·²¿ÏÂÒ»¸ö
-        q=pgr->pHead;//·µ»Øµ±Ç°Í·²¿
+        pgr->pHead=p->pNext;//å¤´éƒ¨ä¸‹ä¸€ä¸ª
+        q=pgr->pHead;//è¿”å›å½“å‰å¤´éƒ¨
     }
-    pgr->GiftNum--;//ÀñÎïÊıÁ¿--
+    pgr->GiftNum--;//ç¤¼ç‰©æ•°é‡--
 
-    if(p->Status == p->Method)//Èç¹ûÖ®Ç°ÈÎÎñ×´Ì¬ Óë Ä£Ê½ÏµÍ³
+    if(p->Status == p->Method)//å¦‚æœä¹‹å‰ä»»åŠ¡çŠ¶æ€ ä¸ æ¨¡å¼ç³»ç»Ÿ
     {
-        p->pGT->PostmanFlag.all &= ~((lw_u64)1<<p->ID);//Çå³ı·¢ËÍ±êÖ¾
-        p->Status=GiftPostmanStatus_Free;//²¢ÇÒ×´Ì¬Îª×ÔÓÉ
+        p->pGT->PostmanFlag.all &= ~((lw_u64)1<<p->ID);//æ¸…é™¤å‘é€æ ‡å¿—
+        p->Status=GiftPostmanStatus_Free;//å¹¶ä¸”çŠ¶æ€ä¸ºè‡ªç”±
 
     }
 #endif // 0
 
 
-    p = (OSlwGiftPostmanSTU *)pgr->List.Head.con.pNext;//È¡µÃ³ıÁËÍ·½áµãµÄµÚÒ»¸ö
+    p = (OSlwGiftPostmanSTU *)pgr->List.Head.con.pNext;//å–å¾—é™¤äº†å¤´ç»“ç‚¹çš„ç¬¬ä¸€ä¸ª
 
     if (!p)
     {
         return NULL;
     }
-    //Öğ½¥·ÅÆú ²ÉÓÃÄÚ´æ·ÖÅä»úÖÆ´úÌæ
+    //é€æ¸æ”¾å¼ƒ é‡‡ç”¨å†…å­˜åˆ†é…æœºåˆ¶ä»£æ›¿
 #if 0
-    if (p->Status == p->Method && (p->pGT))//Èç¹ûÈÎÎñ×´Ì¬ Óë Ä¿±êÄ£Ê½Ò»ÖÂ ÇÒ ÓÊµİÔ±ÓĞÖ÷
+    if (p->Status == p->Method && (p->pGT))//å¦‚æœä»»åŠ¡çŠ¶æ€ ä¸ ç›®æ ‡æ¨¡å¼ä¸€è‡´ ä¸” é‚®é€’å‘˜æœ‰ä¸»
     {
-        p->pGT->PostmanFlag.all &= ~((lw_u64)1 << p->PostmanID);//Çå³ı·¢ËÍ±êÖ¾
-        p->Status = GiftPostmanStatus_Free;//²¢ÇÒ×´Ì¬Îª×ÔÓÉ
+        p->pGT->PostmanFlag.all &= ~((lw_u64)1 << p->PostmanID);//æ¸…é™¤å‘é€æ ‡å¿—
+        p->Status = GiftPostmanStatus_Free;//å¹¶ä¸”çŠ¶æ€ä¸ºè‡ªç”±
 
     }
 #endif
@@ -187,10 +187,10 @@ OSlwGiftPostmanSTU * OSlwGiftReceiveMoveNext(OSlwGiftReceiveSTU *pgr)
 
 
 //------------------------------------------
-//<º¯ÊıÃû>OSlwGiftReceiveSlipNext</º¯ÊıÃû>
-//<¹¦ÄÜËµÃ÷>ÀñÎï½ÓÊÕÆ÷ÒÆ¶¯ ÓÃÓÚ do{...}while(..slip(,&pgp)..)Ñ­»·</¹¦ÄÜËµÃ÷>
-//<ÊäÈëËµÃ÷>pgr:this,ppGP:Ö¸ÏòÖ¸ÕëµÄÖ¸Õë</ÊäÈëËµÃ÷>
-//<Êä³öËµÃ÷>ĞŞ¸ÄÖ®ºóµÄÖ¸ÕëÖµ</Êä³öËµÃ÷>
+//<å‡½æ•°å>OSlwGiftReceiveSlipNext</å‡½æ•°å>
+//<åŠŸèƒ½è¯´æ˜>ç¤¼ç‰©æ¥æ”¶å™¨ç§»åŠ¨ ç”¨äº do{...}while(..slip(,&pgp)..)å¾ªç¯</åŠŸèƒ½è¯´æ˜>
+//<è¾“å…¥è¯´æ˜>pgr:this,ppGP:æŒ‡å‘æŒ‡é’ˆçš„æŒ‡é’ˆ</è¾“å…¥è¯´æ˜>
+//<è¾“å‡ºè¯´æ˜>ä¿®æ”¹ä¹‹åçš„æŒ‡é’ˆå€¼</è¾“å‡ºè¯´æ˜>
 //------------------------------------------
 OSlwGiftPostmanSTU * OSlwGiftReceiveSlipNext(OSlwGiftReceiveSTU *pgr,OSlwGiftPostmanSTU **ppGP)
 {
@@ -202,7 +202,7 @@ OSlwGiftPostmanSTU * OSlwGiftReceiveSlipNext(OSlwGiftReceiveSTU *pgr,OSlwGiftPos
 
     p=(OSlwGiftPostmanSTU *)((*ppGP)->node.con.pNext);
 
-    /*(Ver.=0.96)
+    /*(Ver.=0.97)
     if(_OSlwToolDListRemoveNode(&(pgr->List),(OSlwToolDListNodeSTU *)(*ppGP)))
     {
     	return NULL;
@@ -215,7 +215,7 @@ OSlwGiftPostmanSTU * OSlwGiftReceiveSlipNext(OSlwGiftReceiveSTU *pgr,OSlwGiftPos
     {
         _OSlwToolDListRemoveNode(&(pgr->List),(OSlwToolDListNodeSTU *)(*ppGP));
 
-        if(!((*ppGP)->pmem->Free((*ppGP)->pmem,(*ppGP))))//Èç¹ûÊÍ·ÅÊ§°Ü
+        if(!((*ppGP)->pmem->Free((*ppGP)->pmem,(*ppGP))))//å¦‚æœé‡Šæ”¾å¤±è´¥
         {
 
             (*ppGP)=p;
@@ -230,10 +230,10 @@ OSlwGiftPostmanSTU * OSlwGiftReceiveSlipNext(OSlwGiftReceiveSTU *pgr,OSlwGiftPos
 
 
 //------------------------------------------
-//<º¯ÊıÃû>OSlwGiftReceiveForeah</º¯ÊıÃû>
-//<¹¦ÄÜËµÃ÷>±éÀúÀñÎï/¹¦ÄÜËµÃ÷>
-//<ÊäÈëËµÃ÷>pgr:this,ppGP:Ö¸ÏòÖ¸ÕëµÄÖ¸Õë</ÊäÈëËµÃ÷>
-//<Êä³öËµÃ÷>ÏÂÒ»¸öÀñÎï</Êä³öËµÃ÷>
+//<å‡½æ•°å>OSlwGiftReceiveForeah</å‡½æ•°å>
+//<åŠŸèƒ½è¯´æ˜>éå†ç¤¼ç‰©/åŠŸèƒ½è¯´æ˜>
+//<è¾“å…¥è¯´æ˜>pgr:this,ppGP:æŒ‡å‘æŒ‡é’ˆçš„æŒ‡é’ˆ</è¾“å…¥è¯´æ˜>
+//<è¾“å‡ºè¯´æ˜>ä¸‹ä¸€ä¸ªç¤¼ç‰©</è¾“å‡ºè¯´æ˜>
 //------------------------------------------
 OSlwGiftPostmanSTU * OSlwGiftReceiveForeah(OSlwGiftReceiveSTU *pgr,OSlwGiftPostmanSTU **ppGP)
 {
@@ -251,7 +251,7 @@ OSlwGiftPostmanSTU * OSlwGiftReceiveForeah(OSlwGiftReceiveSTU *pgr,OSlwGiftPostm
 			{
 					_OSlwToolDListRemoveNode(&(pgr->List),(OSlwToolDListNodeSTU *)(*ppGP));
 
-					if(!((*ppGP)->pmem->Free((*ppGP)->pmem,(*ppGP))))//Èç¹ûÊÍ·ÅÊ§°Ü
+					if(!((*ppGP)->pmem->Free((*ppGP)->pmem,(*ppGP))))//å¦‚æœé‡Šæ”¾å¤±è´¥
 					{
 
 							(*ppGP)=p;
@@ -265,13 +265,13 @@ OSlwGiftPostmanSTU * OSlwGiftReceiveForeah(OSlwGiftReceiveSTU *pgr,OSlwGiftPostm
     return *ppGP;
 }
 
-//Öğ½¥·ÅÆú ²ÉÓÃÄÚ´æ·ÖÅä»úÖÆ´úÌæ
+//é€æ¸æ”¾å¼ƒ é‡‡ç”¨å†…å­˜åˆ†é…æœºåˆ¶ä»£æ›¿
 #if 0
 //------------------------------------------
-//<º¯ÊıÃû>OSlwGiftTransmitIdleIndex</º¯ÊıÃû>
-//<¹¦ÄÜËµÃ÷>µÃµ½¿ÕÏĞÓÊµİÔ±º¯Êı</¹¦ÄÜËµÃ÷>
-//<ÊäÈëËµÃ÷>pgt:this</ÊäÈëËµÃ÷>
-//<Êä³öËµÃ÷>¿ÕÏĞÓÊµİÔ±µÄID Èç¹û·µ»Ø-1±íÊ¾Ã»ÓĞ¿ÕÏĞ</Êä³öËµÃ÷>
+//<å‡½æ•°å>OSlwGiftTransmitIdleIndex</å‡½æ•°å>
+//<åŠŸèƒ½è¯´æ˜>å¾—åˆ°ç©ºé—²é‚®é€’å‘˜å‡½æ•°</åŠŸèƒ½è¯´æ˜>
+//<è¾“å…¥è¯´æ˜>pgt:this</è¾“å…¥è¯´æ˜>
+//<è¾“å‡ºè¯´æ˜>ç©ºé—²é‚®é€’å‘˜çš„ID å¦‚æœè¿”å›-1è¡¨ç¤ºæ²¡æœ‰ç©ºé—²</è¾“å‡ºè¯´æ˜>
 //------------------------------------------
 OSlwGiftPostmanSTU * OSlwGiftTransmitIdle(OSlwGiftTransmitSTU *pgt)
 {
@@ -280,7 +280,7 @@ OSlwGiftPostmanSTU * OSlwGiftTransmitIdle(OSlwGiftTransmitSTU *pgt)
 
     lw_8 n=0;
 
-    while(((1<<n)&sta) && n<OSLW_GIFT_POSTMAN_MAX) n++;//Ñ­»·ÅĞ¶ÏÓÊµİÔ± Èç¹ûÅĞ¶ÏÊıÁ¿³¬¹ı »òÕßÕÒµ½ÁË ¾ÍÍ£Ö¹Ñ­»·
+    while(((1<<n)&sta) && n<OSLW_GIFT_POSTMAN_MAX) n++;//å¾ªç¯åˆ¤æ–­é‚®é€’å‘˜ å¦‚æœåˆ¤æ–­æ•°é‡è¶…è¿‡ æˆ–è€…æ‰¾åˆ°äº† å°±åœæ­¢å¾ªç¯
 
     return n<OSLW_GIFT_POSTMAN_MAX? (pgt->PostmanList+n):NULL;
 
@@ -289,10 +289,10 @@ OSlwGiftPostmanSTU * OSlwGiftTransmitIdle(OSlwGiftTransmitSTU *pgt)
 
 
 //------------------------------------------
-//<º¯ÊıÃû>OSlwGiftAllocPostman</º¯ÊıÃû>
-//<¹¦ÄÜËµÃ÷>ÉêÇë¿ÕÏĞÓÊµİÔ±</¹¦ÄÜËµÃ÷>
-//<ÊäÈëËµÃ÷>pmem:ÄÚ´æ·ÖÅäº¯Êı</ÊäÈëËµÃ÷>
-//<Êä³öËµÃ÷>NUL±íÊ¾Ã»ÓĞ</Êä³öËµÃ÷>
+//<å‡½æ•°å>OSlwGiftAllocPostman</å‡½æ•°å>
+//<åŠŸèƒ½è¯´æ˜>ç”³è¯·ç©ºé—²é‚®é€’å‘˜</åŠŸèƒ½è¯´æ˜>
+//<è¾“å…¥è¯´æ˜>pmem:å†…å­˜åˆ†é…å‡½æ•°</è¾“å…¥è¯´æ˜>
+//<è¾“å‡ºè¯´æ˜>NULè¡¨ç¤ºæ²¡æœ‰</è¾“å‡ºè¯´æ˜>
 //------------------------------------------
 OSlwGiftPostmanSTU * OSlwGiftAllocPostman(OSlwMemoryBasicSTU *pmem)
 {
@@ -332,7 +332,7 @@ void * OSlwGiftReceiveMoveNext(OSlwToolDListNodeConnectSTU *pgr)
 	p=pgr->pNext;
 	pmem=(OSlwMemoryBasicSTU *)(p->pLast);
 	
-	if(pgr->pLast == pgr->pNext)//Ö»ÒªÒ»¸öÏûÏ¢
+	if(pgr->pLast == pgr->pNext)//åªè¦ä¸€ä¸ªæ¶ˆæ¯
 	{
 		
 		pgr->pLast=NULL;

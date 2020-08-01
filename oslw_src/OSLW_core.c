@@ -1,4 +1,4 @@
-/*(Ver.=0.96)
+ï»¿/*(Ver.=0.97)
  * OSLW_core.c
  *
  *  Created on: 2017-7-14
@@ -12,10 +12,10 @@
 
 
 //------------------------------------------
-//<º¯ÊıÃû>OSlwTaskDispatch</º¯ÊıÃû>
-//<¹¦ÄÜËµÃ÷>ÈÎÎñµ÷¶ÈÆ÷ ²Ù×÷ÏµÍ³ºËĞÄ</¹¦ÄÜËµÃ÷>
-//<ÊäÈëËµÃ÷>pOS:this</ÊäÈëËµÃ÷>
-//<Êä³öËµÃ÷>void</Êä³öËµÃ÷>
+//<å‡½æ•°å>OSlwTaskDispatch</å‡½æ•°å>
+//<åŠŸèƒ½è¯´æ˜>ä»»åŠ¡è°ƒåº¦å™¨ æ“ä½œç³»ç»Ÿæ ¸å¿ƒ</åŠŸèƒ½è¯´æ˜>
+//<è¾“å…¥è¯´æ˜>pOS:this</è¾“å…¥è¯´æ˜>
+//<è¾“å‡ºè¯´æ˜>void</è¾“å‡ºè¯´æ˜>
 //------------------------------------------
 void OSlwTaskDispatch(OSlwCoreSTU *_pOS)
 {
@@ -24,44 +24,44 @@ void OSlwTaskDispatch(OSlwCoreSTU *_pOS)
 
     pOS = _pOS;
 
-    if(!(pOS->DispatchEable))//ÅĞ¶Ïµ÷¶ÈÆ÷ÊÇ·ñÉÏËø
+    if(!(pOS->DispatchEable))//åˆ¤æ–­è°ƒåº¦å™¨æ˜¯å¦ä¸Šé”
     {
-        while(pOS->pCurrentTask->TaskStatus != OSlwTaskStatus_Ready);//Ö±½ÓµÈ´ıÈÎÎñ½øÈë×¼±¸×´Ì¬
+        while(pOS->pCurrentTask->TaskStatus != OSlwTaskStatus_Ready);//ç›´æ¥ç­‰å¾…ä»»åŠ¡è¿›å…¥å‡†å¤‡çŠ¶æ€
 
         return ;
     }
 		
-    if(pOS->InitialFlagGroup.all)//ÅĞ¶Ï³õÊ¼»¯±êÖ¾×éÊÇ·ñÎª0
-    {   //Èç¹û²»Îª0 ËµÃ÷»¹ÓĞÉĞÎ´³õÊ¼»¯µÄÈÎÎñ
+    if(pOS->InitialFlagGroup.all)//åˆ¤æ–­åˆå§‹åŒ–æ ‡å¿—ç»„æ˜¯å¦ä¸º0
+    {   //å¦‚æœä¸ä¸º0 è¯´æ˜è¿˜æœ‰å°šæœªåˆå§‹åŒ–çš„ä»»åŠ¡
         for(pOS->n1_Dispatch=0; 
 			pOS->n1_Dispatch<pOS->TaskRunningNum
 #if OSLW_SIMPLE_MODE
 			-1
 #endif			
-			; pOS->n1_Dispatch++) //Ñ­»·²éÕÒÎ´³õÊ¼»¯µÄÈÎÎñ  //---------¿ÉÒÔ²ÉÓÃËã·¨ÓÅ»¯--------//
+			; pOS->n1_Dispatch++) //å¾ªç¯æŸ¥æ‰¾æœªåˆå§‹åŒ–çš„ä»»åŠ¡  //---------å¯ä»¥é‡‡ç”¨ç®—æ³•ä¼˜åŒ–--------//
         {
             pOS->Temp=pOS->TaskRunningList[pOS->n1_Dispatch];
-            if((pOS->InitialFlagGroup.all & ((lw_u64)1<<(pOS->Temp))) && //Èç¹û³õÊ¼»¯±êÖ¾×éµÄÄ³Ò»Î»Îª1
-                    (pOS->pTaskList[pOS->Temp]))//ÇÒÕâ¸öÈÎÎñÒÑ¾­×¢²áÁË
+            if((pOS->InitialFlagGroup.all & ((lw_u64)1<<(pOS->Temp))) && //å¦‚æœåˆå§‹åŒ–æ ‡å¿—ç»„çš„æŸä¸€ä½ä¸º1
+                    (pOS->pTaskList[pOS->Temp]))//ä¸”è¿™ä¸ªä»»åŠ¡å·²ç»æ³¨å†Œäº†
             {
                 pOS->pCurrentTask=pOS->pTaskList[pOS->Temp];
 #if !OSLW_SIMPLE_MODE
-                if(!_OSLW_SAVE(pOS->DispatchBreakPoint))//µÈ´ıÈÎÎñÌø»ØÀ´
+                if(!_OSLW_SAVE(pOS->DispatchBreakPoint))//ç­‰å¾…ä»»åŠ¡è·³å›æ¥
                 {
-                    if(pOS->pCurrentTask->TaskFun)//Ìø×ªÖ®Ç°ÏÈÅĞ¶Ïº¯ÊıÖ¸ÕëÊÇ·ñÎª0
+                    if(pOS->pCurrentTask->TaskFun)//è·³è½¬ä¹‹å‰å…ˆåˆ¤æ–­å‡½æ•°æŒ‡é’ˆæ˜¯å¦ä¸º0
                     {
                         pOS->pCurrentTask->TaskFun(pOS->pCurrentTask);
                     }//end if
 
                 }//end if
 #else
-								if(pOS->pCurrentTask->TaskFun)//Ìø×ªÖ®Ç°ÏÈÅĞ¶Ïº¯ÊıÖ¸ÕëÊÇ·ñÎª0
+								if(pOS->pCurrentTask->TaskFun)//è·³è½¬ä¹‹å‰å…ˆåˆ¤æ–­å‡½æ•°æŒ‡é’ˆæ˜¯å¦ä¸º0
 								{
 										pOS->pCurrentTask->TaskFun(pOS->pCurrentTask);
 								}//end if								
 #endif
 								
-                pOS->InitialFlagGroup.all&=(~((lw_u64)1<<(pOS->Temp)));//Çå³ı³õÊ¼»¯±êÖ¾Î»
+                pOS->InitialFlagGroup.all&=(~((lw_u64)1<<(pOS->Temp)));//æ¸…é™¤åˆå§‹åŒ–æ ‡å¿—ä½
                 pOS->ReadyFlagGroup.all|=((lw_u64)1<<(pOS->Temp));
 								
 #if	!OSLW_SIMPLE_MODE															
@@ -76,32 +76,34 @@ void OSlwTaskDispatch(OSlwCoreSTU *_pOS)
 	do{	
 #endif	//(OSLW_SIMPLE_MODE)		
     pOS->_flag_BK = pOS->ReadyFlagGroup.all & (~((lw_u64)1 << (OSLW_TASK_NUM_MAX - 1)));
-    if(pOS->_flag_BK)//ÆÁ±Î×îµÍÓÅÏÈ¼¶--¿ÕÏĞÈÎÎñ ²é¿´ÈÎÎñÊÇ·ñ×¼±¸Íê±Ï
+    if(pOS->_flag_BK)//å±è”½æœ€ä½ä¼˜å…ˆçº§--ç©ºé—²ä»»åŠ¡ æŸ¥çœ‹ä»»åŠ¡æ˜¯å¦å‡†å¤‡å®Œæ¯•
     {
         pOS->_ReadyTaskIndex = 0;
-        if (pOS->TaskRunningNum > __OSLW_LOG2_TASK_NUM  )//Èç¹ûÈÎÎñÊıÁ¿±È½Ï¶à ËµÃ÷¶ş·Ö·¨ËÑË÷Ê±¼ä¸´ÔÓ¶È½ÏµÍ
-        {
 
-            //¶ş·Ö·¨
-            for (pOS->n2_Dispatch = 0; pOS->n2_Dispatch < __OSLW_LOG2_TASK_NUM - 2; pOS->n2_Dispatch++)//¶ş·Ö·¨ÕÛ°ëµ½4 Ö±½Óswitch case
+#if 0
+		/*é‡‡ç”¨æ›´ä¸ºç®€å•çš„æ–¹æ³•*/
+        if (pOS->TaskRunningNum > __OSLW_LOG2_TASK_NUM  )//å¦‚æœä»»åŠ¡æ•°é‡æ¯”è¾ƒå¤š è¯´æ˜äºŒåˆ†æ³•æœç´¢æ—¶é—´å¤æ‚åº¦è¾ƒä½
+        {
+            //äºŒåˆ†æ³•
+            for (pOS->n2_Dispatch = 0; pOS->n2_Dispatch < __OSLW_LOG2_TASK_NUM - 2; pOS->n2_Dispatch++)//äºŒåˆ†æ³•æŠ˜åŠåˆ°4 ç›´æ¥switch case
             {
-                /*(Ver.=0.96)
-                	TASK_NUM == 8 ÎªÀı
+                /*(Ver.=0.97)
+                	TASK_NUM == 8 ä¸ºä¾‹
                 	ReadyFlagGroup=0b10010010
-                	ReadyFlagGroup & 0b00001111 Ïàµ±ÓÚÈ¡³öµÍ4Î»
-                	ÅĞ¶ÏµÍËÄÎ»ÊÇ·ñÎª0
-                	Èç¹ûµÍËÄÎ» ²»Îª0 ËµÃ÷ µÍËÄÎ»ÓĞ±»ÖÃÆğµÄÊı¾İ
-                	·´Ö® ±»ÖÃÆğµÄÎ»ÔÚ¸ß4
+                	ReadyFlagGroup & 0b00001111 ç›¸å½“äºå–å‡ºä½4ä½
+                	åˆ¤æ–­ä½å››ä½æ˜¯å¦ä¸º0
+                	å¦‚æœä½å››ä½ ä¸ä¸º0 è¯´æ˜ ä½å››ä½æœ‰è¢«ç½®èµ·çš„æ•°æ®
+                	åä¹‹ è¢«ç½®èµ·çš„ä½åœ¨é«˜4
 
                 */
                 if (pOS->_flag_BK & pOS->_mask_list[pOS->n2_Dispatch])
                 {
-                    //Èç¹û²»Îª0
-                    pOS->_flag_BK &= pOS->_mask_list[pOS->n2_Dispatch];//ÆÁ±Î¸ßÎ»
+                    //å¦‚æœä¸ä¸º0
+                    pOS->_flag_BK &= pOS->_mask_list[pOS->n2_Dispatch];//å±è”½é«˜ä½
                 }
                 else
                 {
-                    pOS->_flag_BK = (pOS->_flag_BK >> pOS->_move_reg[pOS->n2_Dispatch]) & pOS->_mask_list[pOS->n2_Dispatch];//µÃµ½¸ßÎ»
+                    pOS->_flag_BK = (pOS->_flag_BK >> pOS->_move_reg[pOS->n2_Dispatch]) & pOS->_mask_list[pOS->n2_Dispatch];//å¾—åˆ°é«˜ä½
                     pOS->_ReadyTaskIndex += pOS->_move_reg[pOS->n2_Dispatch];
                 }
 
@@ -133,58 +135,203 @@ void OSlwTaskDispatch(OSlwCoreSTU *_pOS)
                     pOS->_ReadyTaskIndex += 1;
                     break;
 
-                default://Ä©Î²ÊÇ1
+                default://æœ«å°¾æ˜¯1
                     break;
                 }
             }
             else
             {
-                OSLW_assert(1);//²»Ó¦¸Ã>=16
+                OSLW_assert(1);//ä¸åº”è¯¥>=16
             }
         }// end if (pOS->TaskRunningNum >= __OSLW_LOG2_TASK_NUM - 1 )
         else
         {
-            for (pOS->n2_Dispatch = 0; pOS->n2_Dispatch<pOS->TaskRunningNum; pOS->n2_Dispatch++) //Ñ­»·²éÕÒ¾ÍĞ÷µÄÈÎÎñ  //---------²ÉÓÃËã·¨ÓÅ»¯--------//
+            for (pOS->n2_Dispatch = 0; pOS->n2_Dispatch<pOS->TaskRunningNum; pOS->n2_Dispatch++) //å¾ªç¯æŸ¥æ‰¾å°±ç»ªçš„ä»»åŠ¡  //---------é‡‡ç”¨ç®—æ³•ä¼˜åŒ–--------//
             {
                 pOS->_ReadyTaskIndex = pOS->TaskRunningList[pOS->n2_Dispatch];
-                if (pOS->ReadyFlagGroup.all & ((lw_u64)1 << (pOS->_ReadyTaskIndex))) //Èç¹û¾ÍĞ÷±êÖ¾×éµÄÄ³Ò»Î»Îª1
+                if (pOS->ReadyFlagGroup.all & ((lw_u64)1 << (pOS->_ReadyTaskIndex))) //å¦‚æœå°±ç»ªæ ‡å¿—ç»„çš„æŸä¸€ä½ä¸º1
                 {
                     break;
                 }//end if
             }//end for
         }//end else
-				
+#endif	
+		//pOS->_flag_BK = (pOS->_flag_BK) & (-(pOS->_flag_BK));
+#if OSLW_TASK_NUM_MAX<=8
+		pOS->_flag_BK = (pOS->_flag_BK) & ((lw_u8)(-((lw_8)pOS->_flag_BK)));
+		switch(pOS->_flag_BK)
+		{
+			case 0x1:pOS->_ReadyTaskIndex = 0;break;
+			case 0x2:pOS->_ReadyTaskIndex = 1;break;
+			case 0x4:pOS->_ReadyTaskIndex = 2;break;
+			case 0x8:pOS->_ReadyTaskIndex = 3;break;
+			case 0x10:pOS->_ReadyTaskIndex = 4;break;
+			case 0x20:pOS->_ReadyTaskIndex = 5;break;
+			case 0x40:pOS->_ReadyTaskIndex = 6;break;
+			case 0x80:pOS->_ReadyTaskIndex = 7;break;
+			default:OSLW_assert(1);break;
+		}
+#elif OSLW_TASK_NUM_MAX>8 && OSLW_TASK_NUM_MAX<=16
+		pOS->_flag_BK = (pOS->_flag_BK) & ((lw_u16)(-((lw_16)pOS->_flag_BK)));
+		switch (pOS->_flag_BK)
+		{
+			case 0x1:pOS->_ReadyTaskIndex = 0;break;
+			case 0x2:pOS->_ReadyTaskIndex = 1;break;
+			case 0x4:pOS->_ReadyTaskIndex = 2;break;
+			case 0x8:pOS->_ReadyTaskIndex = 3;break;
+			case 0x10:pOS->_ReadyTaskIndex = 4;break;
+			case 0x20:pOS->_ReadyTaskIndex = 5;break;
+			case 0x40:pOS->_ReadyTaskIndex = 6;break;
+			case 0x80:pOS->_ReadyTaskIndex = 7;break;
+			case 0x100:pOS->_ReadyTaskIndex = 8;break;
+			case 0x200:pOS->_ReadyTaskIndex = 9;break;
+			case 0x400:pOS->_ReadyTaskIndex = 10;break;
+			case 0x800:pOS->_ReadyTaskIndex = 11;break;
+			case 0x1000:pOS->_ReadyTaskIndex = 12;break;
+			case 0x2000:pOS->_ReadyTaskIndex = 13;break;
+			case 0x4000:pOS->_ReadyTaskIndex = 14;break;
+			case 0x8000:pOS->_ReadyTaskIndex = 15;break;
+			default:OSLW_assert(1);break;
+		}
+#elif OSLW_TASK_NUM_MAX>16 && OSLW_TASK_NUM_MAX<=32
+		pOS->_flag_BK = (pOS->_flag_BK) & ((lw_u32)(-((lw_32)pOS->_flag_BK)));
+		switch (pOS->_flag_BK)
+		{
+			case 0x1:pOS->_ReadyTaskIndex = 0;break;
+			case 0x2:pOS->_ReadyTaskIndex = 1;break;
+			case 0x4:pOS->_ReadyTaskIndex = 2;break;
+			case 0x8:pOS->_ReadyTaskIndex = 3;break;
+			case 0x10:pOS->_ReadyTaskIndex = 4;break;
+			case 0x20:pOS->_ReadyTaskIndex = 5;break;
+			case 0x40:pOS->_ReadyTaskIndex = 6;break;
+			case 0x80:pOS->_ReadyTaskIndex = 7;break;
+			case 0x100:pOS->_ReadyTaskIndex = 8;break;
+			case 0x200:pOS->_ReadyTaskIndex = 9;break;
+			case 0x400:pOS->_ReadyTaskIndex = 10;break;
+			case 0x800:pOS->_ReadyTaskIndex = 11;break;
+			case 0x1000:pOS->_ReadyTaskIndex = 12;break;
+			case 0x2000:pOS->_ReadyTaskIndex = 13;break;
+			case 0x4000:pOS->_ReadyTaskIndex = 14;break;
+			case 0x8000:pOS->_ReadyTaskIndex = 15;break;
+			case 0x10000:pOS->_ReadyTaskIndex = 16;break;
+			case 0x20000:pOS->_ReadyTaskIndex = 17;break;
+			case 0x40000:pOS->_ReadyTaskIndex = 18;break;
+			case 0x80000:pOS->_ReadyTaskIndex = 19;break;
+			case 0x100000:pOS->_ReadyTaskIndex = 20;break;
+			case 0x200000:pOS->_ReadyTaskIndex = 21;break;
+			case 0x400000:pOS->_ReadyTaskIndex = 22;break;
+			case 0x800000:pOS->_ReadyTaskIndex = 23;break;
+			case 0x1000000:pOS->_ReadyTaskIndex = 24;break;
+			case 0x2000000:pOS->_ReadyTaskIndex = 25;break;
+			case 0x4000000:pOS->_ReadyTaskIndex = 26;break;
+			case 0x8000000:pOS->_ReadyTaskIndex = 27;break;
+			case 0x10000000:pOS->_ReadyTaskIndex = 28;break;
+			case 0x20000000:pOS->_ReadyTaskIndex = 29;break;
+			case 0x40000000:pOS->_ReadyTaskIndex = 30;break;
+			case 0x80000000:pOS->_ReadyTaskIndex = 31;break;
+			default:OSLW_assert(1);break;
+		}
+
+#elif OSLW_TASK_NUM_MAX>32 && OSLW_TASK_NUM_MAX<=64
+		pOS->_flag_BK = (pOS->_flag_BK) & ((lw_u64)(-((lw_64)pOS->_flag_BK)));
+		switch (pOS->_flag_BK)
+		{
+			case 0x1:pOS->_ReadyTaskIndex = 0;break;
+			case 0x2:pOS->_ReadyTaskIndex = 1;break;
+			case 0x4:pOS->_ReadyTaskIndex = 2;break;
+			case 0x8:pOS->_ReadyTaskIndex = 3;break;
+			case 0x10:pOS->_ReadyTaskIndex = 4;break;
+			case 0x20:pOS->_ReadyTaskIndex = 5;break;
+			case 0x40:pOS->_ReadyTaskIndex = 6;break;
+			case 0x80:pOS->_ReadyTaskIndex = 7;break;
+			case 0x100:pOS->_ReadyTaskIndex = 8;break;
+			case 0x200:pOS->_ReadyTaskIndex = 9;break;
+			case 0x400:pOS->_ReadyTaskIndex = 10;break;
+			case 0x800:pOS->_ReadyTaskIndex = 11;break;
+			case 0x1000:pOS->_ReadyTaskIndex = 12;break;
+			case 0x2000:pOS->_ReadyTaskIndex = 13;break;
+			case 0x4000:pOS->_ReadyTaskIndex = 14;break;
+			case 0x8000:pOS->_ReadyTaskIndex = 15;break;
+			case 0x10000:pOS->_ReadyTaskIndex = 16;break;
+			case 0x20000:pOS->_ReadyTaskIndex = 17;break;
+			case 0x40000:pOS->_ReadyTaskIndex = 18;break;
+			case 0x80000:pOS->_ReadyTaskIndex = 19;break;
+			case 0x100000:pOS->_ReadyTaskIndex = 20;break;
+			case 0x200000:pOS->_ReadyTaskIndex = 21;break;
+			case 0x400000:pOS->_ReadyTaskIndex = 22;break;
+			case 0x800000:pOS->_ReadyTaskIndex = 23;break;
+			case 0x1000000:pOS->_ReadyTaskIndex = 24;break;
+			case 0x2000000:pOS->_ReadyTaskIndex = 25;break;
+			case 0x4000000:pOS->_ReadyTaskIndex = 26;break;
+			case 0x8000000:pOS->_ReadyTaskIndex = 27;break;
+			case 0x10000000:pOS->_ReadyTaskIndex = 28;break;
+			case 0x20000000:pOS->_ReadyTaskIndex = 29;break;
+			case 0x40000000:pOS->_ReadyTaskIndex = 30;break;
+			case 0x80000000:pOS->_ReadyTaskIndex = 31;break;
+			case 0x100000000:pOS->_ReadyTaskIndex = 32;break;
+			case 0x200000000:pOS->_ReadyTaskIndex = 33;break;
+			case 0x400000000:pOS->_ReadyTaskIndex = 34;break;
+			case 0x800000000:pOS->_ReadyTaskIndex = 35;break;
+			case 0x1000000000:pOS->_ReadyTaskIndex = 36;break;
+			case 0x2000000000:pOS->_ReadyTaskIndex = 37;break;
+			case 0x4000000000:pOS->_ReadyTaskIndex = 38;break;
+			case 0x8000000000:pOS->_ReadyTaskIndex = 39;break;
+			case 0x10000000000:pOS->_ReadyTaskIndex = 40;break;
+			case 0x20000000000:pOS->_ReadyTaskIndex = 41;break;
+			case 0x40000000000:pOS->_ReadyTaskIndex = 42;break;
+			case 0x80000000000:pOS->_ReadyTaskIndex = 43;break;
+			case 0x100000000000:pOS->_ReadyTaskIndex = 44;break;
+			case 0x200000000000:pOS->_ReadyTaskIndex = 45;break;
+			case 0x400000000000:pOS->_ReadyTaskIndex = 46;break;
+			case 0x800000000000:pOS->_ReadyTaskIndex = 47;break;
+			case 0x1000000000000:pOS->_ReadyTaskIndex = 48;break;
+			case 0x2000000000000:pOS->_ReadyTaskIndex = 49;break;
+			case 0x4000000000000:pOS->_ReadyTaskIndex = 50;break;
+			case 0x8000000000000:pOS->_ReadyTaskIndex = 51;break;
+			case 0x10000000000000:pOS->_ReadyTaskIndex = 52;break;
+			case 0x20000000000000:pOS->_ReadyTaskIndex = 53;break;
+			case 0x40000000000000:pOS->_ReadyTaskIndex = 54;break;
+			case 0x80000000000000:pOS->_ReadyTaskIndex = 55;break;
+			case 0x100000000000000:pOS->_ReadyTaskIndex = 56;break;
+			case 0x200000000000000:pOS->_ReadyTaskIndex = 57;break;
+			case 0x400000000000000:pOS->_ReadyTaskIndex = 58;break;
+			case 0x800000000000000:pOS->_ReadyTaskIndex = 59;break;
+			case 0x1000000000000000:pOS->_ReadyTaskIndex = 60;break;
+			case 0x2000000000000000:pOS->_ReadyTaskIndex = 61;break;
+			case 0x4000000000000000:pOS->_ReadyTaskIndex = 62;break;
+			case 0x8000000000000000:pOS->_ReadyTaskIndex = 63;break;
+			default:OSLW_assert(1);break;
+		}
+#endif
+
 				
 #if	!OSLW_SIMPLE_MODE							
         pOS->LastTaskIndex = pOS->CurrentTaskIndex;
-        pOS->pLastTask = pOS->pCurrentTask;//¼ÇÂ¼ÉÏÒ»´ÎÈÎÎñ
+        pOS->pLastTask = pOS->pCurrentTask;//è®°å½•ä¸Šä¸€æ¬¡ä»»åŠ¡
 #endif
 				
 				
         pOS->CurrentTaskIndex = pOS->_ReadyTaskIndex;
-        pOS->pCurrentTask = pOS->pTaskList[pOS->CurrentTaskIndex];//¸üĞÂ±¾´ÎÈÎÎñ
-        //pOS->pCurrentTask->TaskStatus=OSlwTaskStatus_Running;//¸ü¸ÄÈÎÎñ×´Ì¬
+        pOS->pCurrentTask = pOS->pTaskList[pOS->CurrentTaskIndex];//æ›´æ–°æœ¬æ¬¡ä»»åŠ¡
+        //pOS->pCurrentTask->TaskStatus=OSlwTaskStatus_Running;//æ›´æ”¹ä»»åŠ¡çŠ¶æ€
 				
-        _OSLW_LOAD(pOS->pCurrentTask->BreakPoint[OSLW_TASK_BREAKPOINT_DEEP - 1], pOS->LastTaskIndex,pOS->pCurrentTask);//ÈÎÎñÌø×ª
+        _OSLW_LOAD(pOS->pCurrentTask->BreakPoint[OSLW_TASK_BREAKPOINT_DEEP - 1], pOS->LastTaskIndex,pOS->pCurrentTask);//ä»»åŠ¡è·³è½¬
 
     }//end if
-    else//ËµÃ÷µ±Ç°Ã»ÓĞÈÎÎñ×¼±¸¾ÍĞ÷ Ö´ĞĞ¿ÕÏĞÈÎÎñ
+    else//è¯´æ˜å½“å‰æ²¡æœ‰ä»»åŠ¡å‡†å¤‡å°±ç»ª æ‰§è¡Œç©ºé—²ä»»åŠ¡
     {
         
 #if (OSLW_SIMPLE_MODE)			
 				pOS->pCurrentTask=pOS->pTaskList[OSLW_TASK_NUM_MAX-1];
 				break;
 #else
-			  pOS->pLastTask=pOS->pCurrentTask;
+		pOS->pLastTask=pOS->pCurrentTask;
         pOS->LastTaskIndex=pOS->CurrentTaskIndex;
         pOS->pCurrentTask=pOS->pTaskList[OSLW_TASK_NUM_MAX-1];
         _OSLW_LOAD(pOS->pCurrentTask->BreakPoint[OSLW_TASK_BREAKPOINT_DEEP-1],pOS->LastTaskIndex,pOS->pCurrentTask);
 #endif//(OSLW_SIMPLE_MODE)	
     }
 
-		
-		
-		
 		
 #if (OSLW_SIMPLE_MODE)
 	}while(1);
@@ -194,10 +341,10 @@ void OSlwTaskDispatch(OSlwCoreSTU *_pOS)
 }
 
 //------------------------------------------
-//<º¯ÊıÃû>OSlwClockCallBack</º¯ÊıÃû>
-//<¹¦ÄÜËµÃ÷>²Ù×÷ÏµÍ³Ê±ÖÓ½ÚÅÄ»Øµô ´Ëº¯ÊıÇë·ÅÈë¶¨Ê±Æ÷ÖĞ¶Ï!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!</¹¦ÄÜËµÃ÷>
-//<ÊäÈëËµÃ÷>pOS:this</ÊäÈëËµÃ÷>
-//<Êä³öËµÃ÷>void</Êä³öËµÃ÷>
+//<å‡½æ•°å>OSlwClockCallBack</å‡½æ•°å>
+//<åŠŸèƒ½è¯´æ˜>æ“ä½œç³»ç»Ÿæ—¶é’ŸèŠ‚æ‹å›æ‰ æ­¤å‡½æ•°è¯·æ”¾å…¥å®šæ—¶å™¨ä¸­æ–­!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!</åŠŸèƒ½è¯´æ˜>
+//<è¾“å…¥è¯´æ˜>pOS:this</è¾“å…¥è¯´æ˜>
+//<è¾“å‡ºè¯´æ˜>void</è¾“å‡ºè¯´æ˜>
 //------------------------------------------
 void OSlwClockCallBack(OSlwCoreSTU *pOS)
 {
@@ -221,18 +368,18 @@ void OSlwClockCallBack(OSlwCoreSTU *pOS)
 	else
 	{
 		pOS->_CPU_Usage_count++;
-		if (pOS->CurrentTaskIndex==OSLW_TASK_NUM_MAX-1)//Èç¹ûÊÇ¿ÕÏĞÈÎÎñ
+		if (pOS->CurrentTaskIndex==OSLW_TASK_NUM_MAX-1)//å¦‚æœæ˜¯ç©ºé—²ä»»åŠ¡
 		{
-			pOS->_CPU_Usage_cal_reg--;//¼õ¼ÆÊı Èç¹ûÍêÈ«ÊÇ¿ÕÏĞÈÎÎñ ¼ÆÊıÆ÷»á¼õµ½0
+			pOS->_CPU_Usage_cal_reg--;//å‡è®¡æ•° å¦‚æœå®Œå…¨æ˜¯ç©ºé—²ä»»åŠ¡ è®¡æ•°å™¨ä¼šå‡åˆ°0
 		}
 	}
 
-    for(; n<pOS->TaskRunningNum-1; n++) //Ñ­»·ÈÎÎñÁĞ±í
+    for(; n<pOS->TaskRunningNum-1; n++) //å¾ªç¯ä»»åŠ¡åˆ—è¡¨
     {
         tindex=pOS->TaskRunningList[n];
-        pta=pOS->pTaskList[tindex];//È¡µÃÈÎÎñ¿ØÖÆÀà
-        //ÅĞ¶ÏÈÎÎñ×´Ì¬
-        if(pta->TaskFrozenFlag) continue;//Èç¹ûÊÇ¶³½á×´Ì¬ ²»ÓÃ¹Ü
+        pta=pOS->pTaskList[tindex];//å–å¾—ä»»åŠ¡æ§åˆ¶ç±»
+        //åˆ¤æ–­ä»»åŠ¡çŠ¶æ€
+        if(pta->TaskFrozenFlag) continue;//å¦‚æœæ˜¯å†»ç»“çŠ¶æ€ ä¸ç”¨ç®¡
 
         switch((pta->TaskStatus))
         {
@@ -251,27 +398,27 @@ void OSlwClockCallBack(OSlwCoreSTU *pOS)
 				
 				
 				
-        case OSlwTaskStatus_Wait_ForSleep://µÈ´ıË¯Ãß×´Ì¬
-            if(!(--(pta->SleepCount)))//Ë¯Ãß¼Ä´æÆ÷-- Èç¹ûÎª0£¬ËµÃ÷µÄÊÇÊ±¼äµ½ÁË
+        case OSlwTaskStatus_Wait_ForSleep://ç­‰å¾…ç¡çœ çŠ¶æ€
+            if(!(--(pta->SleepCount)))//ç¡çœ å¯„å­˜å™¨-- å¦‚æœä¸º0ï¼Œè¯´æ˜çš„æ˜¯æ—¶é—´åˆ°äº†
             {
-                OSlwCoreTaskIsReady(pOS,pta,tindex);//×ª»»ÈÎÎñ×´Ì¬ Îª×¼±¸Ì¬
+                OSlwCoreTaskIsReady(pOS,pta,tindex);//è½¬æ¢ä»»åŠ¡çŠ¶æ€ ä¸ºå‡†å¤‡æ€
             }//end if
             break;
 						
 #if OSLW_GIFT_EN						
 						
 #if OSLW_SIMPLE_LEVEL < 3
-        case OSlwTaskStatus_Wait_ForGiftReceive://µÈ´ı½ÓÊÕ×´Ì¬
-            if(pta->Concierge.giftR.List.NowLen > 1)//Èç¹û½ÓÊÕÊıÁ¿²»Îª0 ¾Í¿ÉÒÔ×¼±¸¾ÍĞ÷
+        case OSlwTaskStatus_Wait_ForGiftReceive://ç­‰å¾…æ¥æ”¶çŠ¶æ€
+            if(pta->Concierge.giftR.List.NowLen > 1)//å¦‚æœæ¥æ”¶æ•°é‡ä¸ä¸º0 å°±å¯ä»¥å‡†å¤‡å°±ç»ª
             {
-                OSlwCoreTaskIsReady(pOS,pta,tindex);//×ª»»ÈÎÎñ×´Ì¬ Îª×¼±¸Ì¬
+                OSlwCoreTaskIsReady(pOS,pta,tindex);//è½¬æ¢ä»»åŠ¡çŠ¶æ€ ä¸ºå‡†å¤‡æ€
             }
             break;
 #elif OSLW_SIMPLE_LEVEL == 3
-        case OSlwTaskStatus_Wait_ForGiftReceive://µÈ´ı½ÓÊÕ×´Ì¬
-            if(pta->Concierge.pNext && pta->Concierge.pLast)//Èç¹û½ÓÊÕÊıÁ¿²»Îª0 ¾Í¿ÉÒÔ×¼±¸¾ÍĞ÷
+        case OSlwTaskStatus_Wait_ForGiftReceive://ç­‰å¾…æ¥æ”¶çŠ¶æ€
+            if(pta->Concierge.pNext && pta->Concierge.pLast)//å¦‚æœæ¥æ”¶æ•°é‡ä¸ä¸º0 å°±å¯ä»¥å‡†å¤‡å°±ç»ª
             {
-                OSlwCoreTaskIsReady(pOS,pta,tindex);//×ª»»ÈÎÎñ×´Ì¬ Îª×¼±¸Ì¬
+                OSlwCoreTaskIsReady(pOS,pta,tindex);//è½¬æ¢ä»»åŠ¡çŠ¶æ€ ä¸ºå‡†å¤‡æ€
             }
             break;
 						
@@ -282,7 +429,7 @@ void OSlwClockCallBack(OSlwCoreSTU *pOS)
         case OSlwTaskStatus_Wait_ForGroupFlag:
             if(pta->TaskGroupFlag.CurrentStatus.all & pta->TaskGroupFlag.AimStatus.all)
             {
-                OSlwCoreTaskIsReady(pOS,pta,tindex);//×ª»»ÈÎÎñ×´Ì¬ Îª×¼±¸Ì¬
+                OSlwCoreTaskIsReady(pOS,pta,tindex);//è½¬æ¢ä»»åŠ¡çŠ¶æ€ ä¸ºå‡†å¤‡æ€
             }
             break;
 						
@@ -312,22 +459,22 @@ void OSlwClockCallBack(OSlwCoreSTU *pOS)
 
 
 //------------------------------------------
-//<º¯ÊıÃû>OSlwCoreInitial</º¯ÊıÃû>
-//<¹¦ÄÜËµÃ÷>²Ù×÷ÏµÍ³ÄÚºË³õÊ¼»¯º¯Êı ³õÊ¼»¯ÄÚºË¼Ä´æÆ÷ ´´½¨ÏµÍ³ÄÚ²¿ÈÎÎñ</¹¦ÄÜËµÃ÷>
-//<ÊäÈëËµÃ÷>pOS:this</ÊäÈëËµÃ÷>
-//<Êä³öËµÃ÷>void</Êä³öËµÃ÷>
+//<å‡½æ•°å>OSlwCoreInitial</å‡½æ•°å>
+//<åŠŸèƒ½è¯´æ˜>æ“ä½œç³»ç»Ÿå†…æ ¸åˆå§‹åŒ–å‡½æ•° åˆå§‹åŒ–å†…æ ¸å¯„å­˜å™¨ åˆ›å»ºç³»ç»Ÿå†…éƒ¨ä»»åŠ¡</åŠŸèƒ½è¯´æ˜>
+//<è¾“å…¥è¯´æ˜>pOS:this</è¾“å…¥è¯´æ˜>
+//<è¾“å‡ºè¯´æ˜>void</è¾“å‡ºè¯´æ˜>
 //------------------------------------------
 void OSlwCoreInitial(OSlwCoreSTU *pOS)
 {
-    int i;
+//    int i;
 
     OSLW_assert(!pOS);
-    memset(pOS,0,sizeof(OSlwCoreSTU));//Çå¿ÕÄÚÈİ
-    memset(pOS->TaskRunningList,OSLW_TASK_NUM_MAX+1,sizeof(pOS->TaskRunningList));//Ö´ĞĞ±í³õÊ¼»¯
+    memset(pOS,0,sizeof(OSlwCoreSTU));//æ¸…ç©ºå†…å®¹
+    memset(pOS->TaskRunningList,OSLW_TASK_NUM_MAX+1,sizeof(pOS->TaskRunningList));//æ‰§è¡Œè¡¨åˆå§‹åŒ–
 
 	pOS->_CPU_Usage_cal_reg = OSLW_CPU_USAGE_MAX;
 
-    //ÈÎÎñµ÷¶ÈÆ÷³õÊ¼»¯¸³Öµ
+    //ä»»åŠ¡è°ƒåº¦å™¨åˆå§‹åŒ–èµ‹å€¼
 #if OSLW_TASK_NUM_MAX<=8
     pOS->_mask_list[0] = 0x0f;
 
@@ -364,7 +511,7 @@ void OSlwCoreInitial(OSlwCoreSTU *pOS)
 #endif
 
 
-    //º¯ÊıÖ¸Õë³õÊ¼»¯
+    //å‡½æ•°æŒ‡é’ˆåˆå§‹åŒ–
 #if OSLW_STEP_RUNNING
     pOS->StepFun = OSlwCoreStep;
 #else
@@ -372,7 +519,7 @@ void OSlwCoreInitial(OSlwCoreSTU *pOS)
 #endif
     pOS->TimerAppendFun = OSlwTimerAppend;
     pOS->TaskAppendFun = OSlwTaskAppend;
-    /*(Ver.=0.96)
+    /*(Ver.=0.97)
     #if !(OSLW_SIMPLE_MODE)
     pOS->ClockCBFun=OSlwClockCallBack;
     pOS->DispatchFun=OSlwTaskDispatch;
@@ -381,9 +528,9 @@ void OSlwCoreInitial(OSlwCoreSTU *pOS)
     pOS->TimerAppendFun=OSlwTimerAppend;
     #endif
     */
-    //ÄÚ´æ¿ØÖÆ³õÊ¼»¯
+    //å†…å­˜æ§åˆ¶åˆå§‹åŒ–
 
-//	//²ÎÊı¿ØÖÆ³õÊ¼»¯
+//	//å‚æ•°æ§åˆ¶åˆå§‹åŒ–
 //	for(i=0;i<OSLW_CORE_PARA_CTRL_NUM;i++)
 //	{
 //
@@ -393,9 +540,9 @@ void OSlwCoreInitial(OSlwCoreSTU *pOS)
 //#endif
 //	}
 
-    //ÄÚ²¿ÈÎÎñ ¿ÕÏĞÈÎÎñ
+    //å†…éƒ¨ä»»åŠ¡ ç©ºé—²ä»»åŠ¡
 
-    OSlwTaskInit(//¿ÕÏĞÈÎÎñ³õÊ¼»¯
+    OSlwTaskInit(//ç©ºé—²ä»»åŠ¡åˆå§‹åŒ–
         &(pOS->OSlwInlineTaskBoring),
         OSLW_TASK_NUM_MAX-1,
         "~_~",
@@ -403,10 +550,10 @@ void OSlwCoreInitial(OSlwCoreSTU *pOS)
         (void *)0,
         OSlwInlineTaskBoringExe
     );
-    OSlwTaskAppend(pOS, &(pOS->OSlwInlineTaskBoring));//¿ÕÏĞÈÎÎñ×·¼Ó
+    OSlwTaskAppend(pOS, &(pOS->OSlwInlineTaskBoring));//ç©ºé—²ä»»åŠ¡è¿½åŠ 
 
 
-    /*(Ver.=0.96)
+    /*(Ver.=0.97)
     	OSlwTaskInit(
     			&OSlwInlineTaskParameter,
     			1,
@@ -415,9 +562,9 @@ void OSlwCoreInitial(OSlwCoreSTU *pOS)
     			(void *)(pOS->ParaCtrlList),
     			OSlwInlineTaskParameterExe
     			);
-    	OSlwTaskAppend(pOS,&OSlwInlineTaskParameter);//²ÎÊı¹ÜÀíÈÎÎñ
+    	OSlwTaskAppend(pOS,&OSlwInlineTaskParameter);//å‚æ•°ç®¡ç†ä»»åŠ¡
     */
-/*(Ver.=0.96)
+/*(Ver.=0.97)
     for(i=0; i<OSLW_CORE_PARA_PAGE_NUM; i++)
     {
 
@@ -427,28 +574,28 @@ void OSlwCoreInitial(OSlwCoreSTU *pOS)
 
     }
 */
-#if OSLW_TASK_COMMUN_ENABLE //Èç¹ûÊ¹ÄÜÍ¨ĞÅÈÎÎñ
-//	for(i=0;i<OSLW_CORE_COMMUN_LIST_LENGTH;i++)//Ñ­»·Í¨ĞÅ¿ØÖÆÆ÷ÁĞ±í
+#if OSLW_TASK_COMMUN_ENABLE //å¦‚æœä½¿èƒ½é€šä¿¡ä»»åŠ¡
+//	for(i=0;i<OSLW_CORE_COMMUN_LIST_LENGTH;i++)//å¾ªç¯é€šä¿¡æ§åˆ¶å™¨åˆ—è¡¨
 //	{
-//		//Ö¸Õë³õÊ¼»¯
+//		//æŒ‡é’ˆåˆå§‹åŒ–
 //		pOS->Comm[i].pRx=pOS->Comm[i].RxList;
 //		pOS->Comm[i].pTx=pOS->Comm[i].pTxTail=pOS->Comm[i].TxList;
 
-//		//»¬´°³õÊ¼»¯
+//		//æ»‘çª—åˆå§‹åŒ–
 //		pOS->Comm[i].ComRX.AppendFun=OSlwToolSlipwinAppend;
 //		pOS->Comm[i].ComRX.MDataLen_forSize_t=(sizeof(lw_u8)*OSLW_COMMUN_RX_LENGTH);
 //		pOS->Comm[i].ComRX.pBufferData=pOS->Comm[i].RxListBuf;
 //		pOS->Comm[i].ComRX.pMasterData=pOS->Comm[i].RxList;
 
-//		//º¯ÊıÖ¸Õë³õÊ¼»¯
+//		//å‡½æ•°æŒ‡é’ˆåˆå§‹åŒ–
 //		pOS->Comm[i].isReadyFun	= OSlwCommunIsReady;
 //		pOS->Comm[i].TxReadyFun = OSlwCommunTxReady;
 //
-//		//²Ù×÷ÏµÍ³Ö¸Õë
+//		//æ“ä½œç³»ç»ŸæŒ‡é’ˆ
 //		pOS->Comm[i].pOS=pOS;
-//		pOS->Comm[i].Address=OSLW_COMMUN_ADDRESS;//µØÖ·
+//		pOS->Comm[i].Address=OSLW_COMMUN_ADDRESS;//åœ°å€
 //
-//		//Í¨ĞÅ·¢ËÍÄ£¿é³õÊ¼»¯ ÓÃÓÚÊÕµ½Êı¾İÖ®ºóÏòÍ¨ĞÅÈÎÎñ·¢ËÍ
+//		//é€šä¿¡å‘é€æ¨¡å—åˆå§‹åŒ– ç”¨äºæ”¶åˆ°æ•°æ®ä¹‹åå‘é€šä¿¡ä»»åŠ¡å‘é€
 //		OSlwGiftTransmitInitial(&(pOS->Comm[i].giftT));
 //		pOS->Comm[i].giftT.IdleIndexFun=OSlwGiftTransmitIdleIndex;
 //	}
@@ -461,12 +608,12 @@ void OSlwCoreInitial(OSlwCoreSTU *pOS)
 //			(void *)(&(pOS->Comm)),
 //			OSlwInlineTaskCommunExe
 //			);
-//	OSlwTaskAppend(pOS,&OSlwInlineTaskCommun);//ÏµÍ³Í¨ĞÅÈÎÎñ
+//	OSlwTaskAppend(pOS,&OSlwInlineTaskCommun);//ç³»ç»Ÿé€šä¿¡ä»»åŠ¡
 
 #endif
 
 #if OSLW_MEMORY_ENABLE
-//Öğ½¥·ÅÆú ¼¦Àß
+//é€æ¸æ”¾å¼ƒ é¸¡è‚‹
 
 #if 0
     OSlwMemoryMapInital(&(pOS->GiftMem),(pOS->GiftBuf), OSLW_CORE_GIFT_NUM,sizeof(OSlwGiftUnitSTU),sizeof(pOS->GiftBuf));
@@ -534,7 +681,7 @@ void OSlwCoreInitial(OSlwCoreSTU *pOS)
         (void *)(&(pOS->Show)),
         OSlwInlineTaskShowExe
     );
-    OSlwTaskAppend(pOS,&OSlwInlineTaskShow);//ÏµÍ³ÏÔÊ¾ÈÎÎñ
+    OSlwTaskAppend(pOS,&OSlwInlineTaskShow);//ç³»ç»Ÿæ˜¾ç¤ºä»»åŠ¡
 
 
 
@@ -551,41 +698,41 @@ void OSlwCoreInitial(OSlwCoreSTU *pOS)
 }
 
 //------------------------------------------
-//<º¯ÊıÃû>OSlwTaskAppend</º¯ÊıÃû>
-//<¹¦ÄÜËµÃ÷>²Ù×÷ÏµÍ³×·¼ÓÈÎÎñ !!!!!!¸Ãº¯Êı²»¹ÜÈÎÎñ¿ØÖÆ¿éµÄ³õÊ¼»¯!!!!!!!!!</¹¦ÄÜËµÃ÷>
-//<ÊäÈëËµÃ÷>pOS:this pta:×·¼ÓÈÎÎñ¿ØÖÆ¿é</ÊäÈëËµÃ÷>
-//<Êä³öËµÃ÷>pOS:this</Êä³öËµÃ÷>
+//<å‡½æ•°å>OSlwTaskAppend</å‡½æ•°å>
+//<åŠŸèƒ½è¯´æ˜>æ“ä½œç³»ç»Ÿè¿½åŠ ä»»åŠ¡ !!!!!!è¯¥å‡½æ•°ä¸ç®¡ä»»åŠ¡æ§åˆ¶å—çš„åˆå§‹åŒ–!!!!!!!!!</åŠŸèƒ½è¯´æ˜>
+//<è¾“å…¥è¯´æ˜>pOS:this pta:è¿½åŠ ä»»åŠ¡æ§åˆ¶å—</è¾“å…¥è¯´æ˜>
+//<è¾“å‡ºè¯´æ˜>pOS:this</è¾“å‡ºè¯´æ˜>
 //------------------------------------------
 OSlwCoreSTU *OSlwTaskAppend(OSlwCoreSTU *pOS,OSlwTaskSTU *pta)
 {
     OSLW_assert(!pOS);
     OSLW_assert(!pta);
 
-    if(pOS->pTaskList[pta->Priority])//ÅĞ¶Ï¸ÃÈÎÎñºÅÊÇ·ñÒÑ¾­±»×¢²á
+    if(pOS->pTaskList[pta->Priority])//åˆ¤æ–­è¯¥ä»»åŠ¡å·æ˜¯å¦å·²ç»è¢«æ³¨å†Œ
     {
-        pOS->CoreError=OSlwCoreError_PriorityRedefine;//ÄÚºËÒì³£ÖÃÆğ
-        return pOS;//·µ»Ø
+        pOS->CoreError=OSlwCoreError_PriorityRedefine;//å†…æ ¸å¼‚å¸¸ç½®èµ·
+        return pOS;//è¿”å›
     }
 
-    pta->pOS=pOS;//ÈÎÎñËùÊöµÄ²Ù×÷ÏµÍ³Ö¸Õë
+    pta->pOS=pOS;//ä»»åŠ¡æ‰€è¿°çš„æ“ä½œç³»ç»ŸæŒ‡é’ˆ
 
 
-    pOS->pTaskList[pta->Priority]=pta;//ÈÎÎñ¿ØÖÆ¿é´æÈëÏàÓ¦Î»ÖÃ
-    pOS->TaskRunningList[pOS->TaskRunningNum]=pta->Priority;//ÈÎÎñÓÅÏÈ¼¶±£´æÈëÔËĞĞ±í¸ñ
-    pOS->TaskRunningNum++;//ÈÎÎñÔËĞĞÊı+1
-    _quicksort(pOS->TaskRunningList,pOS->TaskRunningNum,sizeof(pOS->TaskRunningList[0]),(void *)comp);//¶ÔÔËĞĞ±í¸ñ½øĞĞÅÅĞò ×ÔĞ¡Ïò´ó
-    pOS->InitialFlagGroup.all|=((lw_u64)1<<pta->Priority);//ÄÚºË³õÊ¼»¯±êÖ¾×éÖÃÆğ
+    pOS->pTaskList[pta->Priority]=pta;//ä»»åŠ¡æ§åˆ¶å—å­˜å…¥ç›¸åº”ä½ç½®
+    pOS->TaskRunningList[pOS->TaskRunningNum]=pta->Priority;//ä»»åŠ¡ä¼˜å…ˆçº§ä¿å­˜å…¥è¿è¡Œè¡¨æ ¼
+    pOS->TaskRunningNum++;//ä»»åŠ¡è¿è¡Œæ•°+1
+    _quicksort(pOS->TaskRunningList,pOS->TaskRunningNum,sizeof(pOS->TaskRunningList[0]),(_compar_fn)comp);//å¯¹è¿è¡Œè¡¨æ ¼è¿›è¡Œæ’åº è‡ªå°å‘å¤§
+    pOS->InitialFlagGroup.all|=((lw_u64)1<<pta->Priority);//å†…æ ¸åˆå§‹åŒ–æ ‡å¿—ç»„ç½®èµ·
 
     return pOS;
 }
 
 //------------------------------------------
-//<º¯ÊıÃû>OSlwParaAppend</º¯ÊıÃû>
-//<¹¦ÄÜËµÃ÷>²ÎÊı×·¼ÓÈÎÎñ ÏòOS×·¼Ó²ÎÊı</¹¦ÄÜËµÃ÷>
-//<ÊäÈëËµÃ÷>pOS:this num:²ÎÊıÁĞ±í±àºÅ ³£¼ûÓĞ0(ÊäÈë¼Ä´æÆ÷²ÎÊı) 1(±£³Ö¼Ä´æÆ÷²ÎÊı) *p:²ÎÊıÖ¸Õë</ÊäÈëËµÃ÷>
-//<Êä³öËµÃ÷>this</Êä³öËµÃ÷>
+//<å‡½æ•°å>OSlwParaAppend</å‡½æ•°å>
+//<åŠŸèƒ½è¯´æ˜>å‚æ•°è¿½åŠ ä»»åŠ¡ å‘OSè¿½åŠ å‚æ•°</åŠŸèƒ½è¯´æ˜>
+//<è¾“å…¥è¯´æ˜>pOS:this num:å‚æ•°åˆ—è¡¨ç¼–å· å¸¸è§æœ‰0(è¾“å…¥å¯„å­˜å™¨å‚æ•°) 1(ä¿æŒå¯„å­˜å™¨å‚æ•°) *p:å‚æ•°æŒ‡é’ˆ</è¾“å…¥è¯´æ˜>
+//<è¾“å‡ºè¯´æ˜>this</è¾“å‡ºè¯´æ˜>
 //------------------------------------------
-/*(Ver.=0.96)
+/*(Ver.=0.97)
 OSlwCoreSTU* OSlwParaAppend(OSlwCoreSTU *pOS,lw_u8 num,struct OSLW_PARAMETER_STRUCT *p)
 {
 
@@ -594,16 +741,16 @@ OSlwCoreSTU* OSlwParaAppend(OSlwCoreSTU *pOS,lw_u8 num,struct OSLW_PARAMETER_STR
 	OSLW_assert(!pOS);
 	OSLW_assert(!p);
 
-	num= num % OSLW_CORE_PARA_CTRL_NUM;//% ±£Ö¤ÁĞ±í±àºÅ²»»áÔ½½ç
-	pPC = & (pOS->ParaCtrlList[num]);// È¡µÃÏµÍ³²ÎÊı¿ØÖÆÁĞ±íµÄÖ¸Õë
-	if (pPC->ParaLength >= OSLW_PARA_LIST_LENGRH)//Èç¹û²ÎÊıÊıÁ¿ÒÑ¾­³¬¹ıÁĞ±í×Ü³¤¶È
+	num= num % OSLW_CORE_PARA_CTRL_NUM;//% ä¿è¯åˆ—è¡¨ç¼–å·ä¸ä¼šè¶Šç•Œ
+	pPC = & (pOS->ParaCtrlList[num]);// å–å¾—ç³»ç»Ÿå‚æ•°æ§åˆ¶åˆ—è¡¨çš„æŒ‡é’ˆ
+	if (pPC->ParaLength >= OSLW_PARA_LIST_LENGRH)//å¦‚æœå‚æ•°æ•°é‡å·²ç»è¶…è¿‡åˆ—è¡¨æ€»é•¿åº¦
 	{
-		pOS->CoreError=OSlwCoreError_ParaListLengthOver;//ÉèÖÃ´íÎó±êÖ¾
+		pOS->CoreError=OSlwCoreError_ParaListLengthOver;//è®¾ç½®é”™è¯¯æ ‡å¿—
 		return pOS;
 	}
-	p->ParaId=pPC->ParaLength;//ÉèÖÃ²ÎÊı±àºÅ
-	pPC->pParaList[pPC->ParaLength]=p;//±£´æ²ÎÊı
-	pPC->ParaLength++;//ÊıÁ¿+1
+	p->ParaId=pPC->ParaLength;//è®¾ç½®å‚æ•°ç¼–å·
+	pPC->pParaList[pPC->ParaLength]=p;//ä¿å­˜å‚æ•°
+	pPC->ParaLength++;//æ•°é‡+1
 
 	return pOS;
 
@@ -611,7 +758,7 @@ OSlwCoreSTU* OSlwParaAppend(OSlwCoreSTU *pOS,lw_u8 num,struct OSLW_PARAMETER_STR
 */
 
 
-/*(Ver.=0.96)
+/*(Ver.=0.97)
 OSlwCoreSTU* OSlwParaAppend(OSlwCoreSTU *pOS,lw_u8 PageId,OSlwParameterSTU *pP)
 {
     OSlwParaListCtrlSTU *pPLC;
@@ -620,11 +767,11 @@ OSlwCoreSTU* OSlwParaAppend(OSlwCoreSTU *pOS,lw_u8 PageId,OSlwParameterSTU *pP)
     OSLW_assert(!pP);
 
     PageId= PageId % OSLW_CORE_PARA_PAGE_NUM;
-    pPLC = & (pOS->ParaBook[PageId]);// È¡µÃÏµÍ³²ÎÊı¿ØÖÆÁĞ±íµÄÖ¸Õë
+    pPLC = & (pOS->ParaBook[PageId]);// å–å¾—ç³»ç»Ÿå‚æ•°æ§åˆ¶åˆ—è¡¨çš„æŒ‡é’ˆ
 
-    if (pPLC->ParaLength >= OSLW_PARA_LIST_LENGRH)//Èç¹û²ÎÊıÊıÁ¿ÒÑ¾­³¬¹ıÁĞ±í×Ü³¤¶È
+    if (pPLC->ParaLength >= OSLW_PARA_LIST_LENGRH)//å¦‚æœå‚æ•°æ•°é‡å·²ç»è¶…è¿‡åˆ—è¡¨æ€»é•¿åº¦
     {
-        pOS->CoreError=OSlwCoreError_ParaListLengthOver;//ÉèÖÃ´íÎó±êÖ¾
+        pOS->CoreError=OSlwCoreError_ParaListLengthOver;//è®¾ç½®é”™è¯¯æ ‡å¿—
         return pOS;
     }
 
@@ -655,22 +802,22 @@ OSlwCoreSTU* OSlwTimerAppend(OSlwCoreSTU *pOS,OSlwTimerSTU *pT)
 
 
 //------------------------------------------
-//<º¯ÊıÃû>OSlwCoreStart</º¯ÊıÃû>
-//<¹¦ÄÜËµÃ÷>OSLW¿ªÊ¼ !!!!!ÇëÔÚËùÒÔÈÎÎñ¿ØÖÆ¿éÓë²Ù×÷ÏµÍ³ÄÚºË³õÊ¼»¯Íê³ÉÖ®ºóÔÙµ÷ÓÃ!!!!!!</¹¦ÄÜËµÃ÷>
-//<ÊäÈëËµÃ÷>pOS:this</ÊäÈëËµÃ÷>
-//<Êä³öËµÃ÷>void</Êä³öËµÃ÷>
+//<å‡½æ•°å>OSlwCoreStart</å‡½æ•°å>
+//<åŠŸèƒ½è¯´æ˜>OSLWå¼€å§‹ !!!!!è¯·åœ¨æ‰€ä»¥ä»»åŠ¡æ§åˆ¶å—ä¸æ“ä½œç³»ç»Ÿå†…æ ¸åˆå§‹åŒ–å®Œæˆä¹‹åå†è°ƒç”¨!!!!!!</åŠŸèƒ½è¯´æ˜>
+//<è¾“å…¥è¯´æ˜>pOS:this</è¾“å…¥è¯´æ˜>
+//<è¾“å‡ºè¯´æ˜>void</è¾“å‡ºè¯´æ˜>
 //------------------------------------------
 void OSlwCoreStart(OSlwCoreSTU *pOS)
 {
 
-    pOS->DispatchEable=1;//µ÷¶ÈÆ÷Ê¹ÄÜ
-    pOS->CoreStatus=OSlwCoreStatus_Running;//ÈÎÎñÄÚºË×ª»»ÎªÔËĞĞÌ¬
+    pOS->DispatchEable=1;//è°ƒåº¦å™¨ä½¿èƒ½
+    pOS->CoreStatus=OSlwCoreStatus_Running;//ä»»åŠ¡å†…æ ¸è½¬æ¢ä¸ºè¿è¡Œæ€
 #if !(OSLW_SIMPLE_MODE)
-    OSlwTaskDispatch(pOS);//Ö´ĞĞÈÎÎñµ÷¶È
+    OSlwTaskDispatch(pOS);//æ‰§è¡Œä»»åŠ¡è°ƒåº¦
 #else
     pOS->OSlwInlineTaskBoring.TaskFun(&(pOS->OSlwInlineTaskBoring));
 #endif
-    while(1)//!!!!!!!!!!!!Õı³£Çé¿öÏÂ²»»á½øÈëÕâ¸öÑ­»·!!!!!!!!!!!!!!!!!!!!!
+    while(1)//!!!!!!!!!!!!æ­£å¸¸æƒ…å†µä¸‹ä¸ä¼šè¿›å…¥è¿™ä¸ªå¾ªç¯!!!!!!!!!!!!!!!!!!!!!
     {
         ;
     }
@@ -679,20 +826,20 @@ void OSlwCoreStart(OSlwCoreSTU *pOS)
 
 
 //------------------------------------------
-//<º¯ÊıÃû>OSlwCoreStep</º¯ÊıÃû>
-//<¹¦ÄÜËµÃ÷>OSLW²½½ø !!!!!ÇëÔÚËùÒÔÈÎÎñ¿ØÖÆ¿éÓë²Ù×÷ÏµÍ³ÄÚºË³õÊ¼»¯Íê³ÉÖ®ºóÔÙµ÷ÓÃ!!!!!!</¹¦ÄÜËµÃ÷>
+//<å‡½æ•°å>OSlwCoreStep</å‡½æ•°å>
+//<åŠŸèƒ½è¯´æ˜>OSLWæ­¥è¿› !!!!!è¯·åœ¨æ‰€ä»¥ä»»åŠ¡æ§åˆ¶å—ä¸æ“ä½œç³»ç»Ÿå†…æ ¸åˆå§‹åŒ–å®Œæˆä¹‹åå†è°ƒç”¨!!!!!!</åŠŸèƒ½è¯´æ˜>
 //while(1)
 //{....
 //OSlwCoreStep(&myos);
 //....}
-//<ÊäÈëËµÃ÷>pOS:this</ÊäÈëËµÃ÷>
-//<Êä³öËµÃ÷>void</Êä³öËµÃ÷>
+//<è¾“å…¥è¯´æ˜>pOS:this</è¾“å…¥è¯´æ˜>
+//<è¾“å‡ºè¯´æ˜>void</è¾“å‡ºè¯´æ˜>
 //------------------------------------------
 void OSlwCoreStep(OSlwCoreSTU *pOS)
 {
 
-    pOS->DispatchEable=1;//µ÷¶ÈÆ÷Ê¹ÄÜ
-    pOS->CoreStatus=OSlwCoreStatus_Running;//ÈÎÎñÄÚºË×ª»»ÎªÔËĞĞÌ¬
+    pOS->DispatchEable=1;//è°ƒåº¦å™¨ä½¿èƒ½
+    pOS->CoreStatus=OSlwCoreStatus_Running;//ä»»åŠ¡å†…æ ¸è½¬æ¢ä¸ºè¿è¡Œæ€
 #if !(OSLW_SIMPLE_MODE)
     OSLW_assert(1);
 #else
@@ -706,8 +853,8 @@ void OSlwCoreStep(OSlwCoreSTU *pOS)
 
 
 //------------------------------------------
-//<º¯ÊıÃû>comp</º¯ÊıÃû>
-//<¹¦ÄÜËµÃ÷>±È½Ïº¯Êı ÓÃÓÚÓÅÏÈ¼¶ÅÅĞò</¹¦ÄÜËµÃ÷>
+//<å‡½æ•°å>comp</å‡½æ•°å>
+//<åŠŸèƒ½è¯´æ˜>æ¯”è¾ƒå‡½æ•° ç”¨äºä¼˜å…ˆçº§æ’åº</åŠŸèƒ½è¯´æ˜>
 //------------------------------------------
 lw_16 comp(const void*a,const void*b)
 {
@@ -717,9 +864,9 @@ lw_16 comp(const void*a,const void*b)
 }
 
 //------------------------------------------
-//<º¯ÊıÃû>_quicksort</º¯ÊıÃû>
-//<¹¦ÄÜËµÃ÷>¿ìËÙÅÅĞò</¹¦ÄÜËµÃ÷>//
-//by »¥ÁªÍø
+//<å‡½æ•°å>_quicksort</å‡½æ•°å>
+//<åŠŸèƒ½è¯´æ˜>å¿«é€Ÿæ’åº</åŠŸèƒ½è¯´æ˜>//
+//by äº’è”ç½‘
 //------------------------------------------
 void _quicksort (void *const pbase, size_t total_elems, size_t size,_compar_fn cmp)
 {
@@ -728,7 +875,7 @@ void _quicksort (void *const pbase, size_t total_elems, size_t size,_compar_fn c
     const size_t max_thresh = MAX_THRESH * size;
 
     if (total_elems == 0)
-        /*(Ver.=0.96) Avoid lossage with unsigned arithmetic below.  */
+        /*(Ver.=0.97) Avoid lossage with unsigned arithmetic below.  */
         return;
 
     if (total_elems > MAX_THRESH)
@@ -789,24 +936,24 @@ jump_over:
             if ((size_t) (right_ptr - lo) <= max_thresh)
             {
                 if ((size_t) (hi - left_ptr) <= max_thresh)
-                    /*(Ver.=0.96) Ignore both small partitions. */
+                    /*(Ver.=0.97) Ignore both small partitions. */
                     POP (lo, hi);
                 else
-                    /*(Ver.=0.96) Ignore small left partition. */
+                    /*(Ver.=0.97) Ignore small left partition. */
                     lo = left_ptr;
             }
             else if ((size_t) (hi - left_ptr) <= max_thresh)
-                /*(Ver.=0.96) Ignore small right partition. */
+                /*(Ver.=0.97) Ignore small right partition. */
                 hi = right_ptr;
             else if ((right_ptr - lo) > (hi - left_ptr))
             {
-                /*(Ver.=0.96) Push larger left partition indices. */
+                /*(Ver.=0.97) Push larger left partition indices. */
                 PUSH (lo, right_ptr);
                 lo = left_ptr;
             }
             else
             {
-                /*(Ver.=0.96) Push larger right partition indices. */
+                /*(Ver.=0.97) Push larger right partition indices. */
                 PUSH (left_ptr, hi);
                 hi = right_ptr;
             }

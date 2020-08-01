@@ -1,4 +1,4 @@
-/*(Ver.=0.96)
+﻿/*(Ver.=0.97)
  * OSLW_tool.c
  *
  *  Created on: 2019-01-22
@@ -456,7 +456,7 @@ lw_ptr OSlwToolBPnnLayerSoftMaxForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUC
 	register ParaType rmax, rsum;
 	register lw_u16 i, j, col;
 	register ParaType *_in, *_out, *_inb,*_outb;
-	OSlwToolNNLayerActFunSeLUSTU *pthis;
+	//OSlwToolNNLayerActFunSeLUSTU *pthis;
 	OSLW_assert(!(pNNSLB));
 	col = pNNSLB->out.col;
 	_inb = pNNSLB->in.a;

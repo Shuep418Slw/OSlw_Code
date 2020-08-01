@@ -1,4 +1,4 @@
-/*(Ver.=0.96)
+/*(Ver.=0.97)
 * OSLW_tool.c
 *
 *  Created on: 2019-01-22
@@ -758,13 +758,13 @@ lw_ptr OSlwToolBPnnLayerConvBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT 
 	OSlwToolNNLayerFullConSTU *pfc;
 	OSlwToolNNLayerConvSTU *pcv;
 	lw_u16 i = 0, j, k;
-	ParaType *db, *dw, *dw2, delt_bias, *dbm;
-	lw_u32 move_d;
+	ParaType *db, delt_bias, *dbm;
+	//lw_u32 move_d;
 	OSlwMat m_dw, m_in, m_out;
 	OSLW_assert(!(pNNSLB));
 	pfc = (OSlwToolNNLayerFullConSTU *)pNNSLB;
 	pcv = (void *)pfc;
-	move_d = pfc->basic.in.col*pcv->out_x*pcv->out_y;
+	//move_d = pfc->basic.in.col*pcv->out_x*pcv->out_y;
 
 #if OSLW_TOOL_NN_DATA_FRAME==OSLW_TOOL_NN_D_FRAME_C
 	i = mini_b_num;
@@ -982,7 +982,7 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerPoolNew(
 )
 {
 	OSlwToolNNLayerPoolSTU *node;
-	lw_u32 max_data_len;
+	//lw_u32 max_data_len;
 	lw_u32 out_x, out_y;
 	LwMatRowType in_row, out_row;
 
@@ -1072,11 +1072,11 @@ void* _OSlwToolNNMaxPoolingFD
 	ParaType **data_mem
 )
 {
-	ParaType *in_a = in->a, *out_a = out->a, *in_p;
+	ParaType *in_a = in->a, *out_a = out->a;
 	ParaType *in_c, *in_r, *in_p_c, *in_p_r;
 	lw_u32 in_pic_2d_move, in_c_move, in_r_move, in_p_c_move;
 	ParaType now_max, *pMax = NULL;
-	lw_32  jx, jy, k, l, m;
+	lw_32  jx, jy, k, l;
 
 
 	in_pic_2d_move = in_x*in_y;
@@ -1126,11 +1126,11 @@ OSlwToolMatrixSTU* _OSlwToolNNAvgPoolingFD
 	lw_u16 move_x, lw_u16 move_y
 )
 {
-	ParaType *in_a = in->a, *out_a = out->a, *in_p;
+	ParaType *in_a = in->a, *out_a = out->a;
 	ParaType *in_c, *in_r, *in_p_c, *in_p_r;
 	lw_u32 in_pic_2d_move, in_c_move, in_r_move, in_p_c_move;
 	ParaType now_sum, data_div = _ParaDiv(_ParaFint(1), _ParaFint(move_x* move_y));
-	lw_32 jx, jy, k, l, m;
+	lw_32 jx, jy, k, l;
 
 
 	in_pic_2d_move = in_x*in_y;
@@ -1203,11 +1203,11 @@ OSlwToolMatrixSTU* _OSlwToolNNAvgPoolingBK
 	lw_u16 move_x, lw_u16 move_y
 )
 {
-	ParaType *in_a = inerr->a, *out_a = outerr->a, *in_p;
+	ParaType *in_a = inerr->a, *out_a = outerr->a;
 	ParaType *in_c, *in_r, *in_p_c, *in_p_r;
 	lw_u32 in_pic_2d_move, in_c_move, in_r_move, in_p_c_move;
 	ParaType now_sum, data_div = _ParaDiv(_ParaFint(1), _ParaFint(move_x* move_y));
-	lw_32 jx, jy, k, l, m;
+	lw_32 jx, jy, k, l;
 
 
 	in_pic_2d_move = inerr_x*inerr_y;
@@ -1690,11 +1690,11 @@ void* OSlwToolBPnnConvAppend
 {
 
 	OSlwToolNNSubLayerBasicSTU *pnode1, *pnode2;
-	OSlwToolNNLayerConvSTU *pcv;
+	//OSlwToolNNLayerConvSTU *pcv;
 	OSlwToolNNLayerFullConSTU *pfc;
-	OSlwToolDListNodeSTU *pln1, *pln2;
-	ParaType *pWreal, *pBreal;
-	OSlwToolNNSubLayerBasicSTU **ppLIST1, **ppLIST2, **pptail;
+	OSlwToolDListNodeSTU *pln1;
+	//ParaType *pWreal, *pBreal;
+	OSlwToolNNSubLayerBasicSTU **ppLIST1, **pptail;
 	LwMatRowType in_col, mat_out_col;
 	lw_u32 out_x, out_y;
 	OSLW_assert(!(pBPnn));
@@ -1740,7 +1740,7 @@ void* OSlwToolBPnnConvAppend
 		//每次都要复制输出层
 		memcpy(&(pBPnn->y), &(pnode2->out), sizeof(OSlwMat));
 
-		pcv = (void *)pnode1;
+		//pcv = (void *)pnode1;
 		pfc = (void *)pnode1;
 	}
 	else//采用不带激活函数的方式
@@ -1771,7 +1771,7 @@ void* OSlwToolBPnnConvAppend
 		//每次都要复制输出层
 		memcpy(&(pBPnn->y), &(pnode1->out), sizeof(OSlwMat));
 
-		pcv = (void *)pnode1;
+		//pcv = (void *)pnode1;
 		pfc = (void *)pnode1;
 	}
 
@@ -1802,7 +1802,7 @@ void* OSlwToolBPnnPoolAppend
 {
 
 	OSlwToolNNSubLayerBasicSTU *pnode1;
-	OSlwToolNNLayerPoolSTU *pPL;
+	//OSlwToolNNLayerPoolSTU *pPL;
 	OSlwToolDListNodeSTU *pln1;
 	OSlwToolNNSubLayerBasicSTU **ppLIST1, **pptail;
 	LwMatColType in_col;

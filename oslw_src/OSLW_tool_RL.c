@@ -1,4 +1,4 @@
-/*(Ver.=0.96)
+/*(Ver.=0.97)
  * OSLW_tool.c
  *
  *  Created on: 2017-11-27
@@ -24,7 +24,7 @@ void OSlwToolRL_Termial(
 
 	_rl = pRL;
 
-	_rl->isTermialFun = OSlwToolRL_isTermial;
+	_rl->isTermialFun = (lw_8 (*)(struct OSLW_TOOL_RL_BASIC_STRUCT *))OSlwToolRL_isTermial;
 	_rl->TermialJudgeFlag.all = TermialJudgeFlag;
 	_rl->RewardSumMax = RewardSumMax;
 	_rl->RewardSumMin = RewardSumMin;
@@ -126,16 +126,16 @@ void OSlwToolQLearningParaInitial
     pTQL->Lr=Lr;
     pTQL->basic.basic.Gamma=Gamma;
     pTQL->basic.basic.pRand=prand;
-    pTQL->basic.basic.ActEnvFun=(void *)pActfun;
-    pTQL->basic.basic.BornFun= (void *)OSlwToolRL_Born;
-	pTQL->basic.basic.BornFunByUser = (void *)pBornfun;
+    pTQL->basic.basic.ActEnvFun=(void (*)(struct OSLW_TOOL_RL_BASIC_STRUCT *))pActfun;
+    pTQL->basic.basic.BornFun= (void (*)(struct OSLW_TOOL_RL_BASIC_STRUCT *))OSlwToolRL_Born;
+	pTQL->basic.basic.BornFunByUser = (void (*)(struct OSLW_TOOL_RL_BASIC_STRUCT *))pBornfun;
 
     pTQL->basic.basic.pmem = pmem;
 
-    pTQL->basic.basic.LearnFun = (void *)OSlwToolQLearningLearnFun;
-    pTQL->basic.basic.ChooseFun = (void *)OSlwToolQLearningChooseFun;
-    pTQL->basic.basic.StateStoreFun = (void *)OSlwToolQLearningLearnStateStore;
-    pTQL->basic.basic.isTermialFun = (void *)OSlwToolRL_isTermial;
+    pTQL->basic.basic.LearnFun = (void* (*)(struct OSLW_TOOL_RL_BASIC_STRUCT *))OSlwToolQLearningLearnFun;
+    pTQL->basic.basic.ChooseFun = (void* (*)(struct OSLW_TOOL_RL_BASIC_STRUCT *))OSlwToolQLearningChooseFun;
+    pTQL->basic.basic.StateStoreFun = (void *(*)(struct OSLW_TOOL_RL_BASIC_STRUCT *, OSlwToolMatrixSTU *))OSlwToolQLearningLearnStateStore;
+    pTQL->basic.basic.isTermialFun = (lw_8 (*)(struct OSLW_TOOL_RL_BASIC_STRUCT *))OSlwToolRL_isTermial;
 
 }
 
@@ -253,7 +253,7 @@ OSlwToolQLearningSTU* OSlwToolQLearningLearnFun(OSlwToolQLearningSTU *pQRL)
 
     OSlwToolQRLDataSTU *pTQRLDS;
     OSlwToolQRLBasicSTU *pQRLB;
-	OSlwToolRLBasicSTU *rl;
+	//OSlwToolRLBasicSTU *rl;
     ParaType *p,dmax;
     lw_u16 maxindex, row;
     OSlwToolMatrixSTU mat;
@@ -265,7 +265,7 @@ OSlwToolQLearningSTU* OSlwToolQLearningLearnFun(OSlwToolQLearningSTU *pQRL)
 
 	OSLW_RL_UPDATE(pQRL);
 
-    /*(Ver.=0.96)
+    /*(Ver.=0.97)
     mat.length = pTQRLDS->state.length;
     mat.a = pTQRLDS->state.a;
 
@@ -319,7 +319,7 @@ OSlwToolQLearningSTU* OSlwToolQLearningChooseFun(OSlwToolQLearningSTU *pQRLB)
 {
 
     ParaType drand, dmax;
-    lw_u16 selrand, maxindex, state_index, row;
+    lw_u16 selrand, maxindex, row;
     OSlwToolQRLDataSTU *pTQRLDS;
 	OSlwToolRLBasicSTU *pRL;
     OSlwToolMatrixSTU mat;
@@ -332,7 +332,7 @@ OSlwToolQLearningSTU* OSlwToolQLearningChooseFun(OSlwToolQLearningSTU *pQRLB)
 
 
     //根据state 查询state的ID
-    /*(Ver.=0.96)
+    /*(Ver.=0.97)
     mat.col = pTQRLDS->action.col;
     mat.row = 1;
     mat.length = pTQRLDS->action.length;
@@ -410,16 +410,16 @@ void OSlwToolSarsaLamberParaInitial
     pTQL->basic.basic.Gamma = Gamma;
     pTQL->basic.basic.pRand = prand;
     pTQL->basic.basic.pmem = pmem;
-    pTQL->basic.basic.ActEnvFun = (void *)pActfun;
-	pTQL->basic.basic.BornFun = (void *)OSlwToolRL_Born;
-    pTQL->basic.basic.BornFunByUser = (void *)pBornfun;
+    pTQL->basic.basic.ActEnvFun = (void (*)(struct OSLW_TOOL_RL_BASIC_STRUCT *))pActfun;
+	pTQL->basic.basic.BornFun = (void (*)(struct OSLW_TOOL_RL_BASIC_STRUCT *))OSlwToolRL_Born;
+    pTQL->basic.basic.BornFunByUser = (void (*)(struct OSLW_TOOL_RL_BASIC_STRUCT *))pBornfun;
     pTQL->Lamber = lamber;
 
-    pTQL->basic.basic.LearnFun = (void *)OSlwToolSarsaLamberLearnFun;
+    pTQL->basic.basic.LearnFun = (void* (*)(struct OSLW_TOOL_RL_BASIC_STRUCT *))OSlwToolSarsaLamberLearnFun;
 
-    pTQL->basic.basic.ChooseFun = (void *)OSlwToolQLearningChooseFun;
-    pTQL->basic.basic.StateStoreFun = (void *)OSlwToolQLearningLearnStateStore;
-    pTQL->basic.basic.isTermialFun = (void *)OSlwToolRL_isTermial;
+    pTQL->basic.basic.ChooseFun = (void* (*)(struct OSLW_TOOL_RL_BASIC_STRUCT *))OSlwToolQLearningChooseFun;
+    pTQL->basic.basic.StateStoreFun = (void *(*)(struct OSLW_TOOL_RL_BASIC_STRUCT *, OSlwToolMatrixSTU *))OSlwToolQLearningLearnStateStore;
+    pTQL->basic.basic.isTermialFun = (lw_8 (*)(struct OSLW_TOOL_RL_BASIC_STRUCT *))OSlwToolRL_isTermial;
 
 }
 
@@ -484,7 +484,7 @@ OSlwToolSarsaLamberSTU* OSlwToolSarsaLamberLearnFun(OSlwToolSarsaLamberSTU *pTSL
 	pRL = &(pTSL->basic.basic);
     pTQRLDS = &(pTSL->basic.DataTable);
 	OSLW_RL_UPDATE(pTSL);
-    /*(Ver.=0.96)
+    /*(Ver.=0.97)
         mat.length = pTQRLDS->state.length;
         mat.a = pTQRLDS->state.a;
         pOSlwToolMatrixIndex(&mat, pQRLB->StateNow, &(pQRLB->StateNowIndex), &col);
@@ -554,7 +554,7 @@ OSlwToolDQNetExpReplaySTU *OSlwToolDQNetExpReplayAppend(OSlwToolDQNetExpReplayST
 
 	OSLW_assert(!(pExpRe));
 
-	/*(Ver.=0.96)
+	/*(Ver.=0.97)
 	//旧版本 没有采用table
 	pbase = ((lw_u8 *)(pExpRe->MemPool.pData) + Num*OSLW_TOOL_DQN_EXP_FRAME_SIZE(*pExpRe));
 	//state last 保存
@@ -640,7 +640,7 @@ OSlwToolDQNetExpReplaySTU *OSlwToolDQNetExpReplayAppend(OSlwToolDQNetExpReplayST
 
 
 
-	/*(Ver.=0.96)
+	/*(Ver.=0.97)
 	//旧版本 没有采用table
 	pbase = ((lw_u8 *)(pExpRe->MemPool.pData) + (Num + 1)*OSLW_TOOL_DQN_EXP_FRAME_SIZE(*pExpRe));
 
@@ -718,7 +718,7 @@ OSlwToolDQNetExpReplaySTU *_OSlwToolDQNetExpReplayInsert(OSlwToolDQNetExpReplayS
 	//步骤1 重要性定位（哈希值计算）
 	hash_index = _ParaInt(_ParaCeil(_ParaDiv(_ParaSub(pExpReF->Importance, pExpRe->Rmin), pExpRe->Div)));
 
-	hash_index = hash_index > pExpRe->DivResult.uData ? pExpRe->DivResult.uData : hash_index;
+	hash_index = hash_index > (lw_32)(pExpRe->DivResult.uData) ? pExpRe->DivResult.uData : hash_index;
 	hash_index = hash_index < 0 ? 0 : hash_index;
 
 	hash_index = pExpRe->DivResult.uData - hash_index;//反向排列
@@ -755,7 +755,7 @@ OSlwToolDQNetExpReplaySTU *_OSlwToolDQNetExpReplayInsert(OSlwToolDQNetExpReplayS
 
 	pExpRe->Sum = _ParaAdd(pExpRe->Sum, pExpReF->Importance);
 
-	/*(Ver.=0.96)
+	/*(Ver.=0.97)
 	if (pExpRe->pMax == NULL)
 	{
 	pExpRe->pMax = pExpReF;
@@ -827,7 +827,7 @@ OSlwToolDQNetExpReplaySTU *_OSlwToolDQNetExpReplayDelete(OSlwToolDQNetExpReplayS
 
 	pExpRe->Sum = _ParaSub(pExpRe->Sum, pExpReF->Importance);
 
-	/*(Ver.=0.96)
+	/*(Ver.=0.97)
 	num = pExpRe->DivResult.uData;
 
 	if (pExpRe->pMax ==pExpReF)
@@ -933,7 +933,7 @@ lw_u16 OSlwToolDQNetExpReplaySample(OSlwToolDQNetExpReplaySTU *pExpRe)
 			{
 				//循环本体
 				now_Sum = _ParaAdd(now_Sum, pexpref->Importance);
-				/*(Ver.=0.96)
+				/*(Ver.=0.97)
 				if (now_Sum >= sample_th && num < pExpRe->SampleResult.uData)
 				{
 				now_min = _ParaAdd(para_div, now_min);
@@ -1019,16 +1019,16 @@ void OSlwToolDQNetInitial(OSlwToolDQNetSTU *pDQN)
 
 	OSlwToolBPnnInit(&(pDQN->MainNet),1);
 	OSlwToolBPnnInit(&(pDQN->TargetNet),1);
-	pDQN->TargetNet.Train.Flag.NeedTrain = 1;
+	pDQN->TargetNet.Train.Flag.NeedTrain = OSlwToolNNNeedTrain_NeedNot;
 
-    pDQN->StoreMemFun = (void *)OSlwToolDQNetStoreMem;
-    pDQN->basic.basic.ChooseFun = (void *)OSlwToolDQNetChoose;
-    pDQN->basic.basic.LearnFun = (void *)OSlwToolDQNetLearning;
+    pDQN->StoreMemFun = (struct OSLW_TOOL_DEEP_Q_NET_STRUCT *(*)(struct OSLW_TOOL_DEEP_Q_NET_STRUCT *))OSlwToolDQNetStoreMem;
+    pDQN->basic.basic.ChooseFun = (void *(*)(struct OSLW_TOOL_RL_BASIC_STRUCT *))OSlwToolDQNetChoose;
+    pDQN->basic.basic.LearnFun = (void *(*)(struct OSLW_TOOL_RL_BASIC_STRUCT *))OSlwToolDQNetLearning;
 
-    pDQN->ExpReplay.AppendFun = (void *)OSlwToolDQNetExpReplayAppend;
-    pDQN->ExpReplay.SampleFun = (void *)OSlwToolDQNetExpReplaySample;
-    pDQN->ExpReplay.UpdateFun = (void *)OSlwToolDQNetExpReplayUpdate;
-    pDQN->ExpReplay.MinMaxFun = (void *)OSlwToolDQNetExpReplayMinMax;
+    pDQN->ExpReplay.AppendFun = (struct OSLW_TOOL_DQN_EXP_REPLAY_STRUCT *(*)(struct OSLW_TOOL_DQN_EXP_REPLAY_STRUCT *, lw_u16, lw_u8))OSlwToolDQNetExpReplayAppend;
+    pDQN->ExpReplay.SampleFun = (lw_u16 (*)(struct OSLW_TOOL_DQN_EXP_REPLAY_STRUCT *))OSlwToolDQNetExpReplaySample;
+    pDQN->ExpReplay.UpdateFun = (struct OSLW_TOOL_DQN_EXP_REPLAY_STRUCT *(*)(struct OSLW_TOOL_DQN_EXP_REPLAY_STRUCT *, lw_u16))OSlwToolDQNetExpReplayUpdate;
+    pDQN->ExpReplay.MinMaxFun = (struct OSLW_TOOL_DQN_EXP_REPLAY_STRUCT *(*)(struct OSLW_TOOL_DQN_EXP_REPLAY_STRUCT *))OSlwToolDQNetExpReplayMinMax;
 }
 
 
@@ -1055,11 +1055,11 @@ void OSlwToolDQNetParaInitial//DQN内存初始化函数
     pDQN->Optim = Optim;
     pDQN->basic.basic.pRand = prand;
     pDQN->basic.basic.pmem = pMem;
-    pDQN->basic.basic.ActEnvFun = pActfun;
+    pDQN->basic.basic.ActEnvFun = (void (*)(struct OSLW_TOOL_RL_BASIC_STRUCT *))pActfun;
 	pDQN->basic.basic.BornFun = OSlwToolRL_Born;
-    pDQN->basic.basic.BornFunByUser = pBornfun;
+    pDQN->basic.basic.BornFunByUser = (void (*)(struct OSLW_TOOL_RL_BASIC_STRUCT *))pBornfun;
 
-    pDQN->basic.basic.isTermialFun = OSlwToolRL_isTermial;
+    pDQN->basic.basic.isTermialFun = (lw_8 (*)(struct OSLW_TOOL_RL_BASIC_STRUCT *))OSlwToolRL_isTermial;
 
 }
 
@@ -1291,14 +1291,14 @@ OSlwToolDQNetSTU* OSlwToolDQNetLearning(OSlwToolDQNetSTU *pDQN)
     ParaType ISweight;
     lw_u16  maxindex;
     OSlwToolQRLBasicSTU *pQRLB;
-    OSlwToolQRLDataSTU *pTQRLDS;
+    //OSlwToolQRLDataSTU *pTQRLDS;
     OSlwToolMatrixSTU mat;
     OSlwToolDQNetExpReplayFrameSTU *pbase;
     void **ppsample;
     OSLW_assert(!(pDQN));
 
     pQRLB = &(pDQN->basic);
-    pTQRLDS = &(pQRLB->DataTable);
+    //pTQRLDS = &(pQRLB->DataTable);
 
 	pDQN->StoreMemFun(pDQN);
 
@@ -1369,7 +1369,7 @@ OSlwToolDQNetSTU* OSlwToolDQNetLearning(OSlwToolDQNetSTU *pDQN)
             break;
         }
 
-        actindex = _ParaInt(*pActIndex);
+        actindex = (lw_u16)(_ParaInt(*pActIndex));
 
         pOSlwToolMatrixSet(&(pDQN->MainNet.ref), 0, &(pDQN->MainNet.y));//使误差为0
 
@@ -1392,7 +1392,7 @@ OSlwToolDQNetSTU* OSlwToolDQNetLearning(OSlwToolDQNetSTU *pDQN)
         {
 
             ISweight = _ParaPow(_ParaDiv(pDQN->ExpReplay.Min, pbase->Importance), pDQN->ExpReplay.Beta);
-            pDQN->MainNet._nl_factor = ISweight * 1.5;
+			pDQN->MainNet._nl_factor = _ParaMpy(ISweight, _ParaFrom(1.5));
 
             OSlwToolBPnnCalErr(&(pDQN->MainNet));
 
@@ -1416,7 +1416,7 @@ OSlwToolDQNetSTU* OSlwToolDQNetLearning(OSlwToolDQNetSTU *pDQN)
     pDQN->ExpReplay.UpdateFun(&(pDQN->ExpReplay), sample_len);
 
 
-    /*(Ver.=0.96)
+    /*(Ver.=0.97)
     //旧版本
     for (i = 0; i < pDQN->CountMax; i++)
     {
@@ -1469,8 +1469,8 @@ OSlwToolDQNetSTU* OSlwToolDQNetChoose(OSlwToolDQNetSTU *pDQN)
 {
 
     ParaType drand, dmax;
-    lw_u16 selrand, row;
-    OSlwToolMatrixSTU mat;
+    lw_u16 selrand;
+    //OSlwToolMatrixSTU mat;
     OSlwToolQRLBasicSTU *pQRLB;
     OSlwToolQRLDataSTU *pTQRLDS;
 	OSlwToolRLBasicSTU *pRL;
@@ -1486,7 +1486,7 @@ OSlwToolDQNetSTU* OSlwToolDQNetChoose(OSlwToolDQNetSTU *pDQN)
     if (drand < pQRLB->Ep)
     {
         //填装数据
-        /*(Ver.=0.96)dmax= _ParaDiv(pQRLB->StateNow, pDQN->StateFactor);//归一化
+        /*(Ver.=0.97)dmax= _ParaDiv(pQRLB->StateNow, pDQN->StateFactor);//归一化
         pDQN->MainNet.x.a[0] = dmax;*/
         //pOSlwToolMatrixSet(&(pDQN->MainNet.x), 0, &(pQRLB->StateNow));
         pOSlwToolMatrixDot(&(pDQN->MainNet.x), &(pRL->StateNow), &(pDQN->StateFactor));//乘以归一化因子
@@ -1537,17 +1537,17 @@ void OSlwToolDDPGradInitial(OSlwToolDDPGradSTU *pDDPG)//DDPG初始化函数，最先被调
 	OSlwToolBPnnInit(&(pDDPG->ActorMainNet),1);
 	OSlwToolBPnnInit(&(pDDPG->ActorTargetNet),1);
 
-	pDDPG->CriticTargetNet.Train.Flag.NeedTrain = 1;
-	pDDPG->ActorTargetNet.Train.Flag.NeedTrain = 1;
+	pDDPG->CriticTargetNet.Train.Flag.NeedTrain = OSlwToolNNNeedTrain_NeedNot;
+	pDDPG->ActorTargetNet.Train.Flag.NeedTrain = OSlwToolNNNeedTrain_NeedNot;
 
-	pDDPG->StoreMemFun = (void *)OSlwToolDDPGradStoreMem;
-	pDDPG->PGradBasic.basic.ChooseFun = (void *)OSlwToolDDPGradChoose;
-	pDDPG->PGradBasic.basic.LearnFun = (void *)OSlwToolDDPGradLearning;
+	pDDPG->StoreMemFun = (struct OSLW_TOOL_DEEP_DETE_POLICY_GRAD_STRUCT *(*)(struct OSLW_TOOL_DEEP_DETE_POLICY_GRAD_STRUCT *))OSlwToolDDPGradStoreMem;
+	pDDPG->PGradBasic.basic.ChooseFun = (void *(*)(struct OSLW_TOOL_RL_BASIC_STRUCT *))OSlwToolDDPGradChoose;
+	pDDPG->PGradBasic.basic.LearnFun = (void *(*)(struct OSLW_TOOL_RL_BASIC_STRUCT *))OSlwToolDDPGradLearning;
 
-	pDDPG->PGradBasic.ExpReplay.AppendFun = (void *)OSlwToolDQNetExpReplayAppend;
-	pDDPG->PGradBasic.ExpReplay.SampleFun = (void *)OSlwToolDQNetExpReplaySample;
-	pDDPG->PGradBasic.ExpReplay.UpdateFun = (void *)OSlwToolDQNetExpReplayUpdate;
-	pDDPG->PGradBasic.ExpReplay.MinMaxFun = (void *)OSlwToolDQNetExpReplayMinMax;
+	pDDPG->PGradBasic.ExpReplay.AppendFun = (struct OSLW_TOOL_DQN_EXP_REPLAY_STRUCT *(*)(struct OSLW_TOOL_DQN_EXP_REPLAY_STRUCT *, lw_u16, lw_u8))OSlwToolDQNetExpReplayAppend;
+	pDDPG->PGradBasic.ExpReplay.SampleFun = (lw_u16 (*)(struct OSLW_TOOL_DQN_EXP_REPLAY_STRUCT *))OSlwToolDQNetExpReplaySample;
+	pDDPG->PGradBasic.ExpReplay.UpdateFun = (struct OSLW_TOOL_DQN_EXP_REPLAY_STRUCT *(*)(struct OSLW_TOOL_DQN_EXP_REPLAY_STRUCT *, lw_u16))OSlwToolDQNetExpReplayUpdate;
+	pDDPG->PGradBasic.ExpReplay.MinMaxFun = (struct OSLW_TOOL_DQN_EXP_REPLAY_STRUCT *(*)(struct OSLW_TOOL_DQN_EXP_REPLAY_STRUCT *))OSlwToolDQNetExpReplayMinMax;
 
 
 }
@@ -1573,11 +1573,11 @@ void OSlwToolDDPGradParaInitial//DDPG参数初始化函数
 
 	pDDPG->PGradBasic.basic.pRand = prand;
 	pDDPG->PGradBasic.basic.pmem = pMem;
-	pDDPG->PGradBasic.basic.ActEnvFun = (void *)pActfun;
-	pDDPG->PGradBasic.basic.BornFun = (void *)OSlwToolRL_Born;
-	pDDPG->PGradBasic.basic.BornFunByUser = (void *)pBornfun;
+	pDDPG->PGradBasic.basic.ActEnvFun = (void (*)(struct OSLW_TOOL_RL_BASIC_STRUCT *))pActfun;
+	pDDPG->PGradBasic.basic.BornFun = (void (*)(struct OSLW_TOOL_RL_BASIC_STRUCT *))OSlwToolRL_Born;
+	pDDPG->PGradBasic.basic.BornFunByUser = (void (*)(struct OSLW_TOOL_RL_BASIC_STRUCT *))pBornfun;
 
-	pDDPG->PGradBasic.basic.isTermialFun = (void *)OSlwToolRL_isTermial;
+	pDDPG->PGradBasic.basic.isTermialFun = (lw_8 (*)(struct OSLW_TOOL_RL_BASIC_STRUCT *))OSlwToolRL_isTermial;
 
 
 }
@@ -2041,13 +2041,13 @@ OSlwToolDDPGradSTU* OSlwToolDDPGradStoreMem(OSlwToolDDPGradSTU *pDDPG)
 
 OSlwToolDDPGradSTU* OSlwToolDDPGradLearning(OSlwToolDDPGradSTU *pDDPG)
 {
-	lw_u16 i, sample_len, actindex;
-	ParaType *pStateLast, *pAct, *pReward, *pStateNow, negbuf = _ParaFrom(1), qbuf;
+	lw_u16 i, sample_len;
+	ParaType *pStateLast, *pAct, *pReward, *pStateNow, negbuf = _ParaFrom(1)/*, qbuf*/;
 	OSlwToolRLBasicSTU *pRL;
 	OSlwToolMatrixSTU mat1, mat2, mat3;
 	OSlwToolDQNetExpReplayFrameSTU *pbase;
 	void **ppsample;
-	OSlwToolNNLayerFullConSTU *pTNL;
+	//OSlwToolNNLayerFullConSTU *pTNL;
 
 	OSLW_assert(!(pDDPG));
 
@@ -2088,7 +2088,7 @@ OSlwToolDDPGradSTU* OSlwToolDDPGradLearning(OSlwToolDDPGradSTU *pDDPG)
 
 		//第二步 根据ActionNext 与 stateNow 运行 CrticTarget 计算 qtarget=R+GAMMA*CrticTarget.yout
 
-		pOSlwToolMatrixJoin(&(pDDPG->CriticTargetNet.x), &(pDDPG->ActorTargetNet.x), &(pDDPG->ActorTargetNet.y));//状态拼接动作
+		pOSlwToolMatrixJoin(&(pDDPG->CriticTargetNet.x), &(pDDPG->ActorTargetNet.x), &(pDDPG->ActorTargetNet.y),0x01);//状态拼接动作
 		pDDPG->CriticTargetNet.Train.mini_batch_now = 1;
 		OSlwToolBPnnForward(&(pDDPG->CriticTargetNet));//运行网络
 		
@@ -2110,12 +2110,12 @@ OSlwToolDDPGradSTU* OSlwToolDDPGradLearning(OSlwToolDDPGradSTU *pDDPG)
 		mat2.length = pRL->ActNow.length;
 		mat2.a = pAct;
 
-		pOSlwToolMatrixJoin(&(pDDPG->CriticMainNet.x), &(pDDPG->ActorMainNet.x), &(mat2));//状态拼接动作
+		pOSlwToolMatrixJoin(&(pDDPG->CriticMainNet.x), &(pDDPG->ActorMainNet.x), &(mat2), 0x01);//状态拼接动作
 	
 		pDDPG->CriticMainNet.Train.mini_batch_now = 1;
 		OSlwToolBPnnForward(&(pDDPG->CriticMainNet));//运行网络
 
-		qbuf = pDDPG->CriticMainNet.y.a[0];
+		//qbuf = pDDPG->CriticMainNet.y.a[0];
 
 		OSlwToolBPnnCalErr(&(pDDPG->CriticMainNet));//反向传播误差
 
@@ -2141,7 +2141,7 @@ OSlwToolDDPGradSTU* OSlwToolDDPGradLearning(OSlwToolDDPGradSTU *pDDPG)
 		pDDPG->ActorMainNet.Train.mini_batch_now = 1;
 		OSlwToolBPnnForward(&(pDDPG->ActorMainNet));//运行actormain网络
 
-		pOSlwToolMatrixJoin(&(pDDPG->CriticMainNet.x), &(pDDPG->ActorMainNet.x), &(pDDPG->ActorMainNet.y));//状态拼接动作
+		pOSlwToolMatrixJoin(&(pDDPG->CriticMainNet.x), &(pDDPG->ActorMainNet.x), &(pDDPG->ActorMainNet.y), 0x01);//状态拼接动作
 
 		//第五步
 		//运行C网络 进行qmain估计 
@@ -2149,10 +2149,14 @@ OSlwToolDDPGradSTU* OSlwToolDDPGradLearning(OSlwToolDDPGradSTU *pDDPG)
 		OSlwToolBPnnForward(&(pDDPG->CriticMainNet));
 
 		//第六步
-		//计算dq/da 取出dq/da
-		//mat3.a=OSlwToolBPnnGradForInput(&(pDDPG->CriticMainNet));
+		//计算dq/da 取出dq/da??????????????????
+		
+		//mat3.a=OSlwToolBPnnGradForInput(&(pDDPG->CriticMainNet));//这一步原来被屏蔽了 因为取消了0.96之后GradForInput函数
+		LwMatSet(&(pDDPG->CriticMainNet.y), _ParaFrom(1));//设置输出为1 反向传递就是dy/dx
+		OSlwToolBPnnBackward(&(pDDPG->CriticMainNet));
+		mat3.a = pDDPG->CriticMainNet.x.a;//得到d_critic/d_x
 		mat3.length = mat2.length;
-		mat3.a += mat1.length;
+		mat3.a += mat1.length;//跳过对环境的评价
 
 		//第七步
 		//dq/daparam=dq/da*da/daparam

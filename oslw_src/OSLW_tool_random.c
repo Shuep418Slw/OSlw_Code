@@ -1,4 +1,4 @@
-/*(Ver.=0.96)
+/*(Ver.=0.97)
  * OSLW_tool.c
  *
  *  Created on: 2017-11-13
@@ -121,7 +121,7 @@ ParaType OSlwToolRandomNormal(OSlwToolRandomBasicSTU *pRB, ParaType Cent, ParaTy
 void OSlwToolMatrixRandomInitial(OSlwToolMatrixSTU *m, void *pRand, ParaType Rmin, ParaType Rmax)
 {
 
-	lw_u32 d = m->length, n = 0;
+	lw_u32 d = m->length/*, n = 0*/;
 	ParaType *a;
 	OSlwToolRandomBasicSTU *p = (OSlwToolRandomBasicSTU *)pRand;
 	OSLW_assert(!(m));
@@ -130,6 +130,22 @@ void OSlwToolMatrixRandomInitial(OSlwToolMatrixSTU *m, void *pRand, ParaType Rmi
 	while (d--)
 	{
 		*a++ = p->rand((void *)p, Rmin, Rmax);
+	}
+
+}
+
+void OSlwToolMatrixRandomNormalInitial(OSlwToolMatrixSTU *m, void *pRand, ParaType mean, ParaType var)
+{
+
+	lw_u32 d = m->length/*, n = 0*/;
+	ParaType *a;
+	OSlwToolRandomBasicSTU *p = (OSlwToolRandomBasicSTU *)pRand;
+	OSLW_assert(!(m));
+	OSLW_assert(!(pRand));
+	a = m->a;
+	while (d--)
+	{
+		*a++ = p->randn((void *)p, mean, var);
 	}
 
 }
@@ -172,7 +188,11 @@ void *OSlwToolMatrixToRandnChip(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *m, OSlw
 #if OSLW_TOOL_IMPORT_RAND_CHAOS || OSLW_TOOL_IMPORT_ALL
 
 OSlwToolRandomChaosLogisticSTU OSlwTRCLog =
-{ _ParaFrom(1.0),_ParaFrom(0.0),OSlwToolRandomChaosLogisticFun,OSlwToolRandomChaosLogisticFunInt,OSlwToolRandomNormal,NULL,
+{ _ParaFrom(1.0),_ParaFrom(0.0),
+	OSlwToolRandomChaosLogisticFun,
+	OSlwToolRandomChaosLogisticFunInt,
+	(ParaType (*)(void *, ParaType, ParaType))OSlwToolRandomNormal,
+	NULL,
 #if OSLW_TOOL_RAND_NORM_METHOD == OSLW_TOOL_RAND_NORM_BM || OSLW_TOOL_RAND_NORM_METHOD == OSLW_TOOL_RAND_NORM_MP
 _ParaFrom(0), 0,
 #endif // OSLW_TOOL_RAND_NORM_METHOD == OSLW_TOOL_RAND_NORM_BM || OSLW_TOOL_RAND_NORM_METHOD == OSLW_TOOL_RAND_NORM_MP
@@ -207,7 +227,10 @@ lw_32 OSlwToolRandomChaosLogisticFunInt(void *pRand,lw_32 Rmin,lw_32 Rmax)
 //ÕÊÅñÓ³Éä
 
 OSlwToolRandomChaosTentSTU OSlwTRCTent=
-{_ParaFrom(1.0),_ParaFrom(-1.0),OSlwToolRandomChaosTentFun,OSlwToolRandomChaosTentFunInt,OSlwToolRandomNormal,NULL,
+{_ParaFrom(1.0),_ParaFrom(-1.0),
+	OSlwToolRandomChaosTentFun,
+	OSlwToolRandomChaosTentFunInt,
+	(ParaType (*)(void *, ParaType, ParaType))OSlwToolRandomNormal,NULL,
 #if OSLW_TOOL_RAND_NORM_METHOD == OSLW_TOOL_RAND_NORM_BM || OSLW_TOOL_RAND_NORM_METHOD == OSLW_TOOL_RAND_NORM_MP
 _ParaFrom(0), 0,
 #endif // OSLW_TOOL_RAND_NORM_METHOD == OSLW_TOOL_RAND_NORM_BM || OSLW_TOOL_RAND_NORM_METHOD == OSLW_TOOL_RAND_NORM_MP
@@ -239,7 +262,12 @@ lw_32 OSlwToolRandomChaosTentFunInt(void *pRand,lw_32 Rmin,lw_32 Rmax)
 //-----------------------
 //KENTÓ³Éä
 OSlwToolRandomChaosKentSTU OSlwTRCKent=
-{_ParaFrom(1.0),_ParaFrom(0.0),OSlwToolRandomChaosKentFun,OSlwToolRandomChaosKentFunInt,OSlwToolRandomNormal,NULL,
+{
+	_ParaFrom(1.0),_ParaFrom(0.0),
+	OSlwToolRandomChaosKentFun,
+	OSlwToolRandomChaosKentFunInt,
+	(ParaType (*)(void *, ParaType, ParaType))OSlwToolRandomNormal,
+	NULL,
 #if OSLW_TOOL_RAND_NORM_METHOD == OSLW_TOOL_RAND_NORM_BM || OSLW_TOOL_RAND_NORM_METHOD == OSLW_TOOL_RAND_NORM_MP
 _ParaFrom(0), 0,
 #endif // OSLW_TOOL_RAND_NORM_METHOD == OSLW_TOOL_RAND_NORM_BM || OSLW_TOOL_RAND_NORM_METHOD == OSLW_TOOL_RAND_NORM_MP
@@ -252,7 +280,7 @@ ParaType OSlwToolRandomChaosKentFun(void *pRand,ParaType Rmin,ParaType Rmax)
     OSlwToolRandomChaosKentSTU *p=(OSlwToolRandomChaosKentSTU *) pRand;
     OSLW_assert(!pRand);
 
-    /*(Ver.=0.96)
+    /*(Ver.=0.97)
     if(p->x <= p->a)
     {
         p->x=_ParaDiv(p->x,p->a);
@@ -297,8 +325,10 @@ OSlwToolRandomLCGSTU OSlwTRLcg =
 #elif OSLW_GLOBAL_MATH_TYPE==OSLW_GLOBAL_MATH_FLOAT || OSLW_GLOBAL_MATH_TYPE==OSLW_GLOBAL_MATH_DOUBLE
   _ParaFrom(1.0),_ParaFrom(0.0)
 #endif
-
-  ,OSlwToolRandomLCGFun,OSlwToolRandomLCGFunInt,OSlwToolRandomNormal,NULL,
+  ,OSlwToolRandomLCGFun,
+	OSlwToolRandomLCGFunInt,
+	(ParaType (*)(void *, ParaType, ParaType))OSlwToolRandomNormal,
+		NULL,
 #if OSLW_TOOL_RAND_NORM_METHOD == OSLW_TOOL_RAND_NORM_BM || OSLW_TOOL_RAND_NORM_METHOD == OSLW_TOOL_RAND_NORM_MP
 _ParaFrom(0), 0,
 #endif // OSLW_TOOL_RAND_NORM_METHOD == OSLW_TOOL_RAND_NORM_BM || OSLW_TOOL_RAND_NORM_METHOD == OSLW_TOOL_RAND_NORM_MP
@@ -399,8 +429,8 @@ void OSlwToolRandomWELL512Seed(OSlwToolRandomWELL512STU *pRand, lw_u32 seed)
 	
 	pRand->basic.rand = OSlwToolRandomWELL512Fun;
 	pRand->basic.randint = OSlwToolRandomWELL512FunInt;
-	pRand->basic.randn = OSlwToolRandomNormal;
-	pRand->basic.Seed = OSlwToolRandomWELL512Seed;
+	pRand->basic.randn = (ParaType (*)(void *, ParaType, ParaType))OSlwToolRandomNormal;
+	pRand->basic.Seed = (void (*)(void *, lw_u32))OSlwToolRandomWELL512Seed;
 
 
 }
@@ -510,8 +540,8 @@ void OSlwToolRandomMTSeed(OSlwToolRandomMTSTU *pRand, lw_u32 seed)
 	pRand->_index = N;
 	pRand->basic.rand = OSlwToolRandomMTFun;
 	pRand->basic.randint = OSlwToolRandomMTFunInt;
-	pRand->basic.randn = OSlwToolRandomNormal;
-	pRand->basic.Seed = OSlwToolRandomMTSeed;
+	pRand->basic.randn = (ParaType (*)(void *, ParaType, ParaType))OSlwToolRandomNormal;
+	pRand->basic.Seed = (void (*)(void *, lw_u32))OSlwToolRandomMTSeed;
 
 #if OSLW_GLOBAL_MATH_TYPE==OSLW_GLOBAL_MATH_Q
     pRand->basic.Rmax = OSLW_GLOBAL_MATH_MAX;

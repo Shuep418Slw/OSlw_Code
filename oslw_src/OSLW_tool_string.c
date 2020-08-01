@@ -1,4 +1,4 @@
-/*(Ver.=0.96)
+/*(Ver.=0.97)
 * OSLW_tool_string.c
 *
 *  Created on: 2018-08-22
@@ -46,7 +46,7 @@ lw_sf OSlwToolStringTolw_sf(const lw_u8 *str)
 	while (*str >= '0'&&*str <= '9')//计算小数部分
 	{
 		s = s + (*str - '0') / d;
-		d *= 10.0;
+		d *= 10.0f;
 		str++;
 	}
 
@@ -191,20 +191,20 @@ lw_u8* OSlwToolString_gcvt(lw_sf value, lw_32 ndigit, lw_u8 *buf)
 	{
 	    folat_part = -folat_part;
 	}
-	OSlwToolString_itoa(int_part, p, 10);
+	OSlwToolString_itoa(int_part, (lw_u8*)p, 10);
 
 	while (*p != '\0') p++;
 
 	*p++ = '.';
 
-	while (ndigit > 0 && folat_part > 0.0000001) {
+	while (ndigit > 0 && folat_part > 0.0000001f) {
 		*p++ = (int)(folat_part * 10) + '0';
 		folat_part = (folat_part * 10) - (int)(folat_part * 10);
 		ndigit--;
 	}
 
 	*p = '\0';
-	strcpy(buf, tmpbuf);
+	strcpy((void *)buf, (void *)tmpbuf);
 	return buf;
 }
 
@@ -221,11 +221,11 @@ void* OSlwToolStringVSprintf(lw_8 *buf, const lw_8 *fmt, va_list args)
 		fmt++;  // *fmt = '%'
 		switch (*fmt) {
 		case 'd':
-			OSlwToolString_itoa(va_arg(p_next_arg, int), p, 10);
+			OSlwToolString_itoa(va_arg(p_next_arg, int), (lw_u8*)p, 10);
 			p += strlen(p);
 			break;
 		case 'x':
-			OSlwToolString_utoa(va_arg(p_next_arg, unsigned int), p, 16);
+			OSlwToolString_utoa(va_arg(p_next_arg, unsigned int), (lw_u8*)p, 16);
 			p += strlen(p);
 			break;
 		case 'c':
@@ -237,7 +237,7 @@ void* OSlwToolStringVSprintf(lw_8 *buf, const lw_8 *fmt, va_list args)
 			p += strlen(p);
 			break;
 		case 'f':
-			OSlwToolString_gcvt(va_arg(p_next_arg, lw_sf), 6, p);
+			OSlwToolString_gcvt(va_arg(p_next_arg, lw_sf), 6, (lw_u8*)p);
 			p += strlen(p);
 			break;
 		default:

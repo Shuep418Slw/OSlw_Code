@@ -1,4 +1,4 @@
-/*(Ver.=0.96)
+/*(Ver.=0.97)
  * OSLW_tool.c
  *
  *  Created on: 2017-7-14
@@ -94,7 +94,7 @@ OSlwToolDListNodeSTU* OSlwToolDListIndexOf(OSlwToolDListSTU *pDL, OSLW_TOOL_DLIS
 
     OSLW_assert(!(pDL));
     pDLN = &pDL->Head;
-    /*(Ver.=0.96)
+    /*(Ver.=0.97)
         if(mode== OSlwToolDListIndexMode_byId)
         {
             while(!(pDLN->Id == id)) pDLN= (OSlwToolDListNodeSTU *)pDLN->con.pNext;
@@ -140,7 +140,7 @@ OSlwToolDListNodeSTU* OSlwToolDListAppend(struct OSLW_TOOL_DLIST_STRUCT *pDL,OSl
     OSLW_assert(!(pDL));
     OSLW_assert(!(pDLN));
 
-    /*(Ver.=0.96)
+    /*(Ver.=0.97)
     pDL->pTail->con.pNext=(OSlwToolDListNodeConnectSTU *)pDLN;//尾部的下一个为新的
     pDLN->con.pLast=(OSlwToolDListNodeConnectSTU *)pDL->pTail;//新节点的上一个为原来尾部
     */
@@ -172,7 +172,7 @@ OSlwToolDListNodeSTU* OSlwToolDListInsert
             //pDLNbuf1=(OSlwToolDListNodeSTU *)(pDLNbuf->con.pNext);//得到下一个
             pDLN->Key.uData =pDL->MaxLen++;//ID赋予
             pDL->NowLen++;
-            /*(Ver.=0.96)
+            /*(Ver.=0.97)
             pDLNbuf->con.pNext=(OSlwToolDListNodeConnectSTU *)pDLN;//上一个的下一个为新的
             pDLN->con.pLast=(OSlwToolDListNodeConnectSTU *)pDLNbuf;//新的的上一个为原来的
 
@@ -209,7 +209,7 @@ OSlwToolDListNodeSTU* _OSlwToolDListRemoveNode
         }
         else
         {
-            /*(Ver.=0.96)
+            /*(Ver.=0.97)
             pDLNbuf->con.pLast->pNext=pDLNbuf->con.pNext;//上一个的下一个为下一个
             pDLNbuf->con.pNext->pLast=pDLNbuf->con.pLast;//下一个的上一个为上一个
             */
@@ -233,7 +233,7 @@ OSlwToolDListNodeSTU* OSlwToolDListRemove
     OSlwToolDListNodeSTU *pDLNbuf;
     OSLW_assert(!(pDL));
     pDLNbuf = pDL->IndexOfFUN(pDL, pCmpFun, data, pdata);
-    /*(Ver.=0.96)
+    /*(Ver.=0.97)
         if((pDLNbuf) && data !=0)//0号为head 不可以释放
         {
             if(pDLNbuf == pDL->pTail)
@@ -282,9 +282,11 @@ lw_u8 HashCalStringBKDR(void *pData)
 
     OSLW_assert(!(pData));
 
-    while ((ch=(lw_u8)(*str++)))
+		ch=(lw_u8)str[0];
+    while (ch)
     {
         hash += ((hash << 7) + (hash << 1) + hash + ch);//hash=hash*131+ch;
+				ch=(lw_u8)(*str++);
     }
 
     return hash;
@@ -371,7 +373,6 @@ lw_u8 OSlwToolHashSelect(struct OSLW_TOOL_HASH_STRUCT *pH, void *pKey, lw_u8 *pI
         }
         return 0;
     }
-    return 0;
 
 }
 
@@ -570,7 +571,7 @@ void * OSlwToolTableRead(struct OSLW_TOOL_TABLE_STRUCT *pT, lw_32 row, lw_32 col
 
 lw_32 OSlwToolTableWrite(struct OSLW_TOOL_TABLE_STRUCT *pT, lw_32 row, lw_32 col, void *psrc, lw_u16 len)
 {
-    OSlwMemSizeSTU *pSize;
+    //OSlwMemSizeSTU *pSize;
     lw_u16 _len;
     void *p;
 

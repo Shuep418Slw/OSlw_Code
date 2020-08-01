@@ -1,4 +1,4 @@
-/*(Ver.=0.96)
+/*(Ver.=0.97)
  * OSLW_task.c
  *
  *  Created on: 2017-7-14
@@ -152,7 +152,7 @@ void OSlwInlineTaskBoringExe(OSlwTaskSTU *_pta)
 //------------------------------------------
 
 //!!!!!!!!!!!!为了防止部分编译器的断点不支持局部变量保存 推荐尽量使用全局变量!!!!!!!!!!!!!!!!!!!!!!!!
-/*(Ver.=0.96)
+/*(Ver.=0.97)
 OSlwParaCtrlSTU *ppc_1;
 OSlwGiftReceiveSTU *pgr_1;
 OSlwGiftPostmanSTU *pp_1;
@@ -274,7 +274,7 @@ void OSlwTaskWaitGiftTransmit(OSlwTaskSTU *pta)
 OSlwTaskSTU *OSlwTaskGiftTransmit(OSlwTaskSTU *pta,OSlwTaskSTU *pta_aim,OSlwGiftPostmanSTU *pGP,OSlwGiftUnitSTU *pgu,GiftPostmanStatusNUM method)
 {
 
-    OSlwGiftPostmanSTU *p;
+	OSlwGiftPostmanSTU *p = NULL;
 
 
     OSLW_assert(!pta);
@@ -386,9 +386,9 @@ void * OSlwTaskDelivery(OSlwTaskSTU *pta,OSlwMemoryBasicSTU *pmem,void *src,lw_u
 
 OSlwGroupAllType OSlwTaskAuctionJudge(OSlwTaskSTU *pta,lw_8 task_price)
 {
-    register lw_u32 data;
+    register OSlwGroupAllType data;
 
-    if (task_price >=0 )
+    if ((lw_16)task_price >=0 )
     {
         data = pta->Priority + task_price;
         data = data > (OSLW_TASK_NUM_MAX - 1) ? (OSLW_TASK_NUM_MAX - 1) : data;

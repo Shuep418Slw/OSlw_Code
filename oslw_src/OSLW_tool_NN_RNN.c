@@ -1,4 +1,4 @@
-/*(Ver.=0.96)
+/*(Ver.=0.97)
  * OSLW_tool.c
  *
  *  Created on: 2019-01-22
@@ -82,9 +82,18 @@
 ParaType * OSlwToolNNLayerRnnCellForward(struct OSLW_TOOL_NN_LAYER_RECURRENT_CELL_BASIC_STRUCT *pCELL, lw_u8 TrainFlag)
 {
 	OSlwToolNNLayerRnnCellSTU *pcell = (void *)pCELL;
-	OSlwMat we = { pCELL->cell_we.pData,pCELL->cell_we.uData, pCELL->cell_in_now.col, pcell->ActFun.in.col };
-	OSlwMat bi = { pCELL->cell_bi.pData,pCELL->cell_bi.uData,1, pcell->ActFun.in.col };
-
+	//OSlwMat we = { pCELL->cell_we.pData,pCELL->cell_we.uData, pCELL->cell_in_now.col, pcell->ActFun.in.col };
+	//OSlwMat bi = { pCELL->cell_bi.pData,pCELL->cell_bi.uData,1, pcell->ActFun.in.col };
+	OSlwMat we, bi;
+	we.a = (ParaType *)(pCELL->cell_we.pData);
+	we.length = (LwMatLenType)(pCELL->cell_we.uData);
+	we.row = pCELL->cell_in_now.col;
+	we.col = pcell->ActFun.in.col;
+	
+	bi.a = (ParaType *)(pCELL->cell_bi.pData);
+	bi.length = (LwMatLenType)(pCELL->cell_bi.uData);
+	bi.row = 1;
+	bi.col = pcell->ActFun.in.col;
 
 	pOSlwToolMatrixXWeBi(
 		&(pcell->ActFun.in),
@@ -104,8 +113,19 @@ ParaType * OSlwToolNNLayerRnnCellBackward(struct OSLW_TOOL_NN_LAYER_RECURRENT_CE
 	register lw_u32 i;
 	register ParaType *p1, *p2;
 	OSlwToolNNLayerRnnCellSTU *pcell = (void *)pCELL;
-	OSlwMat we = { pCELL->cell_we.pData,pCELL->cell_we.uData, pCELL->cell_in_now.col, pcell->ActFun.out.col };
-	OSlwMat dwe = { pCELL->p_cell_dwe,pCELL->cell_we.uData, pCELL->cell_in_now.col, pcell->ActFun.out.col };
+	//OSlwMat we = { pCELL->cell_we.pData,pCELL->cell_we.uData, pCELL->cell_in_now.col, pcell->ActFun.out.col };
+	//OSlwMat dwe = { pCELL->p_cell_dwe,pCELL->cell_we.uData, pCELL->cell_in_now.col, pcell->ActFun.out.col };
+
+	OSlwMat we, dwe;
+	we.a = (ParaType *)(pCELL->cell_we.pData);
+	we.length = (LwMatLenType)(pCELL->cell_we.uData);
+	we.row = pCELL->cell_in_now.col;
+	we.col = pcell->ActFun.in.col;
+
+	dwe.a = (ParaType *)(pCELL->p_cell_dwe);
+	dwe.length = (LwMatLenType)(pCELL->cell_we.uData);
+	dwe.row = pCELL->cell_in_now.col;
+	dwe.col = pcell->ActFun.in.col;
 
 
 	pcell->ActFun.Backward((void *)&(pcell->ActFun), 1);
@@ -115,7 +135,7 @@ ParaType * OSlwToolNNLayerRnnCellBackward(struct OSLW_TOOL_NN_LAYER_RECURRENT_CE
 		
 		//采用叠加方法
 		//dw=in'*out
-		pOSlwToolMatrixTurnMpy(&(dwe), &(pCELL->cell_in_now), &(pcell->ActFun.in), 6);
+		pOSlwToolMatrixTurnMpy(&(dwe), &(pCELL->cell_in_now), &(pcell->ActFun.in), 0x12);
 		//直接叠加
 		p1 = pCELL->p_cell_dbi;
 		p2 = pcell->ActFun.in.a;
@@ -124,7 +144,7 @@ ParaType * OSlwToolNNLayerRnnCellBackward(struct OSLW_TOOL_NN_LAYER_RECURRENT_CE
 	}
 
 	//xd = out*w';
-	pOSlwToolMatrixTurnMpy(&(pCELL->cell_in_now), &(pcell->ActFun.in), &(we), 1);
+	pOSlwToolMatrixTurnMpy(&(pCELL->cell_in_now), &(pcell->ActFun.in), &(we), 0x01);
 
 	return pcell->ActFun.out.a;
 }
@@ -213,10 +233,27 @@ void* OSlwToolNNLayerRnnCellNew(
 ParaType * OSlwToolNNLayerRnnCellLNormForward(struct OSLW_TOOL_NN_LAYER_RECURRENT_CELL_BASIC_STRUCT *pCELL, lw_u8 TrainFlag)
 {
 	OSlwToolNNLayerRnnCellLNormSTU *pcell = (void *)pCELL;
-	OSlwMat ht = { pcell->pHt, pcell->ActFun.out.col, 1, pcell->ActFun.out.col };
-	OSlwMat we = { pCELL->cell_we.pData,pCELL->cell_in_now.col*pcell->ActFun.in.col, pCELL->cell_in_now.col, pcell->ActFun.in.col };
-	OSlwMat bi = { pCELL->cell_bi.pData,pcell->ActFun.in.col,1, pcell->ActFun.in.col };
+	//OSlwMat ht = { pcell->pHt, pcell->ActFun.out.col, 1, pcell->ActFun.out.col };
+	//OSlwMat we = { pCELL->cell_we.pData,pCELL->cell_in_now.col*pcell->ActFun.in.col, pCELL->cell_in_now.col, pcell->ActFun.in.col };
+	//OSlwMat bi = { pCELL->cell_bi.pData,pcell->ActFun.in.col,1, pcell->ActFun.in.col };
+	OSlwMat ht;
+	OSlwMat we;
+	OSlwMat bi;
 
+	ht.a = (ParaType *)(pcell->pHt);
+	ht.length = (LwMatLenType)(pcell->ActFun.out.col);
+	ht.row = 1;
+	ht.col = pcell->ActFun.in.col;
+
+	we.a = (ParaType *)(pCELL->cell_we.pData);
+	we.length = ((LwMatLenType)(pCELL->cell_in_now.col)*(LwMatLenType)(pcell->ActFun.in.col));
+	we.row = pCELL->cell_in_now.col;
+	we.col = pcell->ActFun.in.col;
+
+	bi.a = (ParaType *)(pCELL->cell_bi.pData);
+	bi.length = (LwMatLenType)(pcell->ActFun.in.col);
+	bi.row = 1;
+	bi.col = pcell->ActFun.in.col;
 
 	pOSlwToolMatrixXWeBi(
 		&(ht),
@@ -264,7 +301,7 @@ ParaType * OSlwToolNNLayerRnnCellLNormBackward(struct OSLW_TOOL_NN_LAYER_RECURRE
 
 		//采用叠加方法
 		//dw=in'*out
-		pOSlwToolMatrixTurnMpy(&(dwe1), &(pCELL->cell_in_now), &(ht), 6);
+		pOSlwToolMatrixTurnMpy(&(dwe1), &(pCELL->cell_in_now), &(ht), 0x12);
 		//直接叠加
 		p1 = pCELL->p_cell_dbi;
 		p2 = pcell->ActFun.in.a;
@@ -285,7 +322,7 @@ ParaType * OSlwToolNNLayerRnnCellLNormBackward(struct OSLW_TOOL_NN_LAYER_RECURRE
 	}
 
 	//xd = out*w';
-	pOSlwToolMatrixTurnMpy(&(pCELL->cell_in_now), &(ht), &(we), 1);
+	pOSlwToolMatrixTurnMpy(&(pCELL->cell_in_now), &(ht), &(we), 0x01);
 
 	return pcell->ActFun.out.a;
 }
@@ -316,7 +353,7 @@ ParaType * OSlwToolNNLayerRnnCellLNormLoad(struct OSLW_TOOL_NN_LAYER_RECURRENT_C
 ParaType * OSlwToolNNLayerRnnCellLNormParaInit(struct OSLW_TOOL_NN_LAYER_RECURRENT_CELL_BASIC_STRUCT *pCELL,ParaType *we, ParaType *bi, ParaType *dwe, ParaType *dbi, ParaType *stack)
 {
 	OSlwToolNNLayerRnnCellLNormSTU *pcell = (void *)pCELL;
-	ParaType *norm_we, *norm_bi;
+	//ParaType *norm_we, *norm_bi;
 	LwMatColType out_len = pCELL->cell_out_now_handle->col;
 	pCELL->cell_we.pData = we;
 	pCELL->cell_bi.pData = bi;
@@ -897,8 +934,8 @@ lw_ptr OSlwToolNNLayerGruRnnForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *
 lw_ptr OSlwToolNNLayerGruRnnBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
 	register lw_u16 i, j;
-	register ParaType *dx;
-	register ParaType *douterr_t_1;
+	//register ParaType *dx;
+	//register ParaType *douterr_t_1;
 	register ParaType *pdst1, *pdst2, *pdst3;
 	register ParaType *psrc1, *psrc2, *psrc3;
 	register ParaType *out_err_t_1, *h_t_1;
@@ -1098,7 +1135,7 @@ lw_ptr OSlwToolBPnnLayerGruRnnDataInit(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUC
 {
 	OSlwToolNNLayerGruRnnSTU *pbrnn = (void *)pNNSLB;
 	ParaType *pwe, *pbi, *pdw, *pdb;
-	lw_u32 in_len, out_len;
+	//lw_u32 in_len, out_len;
 	ParaType *pflow;
 
 	//先执行全连接初始化
@@ -1108,8 +1145,8 @@ lw_ptr OSlwToolBPnnLayerGruRnnDataInit(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUC
 	{
 		OSLW_assert(1);
 	}
-	in_len = pNNSLB->in.col;
-	out_len = pNNSLB->out.col;
+	//in_len = pNNSLB->in.col;
+	//out_len = pNNSLB->out.col;
 
 	pwe = pbrnn->databasic.Weight.a;
 	pbi = pbrnn->databasic.Bias.a;
@@ -1290,7 +1327,7 @@ void* OSlwToolBPnnGruRnnAppend
 {
 
 	OSlwToolNNSubLayerBasicSTU *pnode1;
-	OSlwToolNNLayerGruRnnSTU *pBRNN;
+	//OSlwToolNNLayerGruRnnSTU *pBRNN;
 	OSlwToolNNLayerFullConSTU *pfc;
 	OSlwToolDListNodeSTU *pln1;
 	OSlwToolNNSubLayerBasicSTU **ppLIST1, **pptail;
@@ -1310,7 +1347,7 @@ void* OSlwToolBPnnGruRnnAppend
 		new_cell_fun, pTemplet, pmem
 	);
 
-	pBRNN = (void *)pnode1;
+	//pBRNN = (void *)pnode1;
 	pfc = (void *)pnode1;
 
 	pln1 = pmem->Calloc(pmem, sizeof(OSlwToolDListNodeSTU));

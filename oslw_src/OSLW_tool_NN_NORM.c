@@ -1,4 +1,4 @@
-/*(Ver.=0.96)
+/*(Ver.=0.97)
  * OSLW_tool.c
  *
  *  Created on: 2019-02-04
@@ -168,7 +168,7 @@ lw_ptr OSlwToolNNLayerLNormForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *p
 #if OSLW_TOOL_NN_DATA_FRAME==OSLW_TOOL_NN_D_FRAME_C
 	pOSlwToolMatrixMoments(&(pNNSLB->in), pln->pMean, pln->pVar,1);
 	
-	for ( i = 0; i < mini_b_num; i++)
+	for ( i = 0; i < (LwMatRowType)mini_b_num; i++)
 	{
 		pln->pVar[i]=_OSlwToolNNLayerLnForwordSub(OSlwMatGetR(pNNSLB->in, i), OSlwMatGetR(pNNSLB->out, i),
 			pln->databasic.Weight.a, pln->databasic.Bias.a,
@@ -425,6 +425,7 @@ ParaType _OSlwToolNNLayerInBackwordSub(
 
 	OSLW_assert(1);
 
+	return 0;
 }
 
 OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerINormNew(

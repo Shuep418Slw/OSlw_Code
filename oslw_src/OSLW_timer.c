@@ -1,4 +1,4 @@
-/*(Ver.=0.96)
+/*(Ver.=0.97)
  * OSLW_timer.c
  *
  *  Created on: 2017-7-25

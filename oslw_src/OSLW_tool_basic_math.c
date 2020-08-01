@@ -1,4 +1,4 @@
-/*(Ver.=0.96)
+/*(Ver.=0.97)
 * OSLW_tool.c
 *
 *  Created on: 2017-7-14
@@ -10,18 +10,15 @@
 
 #if OSLW_TOOL_IMPORT_MATH || OSLW_TOOL_IMPORT_ALL
 
-void OSlwToolMatrixInitial(OSlwToolMatrixSTU *m, LwMatRowType row, LwMatColType col, ParaType *a)
+OSlwToolMatrixSTU* OSlwToolMatrixInitial(OSlwToolMatrixSTU *m, LwMatRowType row, LwMatColType col, ParaType *a)
 {
     OSLW_assert(!(m));
-
     m->a = a;
     m->row = row;
     m->col = col;
-
     m->length = row*col;
+	return m;
 }
-
-
 
 
 
@@ -33,8 +30,7 @@ OSLW_TOOL_FUN(
 )
 {
 
-    
-    register lw_u32 d;
+	register lw_u32 d, t_div, t_mod;
     register ParaType *ps, *pm1, *pm2, data;
     OSLW_assert(!(s));
     OSLW_assert(!(m1));
@@ -45,33 +41,27 @@ OSLW_TOOL_FUN(
     ps = s->a;
     pm1 = m1->a;
     pm2 = m2->a;
+	t_div = d / CACHE_READ_NUM, t_mod = d%CACHE_READ_NUM;
 
-    //if(s->row == m1->row && s->row == m2->row && s->col == m1->col && s->col == m2->col)
-    if (s->length == m1->length && m1->length == m2->length)
+    if (s->length == m1->length && m1->length == m2->length)//向量相加
     {
-		while (d--)
-		{
-			*ps++ = _ParaAdd(*pm1++, *pm2++);
-		}
-
+		LwVectCopy(ps, pm1, t_div, t_mod);
+		ps = s->a;
+		LwVectAddKX(ps, _ParaFint(1), pm2, t_div, t_mod);
     }
     else if(s->length == m1->length && m2->length == 1)
     {
         data = *(m2->a);
-        while (d--)
-        {
-            *ps++ = _ParaAdd(*pm1++, data);
-        }
-
+		LwVectSet(ps, data, t_div, t_mod);
+		ps = s->a;
+		LwVectAddKX(ps, _ParaFint(1), pm1, t_div, t_mod);
     }
     else if (s->length == m2->length && m1->length == 1)
     {
         data = *(m1->a);
-        while (d--)
-        {
-            *ps++ = _ParaAdd(*pm2++, data);
-        }
-
+		LwVectSet(ps, data, t_div, t_mod);
+		ps = s->a;
+		LwVectAddKX(ps, _ParaFint(1), pm2, t_div, t_mod);
     }
     else
     {
@@ -91,7 +81,7 @@ OSLW_TOOL_FUN(
 )
 {
     
-    register lw_u32 d;
+	register lw_u32 d, t_div, t_mod;
     register ParaType *ps, *pm1, *pm2, data;
     OSLW_assert(!(s));
     OSLW_assert(!(m1));
@@ -103,34 +93,28 @@ OSLW_TOOL_FUN(
     pm1 = m1->a;
     pm2 = m2->a;
 
-    //if(s->row == m1->row && s->row == m2->row && s->col == m1->col && s->col == m2->col)
+	t_div = d / CACHE_READ_NUM, t_mod =d%CACHE_READ_NUM;
+
     if (s->length == m1->length && m1->length == m2->length)
     {
-        //for(i=0;i<d;i++)
-        //s->a[i]=_ParaSub(m1->a[i],m2->a[i]);
-        while (d--)
-        {
-            *ps++ = _ParaSub(*pm1++, *pm2++);
-        }
-
+		LwVectCopy(ps, pm1, t_div, t_mod);
+		ps = s->a;
+		LwVectAddKX(ps, _ParaFint(-1), pm2, t_div, t_mod);
     }
     else if (s->length == m1->length && m2->length == 1)
     {
-        data = *(m2->a);
-        while (d--)
-        {
-            *ps++ = _ParaSub(*pm1++, data);
-        }
+		data = -(*(m2->a));//-m2+m1
+		LwVectSet(ps, data, t_div, t_mod);
+		ps = s->a;
+		LwVectAddKX(ps, _ParaFint(-1), pm1, t_div, t_mod);
 
     }
     else if (s->length == m2->length && m1->length == 1)
     {
-        data = *(m1->a);
-        while (d--)
-        {
-            *ps++ = _ParaSub(*pm2++, data);
-        }
-
+		data = *(m1->a);
+		LwVectSet(ps, data, t_div, t_mod);
+		ps = s->a;
+		LwVectAddKX(ps, _ParaFint(-1), pm2, t_div, t_mod);
     }
     else
     {
@@ -146,7 +130,7 @@ OSLW_TOOL_FUN(
 	OSlwToolMatrixDot 
 )
 {
-    register lw_u32 d;
+	register lw_u32 d, t_div, t_mod;
 
     register ParaType *ps, *pm1, *pm2, data;
 
@@ -160,6 +144,8 @@ OSLW_TOOL_FUN(
     pm1 = m1->a;
     pm2 = m2->a;
 
+	t_div = d / CACHE_READ_NUM, t_mod = d%CACHE_READ_NUM;
+
     if (s->length == m1->length && m1->length == m2->length)
     {
         while (d--)
@@ -171,20 +157,16 @@ OSLW_TOOL_FUN(
     else if (s->length == m1->length && m2->length == 1)
     {
         data = *(m2->a);
-        while (d--)
-        {
-            *ps++ = _ParaMpy(*pm1++, data);
-        }
-
+		LwVectCopy(ps, pm1, t_div, t_mod);
+		ps = s->a;
+		LwVectScale(ps, data, t_div, t_mod);
     }
     else if (s->length == m2->length && m1->length == 1)
     {
-        data = *(m1->a);
-        while (d--)
-        {
-            *ps++ = _ParaMpy(*pm2++, data);
-        }
-
+		data = *(m1->a);
+		LwVectCopy(ps, pm2, t_div, t_mod);
+		ps = s->a;
+		LwVectScale(ps, data, t_div, t_mod);
     }
     else
     {
@@ -201,7 +183,7 @@ OSLW_TOOL_FUN(
 	OSlwToolMatrixMpy
 )
 {
-    register LwMatColType j, k, row, col, row1;
+    register LwMatColType j, row, col, row1;
 	register LwMatLenType i;
 	register ParaType temp, *_s, *_m1, *_m2, *_m1buf, *_sbuf, *_m2buf;
 	OSLW_assert(!(s));
@@ -220,14 +202,14 @@ OSLW_TOOL_FUN(
 			s->row, s->col, m1->col, 
 			_ParaFint(1), m1->a, m1->col, 
 			m2->a, m2->col, 
-			_ParaFint(0), s->a, s->col
+			(0), s->a, s->col
 		);
 
 
 #else
 #if L1_L2_CACHE_OPTIM == 1
 		lw_u32 div8, mod8;
-
+		//lw_u32 div7, mod7;
 		row = s->row;
 		col = s->col;
 		row1 = m2->row;
@@ -235,38 +217,64 @@ OSLW_TOOL_FUN(
 		_m1buf = m1->a;
 		_m2buf = m2->a;
 
-		div8 = col / 8, mod8 = col % 8;
+		div8 = col / CACHE_READ_NUM, mod8 = col % CACHE_READ_NUM;
+		//div7 = row1 / 4, mod7 = row1 % 4;
 
 		LW_MAT_CLR(s);
 
 		for (i = 0, _m1 = _m1buf; i < row; ++i)
 		{
+
 			for (j = 0, _m2 = _m2buf; j < row1; ++j, ++_m1)
 			{
 				temp = *_m1;
-				for (k = 0, _s = _sbuf; k < div8; ++k)
-				{
-					_s[0] = _ParaAdd(_s[0], _ParaMpy(temp, _m2[0]));
-					_s[1] = _ParaAdd(_s[1], _ParaMpy(temp, _m2[1]));
-					_s[2] = _ParaAdd(_s[2], _ParaMpy(temp, _m2[2]));
-					_s[3] = _ParaAdd(_s[3], _ParaMpy(temp, _m2[3]));
-
-					_s[4] = _ParaAdd(_s[4], _ParaMpy(temp, _m2[4]));
-					_s[5] = _ParaAdd(_s[5], _ParaMpy(temp, _m2[5]));
-					_s[6] = _ParaAdd(_s[6], _ParaMpy(temp, _m2[6]));
-					_s[7] = _ParaAdd(_s[7], _ParaMpy(temp, _m2[7]));
-
-					_m2 += 8;
-					_s += 8;
-
-				}
-
-				for (k = 0; k < mod8; ++k, ++_m2, ++_s)
-				{
-					*_s = _ParaAdd(*_s, _ParaMpy(temp, *_m2));
-				}
-
+				//改用VECT作为底层
+				_s = _sbuf;
+				LwVectAddKX(_s, temp, _m2, div8, mod8);
 			}
+
+			//_m2 = _m2buf;
+			//for (j = 0; j < div7; ++j,_m1+=4)
+			//{
+			//	temp = _m1[0];_s = _sbuf;
+			//	LwVectAddKX(_s, temp, _m2, div8, mod8);
+			//	temp = _m1[1];_s = _sbuf;
+			//	LwVectAddKX(_s, temp, _m2, div8, mod8);
+			//	temp = _m1[2];_s = _sbuf;
+			//	LwVectAddKX(_s, temp, _m2, div8, mod8);
+			//	temp = _m1[3];_s = _sbuf;
+			//	LwVectAddKX(_s, temp, _m2, div8, mod8);
+			//	//temp = _m1[4];_s = _sbuf;
+			//	//LwVectAddKX(_s, temp, _m2, div8, mod8);
+			//	//temp = _m1[5];_s = _sbuf;
+			//	//LwVectAddKX(_s, temp, _m2, div8, mod8);
+			//	//temp = _m1[6];_s = _sbuf;
+			//	//LwVectAddKX(_s, temp, _m2, div8, mod8);
+			//	//temp = _m1[7];_s = _sbuf;
+			//	//LwVectAddKX(_s, temp, _m2, div8, mod8);
+			//	//temp = _m1[8];_s = _sbuf;
+			//	//LwVectAddKX(_s, temp, _m2, div8, mod8);
+			//	//temp = _m1[9];_s = _sbuf;
+			//	//LwVectAddKX(_s, temp, _m2, div8, mod8);
+			//	//temp = _m1[10];_s = _sbuf;
+			//	//LwVectAddKX(_s, temp, _m2, div8, mod8);
+			//	//temp = _m1[11];_s = _sbuf;
+			//	//LwVectAddKX(_s, temp, _m2, div8, mod8);
+			//	//temp = _m1[12];_s = _sbuf;
+			//	//LwVectAddKX(_s, temp, _m2, div8, mod8);
+			//	//temp = _m1[13];_s = _sbuf;
+			//	//LwVectAddKX(_s, temp, _m2, div8, mod8);
+			//	//temp = _m1[14];_s = _sbuf;
+			//	//LwVectAddKX(_s, temp, _m2, div8, mod8);
+			//	//temp = _m1[15];_s = _sbuf;
+			//	//LwVectAddKX(_s, temp, _m2, div8, mod8);
+			//}
+			//for (j = 0; j < mod7; ++j,++_m1)
+			//{
+			//	temp = *_m1;_s = _sbuf;
+			//	LwVectAddKX(_s, temp, _m2, div8, mod8);
+			//}
+
 			_sbuf = _s;
 		}
 
@@ -379,7 +387,7 @@ OSLW_TOOL_FUN(
 OSLW_TOOL_FUN(
 	OSlwToolMatrixSTU*, 
 	OSlwToolMatrixReSize,          
-	(OSlwToolMatrixSTU *s, lw_u16 row, lw_u16 col),             
+	(OSlwToolMatrixSTU *s, LwMatRowType row, LwMatColType col),
 	OSlwToolMatrixReSize            
 )
 {
@@ -577,31 +585,21 @@ OSLW_TOOL_FUN(OSlwToolMatrixSTU*, OSlwToolMatrixSet,
               OSlwToolMatrixSet
              )
 {
-    register LwMatLenType i = 0;
-    register ParaType *ps;
+	register lw_u32 d, t_div, t_mod;
+	register ParaType *ps, *pa;
     OSLW_assert(!(s));
+
+	d = s->length;
+	ps = s->a;
+	pa = a->a;
+	t_div = d / CACHE_READ_NUM, t_mod = d%CACHE_READ_NUM;
+
     if (a)//如果定义a 相当于复制构造函数
     {
-        /*(Ver.=0.96)
-        for (i = 0; i < s->length; i++)
-        {
-        s->a[i] = a->a[i];
-        }
-        */
-
-        /*(Ver.=0.96)
-        i = s->length;
-        ps = s->a;
-        pa = a->a;
-
-        while (i--)
-        {
-        *ps++ = *pa++;
-        }
-        */
         if (s->length == a->length)
         {
-            memcpy(s->a, a->a, PARA_MEM_CAL(s->length));
+			LwVectCopy(ps, pa, t_div, t_mod);
+            //memcpy(s->a, a->a, PARA_MEM_CAL(s->length));
         }
         else
         {
@@ -611,21 +609,8 @@ OSLW_TOOL_FUN(OSlwToolMatrixSTU*, OSlwToolMatrixSet,
     }
     else//使用常量初始化
     {
-        /*(Ver.=0.96)
-        for (i = 0; i < s->length; i++)
-        {
-        s->a[i] = data;
-        }
-        */
-
-        i = s->length;
-        ps = s->a;
-
-        while (i--)
-        {
-            *ps++ = data;
-        }
-
+		data = *pa;
+		LwVectSet(ps, data, t_div, t_mod);
     }
 
     return s;
@@ -635,57 +620,16 @@ OSLW_TOOL_FUN(OSlwToolMatrixSTU*, OSlwToolMatrixSet,
 
 
 OSLW_TOOL_FUN(OSlwToolMatrixSTU*, OSlwToolMatrixJoin,
-(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *m1, OSlwToolMatrixSTU *m2), OSlwToolMatrixJoin)
+(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *m1, OSlwToolMatrixSTU *m2,lw_u8 dim), OSlwToolMatrixJoin)
 {
-	register lw_u32 i, j;
+	register LwMatLenType i, tdiv1, tmod1, tdiv2, tmod2;
 	register ParaType *sa, *m1a, *m2a;
-	if (s->length >= (m1->length + m2->length ))//满足拼接条件
-	{
-		
-		sa = s->a;
-		m1a = m1->a;
-		m2a = m2->a;
+	OSLW_assert(!(s));
+	OSLW_assert(!(m1));
+	OSLW_assert(!(m2));
+	OSLW_assert((s==m2));
 
-		if (m1->row == m2->row)//行数相等采用行拼接
-		{
-			i = m1->row;
-			while (i--)//行循环
-			{
-				//先复制M1
-				j = m1->col;
-				while (j--)
-				{
-					*sa++ = *m1a++;
-				}
-				//再复制M2
-				j = m2->col;
-				while (j--)
-				{
-					*sa++ = *m2a++;
-				}
-			}//end while 行循环
-		}
-		else//如果不是采用向量复制拼接
-		{
-			i = m1->length;
-
-			while (i--)
-			{
-				*sa++ = *m1a++;
-			}
-
-			i = m2->length;
-			
-			while (i--)
-			{
-				*sa++ = *m2a++;
-			}
-
-		}
-
-
-	}
-	else if (s == m1 && s->length >= m2->length)
+	if (s == m1 && s->length >= m2->length)
 	{
 		i = m2->length;
 		sa = s->a + (s->length - m2->length);
@@ -694,13 +638,78 @@ OSLW_TOOL_FUN(OSlwToolMatrixSTU*, OSlwToolMatrixJoin,
 		{
 			*sa++ = *m2a++;
 		}
+		return s;
 	}
-	else
+
+	sa = s->a;
+	m1a = m1->a;
+	m2a = m2->a;
+	OSLW_assert((sa == m1a));
+	OSLW_assert((sa == m2a));
+
+	switch (dim)
 	{
-		OSLW_assert(1);
-		
+	//按照向量拼接
+	case 0x00:
+		tdiv1 = m1->length / CACHE_READ_NUM, tmod1 = m1->length%CACHE_READ_NUM;
+		tdiv2 = m2->length / CACHE_READ_NUM, tmod2 = m2->length%CACHE_READ_NUM;;
+		if (s->length >= (m1->length + m2->length))//满足拼接条件
+		{
+			LwVectCopy(sa, m1a, tdiv1, tmod1);
+			LwVectCopy(sa, m2a, tdiv2, tmod2);
+		}
+		break;
+
+	//行拼接 
+	/*
+	a11 a12 a13...|b11 b12 b13...
+	a21 a22 a23...|b21 b22 b23...
+	...
+	*/
+	case 0x01:
+		tdiv1 = m1->col / CACHE_READ_NUM, tmod1 = m1->col%CACHE_READ_NUM;
+		tdiv2 = m2->col / CACHE_READ_NUM, tmod2 = m2->col%CACHE_READ_NUM;;
+		if (s->length >= (m1->length + m2->length) && (m1->row == m2->row))//满足拼接条件
+		{
+			for (i = 0; i < m1->row; i++)
+			{
+				LwVectCopy(sa, m1a, tdiv1, tmod1);
+				LwVectCopy(sa, m2a, tdiv2, tmod2);
+			}
+		}
+		break;
+	//列拼接 要求s的列数>m1与m2的列数
+	/*
+	a11 a12 a13 a14 a15 s16 s17.. 
+	a21 a22 a23 a24 a25 s26 s27.. 
+	....
+	b11 b12 b13 sn4 sn5 
+	...
+	*/
+	case 0x02:
+		if (s->row >= (m1->row + m2->row) && (s->col >= m1->col) && (s->col >= m2->col))//满足拼接条件
+		{
+			tdiv1 = m1->col / CACHE_READ_NUM, tmod1 = m1->col%CACHE_READ_NUM;
+			tdiv2 = m2->col / CACHE_READ_NUM, tmod2 = m2->col%CACHE_READ_NUM;;
+
+			for (i = 0; i < m1->row; i++)
+			{
+				sa = OSlwMatGetR(*s, i);
+				LwVectCopy(sa, m1a, tdiv1, tmod1);
+			}
+			for (i = 0; i < m2->row; i++)
+			{
+				sa = OSlwMatGetR(*s, i + m1->row);
+				LwVectCopy(sa, m2a, tdiv2, tmod2);
+			}
+
+
+		}
+		break;
+	default:
+		break;
 	}
-	
+
 
 
 
@@ -772,15 +781,12 @@ OSlwToolMatrixLossCrossEntropyForSoftMax
 				_pre_b = pre->a;
 				col = s->col;
 				for (; i < s->row; i++)
-				{
-					
+				{			
 					for ( j = 0; j < col; ++j, ++_s_b, ++_ref_b, ++_pre_b)
 					{
 						sum+= _ParaMpy(_ParaFrom(*_ref_b), _ParaLn(*_pre_b+ OSLW_GLOBAL_MATH_DELT));
 						*_s_b= *_ref_b - *_pre_b;
 					}
-
-
 				}
 
 #elif OSLW_TOOL_NN_DATA_FRAME == OSLW_TOOL_NN_D_FRAME_F
@@ -905,45 +911,32 @@ OSLW_TOOL_FUN(ParaType, OSlwToolMatrixSum,
 OSlwToolMatrixSum
 )
 {
-	register ParaType _sum = _ParaFint(0);
+	register ParaType _sum = 0;
 	register LwMatRowType r;
 	register LwMatColType c;
-	register LwMatLenType l;
+	register LwMatLenType L;
+	register LwMatLenType t_div, t_mod;
 	register lw_u32 i, j;
 	register ParaType *s, *d, *si;
 
 	OSLW_assert(!(SRC));
-	l = SRC->length;
+	L = SRC->length;
 	r = SRC->row;
 	c = SRC->col;
 	s = SRC->a;
+	d = DST->a;
 	switch (dim)
 	{
 	case 0x00:
-
-#if defined(OSLW_USING_CBLAS) && OSLW_USING_CBLAS
-		_sum=cblas_sasum(l, s, 1);
-#else
-
-		while (l--)
-		{
-			_sum = _ParaAdd(_sum, *s++);
-		}
-#endif
+		t_div = L / CACHE_READ_NUM, t_mod = L%CACHE_READ_NUM;
+		LwVectSum(_sum, s, t_div, t_mod);
 
 		break;
 
 	case 0x10:
 		OSLW_assert(!(DST));
-		d = DST->a;
-#if defined(OSLW_USING_CBLAS) && OSLW_USING_CBLAS
-		_sum = cblas_sasum(l, s, 1);
-#else
-		while (l--)
-		{
-			_sum = _ParaAdd(_sum, *s++);
-		}
-#endif
+		t_div = L / CACHE_READ_NUM, t_mod = L%CACHE_READ_NUM;
+		LwVectSum(_sum, s, t_div, t_mod);
 
 		*d = _ParaAdd(*d, _sum);
 		break;
@@ -953,19 +946,10 @@ OSlwToolMatrixSum
 		OSLW_assert(!(DST->length >= r));
 
 		d = DST->a;
+		t_div = c / CACHE_READ_NUM, t_mod = c%CACHE_READ_NUM;
 		while (r--)
 		{
-			i = c;
-
-#if defined(OSLW_USING_CBLAS) && OSLW_USING_CBLAS
-			_sum = cblas_sasum(i, s, 1);
-			s += i;
-#else
-			_sum = _ParaFrom(0);
-			while (i--)
-				_sum = _ParaAdd(_sum, *s++);
-#endif
-
+			LwVectSum(_sum, s, t_div, t_mod);
 			*d++ = _sum;
 		}
 		break;
@@ -974,20 +958,10 @@ OSlwToolMatrixSum
 		OSLW_assert(!(DST));
 		OSLW_assert(!(DST->length >= r));
 		d = DST->a;
+		t_div = c / CACHE_READ_NUM, t_mod = c%CACHE_READ_NUM;
 		while (r--)
 		{
-			i = c;
-
-#if defined(OSLW_USING_CBLAS) && OSLW_USING_CBLAS
-			_sum = cblas_sasum(i, s, 1);
-			s += i;
-#else
-			_sum = _ParaFrom(0);
-			while (i--)
-				_sum = _ParaAdd(_sum, *s++);
-#endif
-
-
+			LwVectSum(_sum, s, t_div, t_mod);
 			*d = _ParaAdd(*d, _sum);
 			++d;
 		}
@@ -1001,10 +975,6 @@ OSlwToolMatrixSum
 		while (j--)
 		{
 			i = r;
-#if defined(OSLW_USING_CBLAS) && OSLW_USING_CBLAS
-			_sum = cblas_sasum(i, s, c);
-			++s;
-#else
 			_sum = _ParaFrom(0);
 			si = s++;
 			while (i--)
@@ -1012,8 +982,6 @@ OSlwToolMatrixSum
 				_sum = _ParaAdd(_sum, *si);
 				si += c;
 			}
-#endif
-
 			*d++ = _sum;
 		}
 		break;
@@ -1026,10 +994,6 @@ OSlwToolMatrixSum
 		while (j--)
 		{
 			i = r;
-#if defined(OSLW_USING_CBLAS) && OSLW_USING_CBLAS
-			_sum = cblas_sasum(i, s, c);
-			++s;
-#else
 			_sum = _ParaFrom(0);
 			si = s++;
 			while (i--)
@@ -1037,7 +1001,6 @@ OSlwToolMatrixSum
 				_sum = _ParaAdd(_sum, *si);
 				si += c;
 			}
-#endif
 			*d = _ParaAdd(*d, _sum);
 			++d;
 		}
@@ -1047,8 +1010,6 @@ OSlwToolMatrixSum
 		OSLW_assert(1);
 		break;
 	}
-
-
 	return _sum;
 }
 
@@ -1070,7 +1031,6 @@ OSlwToolMatrixMPYA
 	//OSLW_assert(!(x));
 	//OSLW_assert(!(we));
 	//OSLW_assert(!(bi));
-
 	////神经网络前向传播
 	//if (s->row == x->row && s->col == we->col && x->col == we->row && s->length == bi->length)//满足相乘条件
 	//{
@@ -1080,12 +1040,10 @@ OSlwToolMatrixMPYA
 	//	_s = s->a;
 	//	_xbuf = x->a;
 	//	_bi = bi->a;
-
 	//	for (i = 0; i<s->row; i++)
 	//	{
 	//		for (j = 0; j<s->col; j++)
 	//		{
-
 	//			//_x=x->a+i*x->col;//x的指针归位 x归位于[n,1]
 	//			_x = _xbuf;
 	//			_we = we->a + j;//we的指针归位 we归位于[1,n]
@@ -1111,12 +1069,10 @@ OSlwToolMatrixMPYA
 	//	_s = s->a;
 	//	_xbuf = x->a;
 	//	stas = _ParaFint(0);
-
 	//	for (i = 0; i<s->row; i++)
 	//	{
 	//		for (j = 0; j<s->col; j++)
 	//		{
-
 	//			//_x=x->a+i*x->col;//x的指针归位 x归位于[n,1]
 	//			_x = _xbuf;
 	//			_we = we->a + j;//we的指针归位 we归位于[1,n]
@@ -1128,17 +1084,12 @@ OSlwToolMatrixMPYA
 	//				_we += col;
 	//			}//行向量*列向量
 	//			*_s++ = sum;
-
 	//			stas = _ParaAdd(stas, sum);//统计累加
-
 	//		}
 	//		_xbuf += x->col;//x的指针归位 x归位于[n,1]
 	//	}
-
 	//	bi->a[0] = _ParaDiv(stas, _ParaFrom(s->length));//计算平均值
-
 	//}
-
 	//else if (s->length == x->length && we->length ==1)
 	//{
 	//	//矩阵s=数字w*矩阵x+矩阵b
@@ -1149,7 +1100,6 @@ OSlwToolMatrixMPYA
 	//		_s = s->a;
 	//		_xbuf = x->a;
 	//		i = s->length;
-
 	//		while (i--)
 	//		{
 	//			*_s = _ParaAdd(*_bi, _ParaMpy((*_xbuf), _we_a));
@@ -1157,10 +1107,7 @@ OSlwToolMatrixMPYA
 	//			_s++;
 	//			_xbuf++;
 	//			_bi++;
-
 	//		}
-
-
 	//	}
 	//	//矩阵s=数字w*矩阵x+数字b
 	//	else if (bi->length == 1)
@@ -1169,16 +1116,13 @@ OSlwToolMatrixMPYA
 	//		_bi_a = *(bi->a);
 	//		_s = s->a;
 	//		_xbuf = x->a;
-
 	//		i = s->length;
 	//		while (i--)
 	//		{
 	//			*_s = _ParaAdd(_bi_a, _ParaMpy((*_xbuf), _we_a));
 	//			_s++;
 	//			_xbuf++;
-
 	//		}
-
 	//	}
 	//	else
 	//	{
@@ -1189,14 +1133,10 @@ OSlwToolMatrixMPYA
 	//{
 	//	OSLW_assert(1);
 	//}
-
-
 	return s;
 }
-
-
 OSLW_TOOL_FUN(
-	OSlwToolMatrixSTU*, 
+	OSlwToolMatrixSTU*,
 	OSlwToolMatrixWeXBi,
 	(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *we, OSlwToolMatrixSTU *x, OSlwToolMatrixSTU *bi),
 	OSlwToolMatrixWeXBi
@@ -1205,7 +1145,6 @@ OSLW_TOOL_FUN(
 	OSLW_assert(1);
 	return NULL;
 }
-
 OSLW_TOOL_FUN(
 	OSlwToolMatrixSTU*,
 	OSlwToolMatrixXWeBi,
@@ -1214,100 +1153,38 @@ OSLW_TOOL_FUN(
 )
 {
 
-#if defined(OSLW_USING_CBLAS) && OSLW_USING_CBLAS
-	register LwMatColType j, k, row, col, row1;
-	register LwMatLenType i;
-	register ParaType temp, *_s, *_m1, *_m2, *_m1buf, *_sbuf, *_m2buf, *_bibuf, *_bi;
-	
-	OSLW_assert(!(s));
-	OSLW_assert(!(x));
-	OSLW_assert(!(we));
-	OSLW_assert(!(bi));
-
-	if (s->col == we->col && s->row == x->row && we->row == x->col && s->col == bi->length)//满足神经网络前向条件
-	{
-		row = s->row;
-		col = s->col;
-		row1 = x->col;
-		_bibuf = bi->a;
-
-
-		_sbuf = s->a;
-		_m1buf = x->a;
-		_m2buf = we->a;
-
-
-		//先载入偏置
-
-		if (_bibuf)
-		{
-			for (i = 0, _s = _sbuf; i < row; i++)
-			{
-				for (j = 0, _bi = _bibuf; j < col; j++)
-				{
-					*_s++ = *_bi++;
-				}
-			}
-		}
-		else
-		{
-			LW_MAT_CLR(s);
-		}
-
-
-		cblas_sgemm(
-			CblasRowMajor,
-			CblasNoTrans, CblasNoTrans,
-			s->row, s->col, we->row,
-			_ParaFint(1), x->a, x->col,
-			we->a, we->col,
-			_ParaFint(1), s->a, s->col
-		);
-
-
-	}
-
-
-#else
-
-
 #if L1_L2_CACHE_OPTIM == 1
 	//register LwMatLenType i, j, k, row, col, row1;
 	//register ParaType temp, *_s, *_sbuf, *_x, *_we, *_web, *_xb, *_bi, *_bibuf;
-	
-	register LwMatColType j, k, row, col, row1;
-	register LwMatLenType i;
-	register ParaType temp, *_s, *_m1, *_m2, *_m1buf, *_sbuf, *_m2buf, *_bibuf, *_bi;
 
+	register LwMatColType  row, col/*, row1*/;
+	register LwMatLenType i;
+	register ParaType  *_s,/* *_m1buf,*/ *_sbuf,/* *_m2buf,*/ *_bibuf, *_bi;
+	register LwMatLenType div8, mod8;
 	OSLW_assert(!(s));
 	OSLW_assert(!(x));
 	OSLW_assert(!(we));
 	OSLW_assert(!(bi));
-
 	//神经网络前向传播
 	if (s->col == we->col && s->row == x->row && we->row == x->col && s->col == bi->length)//满足神经网络前向条件
 	{
 		row = s->row;
 		col = s->col;
-		row1 = x->col;
+		//row1 = x->col;
 		_bibuf = bi->a;
-
-
 		_sbuf = s->a;
-		_m1buf = x->a;
-		_m2buf = we->a;
-
-
+		//_m1buf = x->a;
+		//_m2buf = we->a;
+		div8 = col / CACHE_READ_NUM, mod8 = col%CACHE_READ_NUM;
 		//先载入偏置
-
 		if (_bibuf)
 		{
-			for (i = 0, _s=_sbuf; i < row; i++)
+			for (i = 0, _s = _sbuf; i < row; i++)
 			{
-				for (j = 0, _bi = _bibuf; j < col; j++)
-				{
-					*_s++ = *_bi++;
-				}
+				_bi = _bibuf;
+				//for (j = 0 ; j < col; j++)
+				//	*_s++ = *_bi++;
+				LwVectCopy(_s, _bi, div8, mod8);
 			}
 		}
 		else
@@ -1315,34 +1192,30 @@ OSLW_TOOL_FUN(
 			LW_MAT_CLR(s);
 		}
 
+		LwMatTurnMpy(s, x, we, 0x10);
 
 
-		for (i = 0, _m1 = _m1buf; i < row; ++i)
-		{
-			for (j = 0, _m2 = _m2buf; j < row1; ++j, ++_m1)
-			{
-				temp = *_m1;
-				for (k = 0, _s = _sbuf; k < col; ++k, ++_m2, ++_s)
-				{
-					*_s = _ParaAdd(*_s, _ParaMpy(temp, *_m2));
-				}
-			}
-			_sbuf = _s;
-		}
+		//for (i = 0, _m1 = _m1buf; i < row; ++i)
+		//{
+		//	for (j = 0, _m2 = _m2buf; j < row1; ++j, ++_m1)
+		//	{
+		//		temp = *_m1;
+		//		for (k = 0, _s = _sbuf; k < col; ++k, ++_m2, ++_s)
+		//		{
+		//			*_s = _ParaAdd(*_s, _ParaMpy(temp, *_m2));
+		//		}
+		//	}
+		//	_sbuf = _s;
+		//}
 	}
-
-
-
 #else
 	register lw_u16 i, j, k, row, col, row1;
 	register ParaType sum, *_s, *_x, *_we, *_web, *_xb, *_bi;
 	register ParaType *_we_a, *_bi_a;
-
 	OSLW_assert(!(s));
 	OSLW_assert(!(x));
 	OSLW_assert(!(we));
 	OSLW_assert(!(bi));
-
 	//神经网络前向传播
 	if (s->col == we->col && s->row == x->row && we->row == x->col && s->col == bi->length)//满足神经网络前向条件
 	{
@@ -1355,14 +1228,12 @@ OSLW_TOOL_FUN(
 		_bi = bi->a;
 		_we_a = we->a;
 		_bi_a = bi->a;
-
 		for (i = 0; i<row; i++)
 		{
 			for (j = 0; j<col; j++)
 			{
 				_we = _web;
 				_x = _xb;
-
 				sum = _ParaFrom(0);
 				for (k = 0; k<row1; k++)
 				{
@@ -1370,7 +1241,6 @@ OSLW_TOOL_FUN(
 					_we += col;
 					_x++;
 				}//行向量*列向量
-
 				*_s++ = _ParaAdd(sum, *_bi);
 				_bi++;
 				_web++;
@@ -1378,17 +1248,13 @@ OSLW_TOOL_FUN(
 			_xb += row1;
 			_bi = _bi_a;
 			_web = _we_a;
-
 		}
 	}
-
 #endif
-
-#endif
-
 
 	return s;
 }
+
 
 OSLW_TOOL_FUN(
 	OSlwToolMatrixSTU*,
@@ -1405,7 +1271,7 @@ OSLW_TOOL_FUN(
 
 	switch (flag)
 	{
-	case 0://都不用转置
+	case 0x00://都不用转置
 		if (s->row == m1->row && s->col == m2->col && m1->col == m2->row)
 		{
 
@@ -1424,7 +1290,7 @@ OSLW_TOOL_FUN(
 			OSLW_assert(1);
 			return NULL;
 		}
-	case 4:
+	case 0x10:
 		if (s->row == m1->row && s->col == m2->col && m1->col == m2->row)
 		{
 			cblas_sgemm(
@@ -1443,7 +1309,7 @@ OSLW_TOOL_FUN(
 			return NULL;
 		}
 		break;
-	case 1://m2转置
+	case 0x01://m2转置
 		if (s->row == m1->row && s->col == m2->row && m1->col == m2->col)
 		{
 			cblas_sgemm(
@@ -1461,7 +1327,7 @@ OSLW_TOOL_FUN(
 			OSLW_assert(1);
 			return NULL;
 		}
-	case 5:
+	case 0x11:
 		if (s->row == m1->row && s->col == m2->row && m1->col == m2->col)
 		{
 			cblas_sgemm(
@@ -1480,9 +1346,7 @@ OSLW_TOOL_FUN(
 		}
 		break;
 
-
-
-	case 2://m1转置
+	case 0x02://m1转置
 		if (s->row == m1->col && s->col == m2->col && m1->row == m2->row)
 		{
 			cblas_sgemm(
@@ -1500,7 +1364,7 @@ OSLW_TOOL_FUN(
 			OSLW_assert(1);
 			return NULL;
 		}
-	case 6:
+	case 0x12:
 		if (s->row == m1->col && s->col == m2->col && m1->row == m2->row)
 		{
 			cblas_sgemm(
@@ -1519,7 +1383,7 @@ OSLW_TOOL_FUN(
 		}
 		break;
 
-	case 3://都转置
+	case 0x03://都转置
 		if (s->row == m1->col && s->col == m2->row && m1->row == m2->col)
 		{
 			cblas_sgemm(
@@ -1537,7 +1401,7 @@ OSLW_TOOL_FUN(
 			OSLW_assert(1);
 			return NULL;
 		}
-	case 7:
+	case 0x13:
 		if (s->row == m1->col && s->col == m2->row && m1->row == m2->col)
 		{
 			cblas_sgemm(
@@ -1571,23 +1435,26 @@ OSLW_TOOL_FUN(
 
 	switch (flag)
 	{
-	case 0://都不用转置
+	case 0x00://都不用转置
 		LW_MAT_CLR(s);
-	case 4:
+	case 0x10:
 		if (s->row == m1->row && s->col == m2->col && m1->col == m2->row)
 		{
-			register LwMatLenType i, j, k, row = s->row, col = s->col, row1 = m2->row;
+			register LwMatLenType i, j, row = s->row, col = s->col, row1 = m2->row;
 			register ParaType temp, *_s, *_m1, *_m2, *_m1buf= m1->a, *_sbuf= s->a, *_m2buf= m2->a;
-
+			register LwMatLenType div8, mod8;
+			div8 = col / CACHE_READ_NUM, mod8 = col % CACHE_READ_NUM;
 			for (i = 0, _m1 = _m1buf; i < row; ++i)
 			{
 				for (j = 0, _m2 = _m2buf; j < row1; ++j, ++_m1)
 				{
 					temp = *_m1;
-					for (k = 0, _s = _sbuf; k < col; ++k, ++_m2, ++_s)
-					{
-						*_s = _ParaAdd(*_s, _ParaMpy(temp, *_m2));
-					}
+					//for (k = 0, _s = _sbuf; k < col; ++k, ++_m2, ++_s)
+					//{
+					//	*_s = _ParaAdd(*_s, _ParaMpy(temp, *_m2));
+					//}
+					_s = _sbuf;
+					LwVectAddKX(_s, temp, _m2, div8, mod8);
 				}
 				_sbuf = _s;
 			}
@@ -1599,24 +1466,26 @@ OSLW_TOOL_FUN(
 			return NULL;
 		}
 		break;
-	case 1://m2转置
+	case 0x01://m2转置
 		LW_MAT_CLR(s);		
-	case 5:
+	case 0x11:
 		if (s->row == m1->row && s->col == m2->row && m1->col == m2->col)
 		{
-			register LwMatLenType i, j, k, row = s->row, col = s->col, row1 = m1->col;
+			register LwMatLenType i, j, row = s->row, col = s->col, row1 = m1->col;
 			register ParaType temp, *_s, *_m1, *_m2, *_m1buf = m1->a, *_sbuf = s->a, *_m2buf = m2->a;
-
+			register LwMatLenType div8, mod8;
+			div8 = row1 / CACHE_READ_NUM, mod8 = row1 % CACHE_READ_NUM;
 			for (i = 0, _s = _sbuf; i < row; ++i)
 			{
 				for (j = 0, _m2 = _m2buf; j < col; ++j,++_s)
 				{
-					temp = _ParaFint(0);
-					for (k = 0, _m1 = _m1buf; k < row1; ++k, ++_m2,++_m1)
-					{
-						temp = _ParaAdd(temp, _ParaMpy(*_m1, *_m2));
-					}
-
+					//temp = _ParaFint(0);
+					//for (k = 0, _m1 = _m1buf; k < row1; ++k, ++_m2,++_m1)
+					//{
+					//	temp = _ParaAdd(temp, _ParaMpy(*_m1, *_m2));
+					//}
+					_m1 = _m1buf;
+					LwVectDot(temp, _m1, _m2, div8, mod8);
 					*_s = _ParaAdd(*_s, temp);
 				}
 				_m1buf = _m1;
@@ -1631,23 +1500,27 @@ OSLW_TOOL_FUN(
 
 
 
-	case 2://m1转置
+	case 0x02://m1转置
 		LW_MAT_CLR(s);
-	case 6:
+	case 0x12:
 		if (s->row == m1->col && s->col == m2->col && m1->row == m2->row)
 		{
-			register LwMatLenType i, j, k, row = s->row, col = s->col, row1 = m2->row;
+			register LwMatLenType i, j, row = s->row, col = s->col, row1 = m2->row;
 			register ParaType temp, *_s, *_m1, *_m2, *_m1buf = m1->a, *_sbuf = s->a, *_m2buf = m2->a;
+			register LwMatLenType div8, mod8;
+			div8 = col / CACHE_READ_NUM, mod8 = col % CACHE_READ_NUM;
 
 			for (i = 0, _m1 = _m1buf; i < row1; ++i)
 			{
 				for (j = 0, _s = _sbuf; j < row; ++j, ++_m1)
 				{	
 					temp = *_m1;
-					for (k = 0,_m2=_m2buf; k < col; ++k, ++_s, ++_m2)
-					{
-						*_s = _ParaAdd(*_s, _ParaMpy(temp, *_m2));
-					}
+					//for (k = 0,_m2=_m2buf; k < col; ++k, ++_s, ++_m2)
+					//{
+					//	*_s = _ParaAdd(*_s, _ParaMpy(temp, *_m2));
+					//}
+					_m2 = _m2buf;
+					LwVectAddKX(_s, temp, _m2, div8, mod8);
 				}
 				_m2buf = _m2;
 			}
@@ -1660,26 +1533,27 @@ OSLW_TOOL_FUN(
 		}
 		break;
 
-	case 3://都转置
+	case 0x03://都转置
 		LW_MAT_CLR(s);
-	case 7:
+	case 0x13:
 		if (s->row == m1->col && s->col == m2->row && m1->row == m2->col)
 		{
 			register LwMatLenType i, j, k, row = s->row, col = s->col, row1 = m1->row;
-			register ParaType temp, *_s, *_m1, *_m2, *_m1buf = m1->a, *_sbuf1 = s->a, *_sbuf2 = s->a, *_m2buf = m2->a;
+			register ParaType temp, *_s, *_m1, *_m2, *_m1buf = m1->a,/* *_sbuf1 = s->a,*/ *_sbuf2 = s->a, *_m2buf = m2->a;
+			//register LwMatLenType div8, mod8;
+			//div8 = row / CACHE_READ_NUM, mod8 = row % CACHE_READ_NUM;
 
 			for (i = 0, _m2 = _m2buf; i < col; ++i, ++_sbuf2)
 			{
 				for (j = 0, _m1 = _m1buf; j < row1; ++j, ++_m2)
 				{
 					temp = *_m2;
+					//s有间隔 无法使用Vect函数
 					for (k = 0, _s = _sbuf2; k < row; ++k, ++_m1, _s += col)
 					{
 						*_s = _ParaAdd(*_s, _ParaMpy(temp, *_m1));
 					}
 				}
-
-				
 			}
 		}
 		else
@@ -1863,7 +1737,7 @@ OSLW_TOOL_FUN(
 {
 	lw_u8 model_flag = ((MoveModel == OSlwToolMatrixConvMethod_Valid) << 1) | (KernalModel == 0);
 	
-	ParaType sum_buf, temp;
+	ParaType sum_buf;
 
 	ParaType *s_a;
 	ParaType *k_a, *k_p;
@@ -1960,38 +1834,45 @@ OSLW_TOOL_FUN(
 			move_y *= m2->col;
 			if (EqualModel)
 			{
+				register LwMatLenType div8, mod8;
+				div8 = kern_c / CACHE_READ_NUM, mod8 = kern_c % CACHE_READ_NUM;
+
 				for (i = 0,m_r=m2->a; i < out_r; i++,m_r+= move_y)
 				{
 					for ( j = 0,m_c=m_r; j < out_c; j++,m_c+=move_x)
 					{
-
 						//求和
-						sum_buf = _ParaFint(0);
+						//sum_buf = _ParaFint(0);
 						k_p = k_a;
 						m_p = m_c;
 						for (k = 0; k < kern_c; k++, m_p += sum_jump)
-							for (l = 0; l < kern_r; l++)
-								sum_buf += _ParaMpy(*k_p++, *m_p++);
-
+						{
+							//for (l = 0; l < kern_r; l++)
+							//	sum_buf += _ParaMpy(*k_p++, *m_p++);
+							LwVectDot(sum_buf, k_p, m_p, div8, mod8);
+						}
 						*s_a++ = sum_buf;
 					}
 				}
 			}
 			else
 			{
+				register LwMatLenType div8, mod8;
+				div8 = kern_c / CACHE_READ_NUM, mod8 = kern_c % CACHE_READ_NUM;
+
 				for (i = 0, m_r = m2->a; i < out_r; i++, m_r += move_y)
 				{
 					for (j = 0, m_c = m_r; j < out_c; j++, m_c += move_x)
 					{
-
 						//求和
-						sum_buf = _ParaFint(0);
 						k_p = k_a;
 						m_p = m_c;
 						for (k = 0; k < kern_c; k++, m_p += sum_jump)
-							for (l = 0; l < kern_r; l++)
-								sum_buf += _ParaMpy(*k_p++, *m_p++);
-
+						{
+							//for (l = 0; l < kern_r; l++)
+							//	sum_buf += _ParaMpy(*k_p++, *m_p++);
+							LwVectDot(sum_buf, k_p, m_p, div8, mod8);
+						}
 						*s_a += sum_buf;
 						s_a++;
 					}
@@ -2033,7 +1914,7 @@ OSLW_TOOL_FUN(
 )
 {
 
-	lw_32 i, j, k, l, n;
+	lw_32 i, j, k, L, n;
 	lw_32 out_r, out_c;
 	lw_32 sum_jump1, sum_jump2, out_jump, kern_len;
 	lw_32 kern_r, kern_c, kern_one_len;
@@ -2045,7 +1926,7 @@ OSLW_TOOL_FUN(
 	ParaType *m_r, *m_c, *m_p, *m_px, *m_py;
 	ParaType *pbuf, *pbuf2;
 
-	lw_32 div2, mod2;
+	LwMatLenType div8, mod8;
 
 	o_a = m_out->a;
 	out_r = m_out->row;
@@ -2063,16 +1944,13 @@ OSLW_TOOL_FUN(
 	{
 		if (bias->a)
 		{
-			l = m_out->col*m_out->row;
+			L = m_out->col*m_out->row;
+			div8 = L / CACHE_READ_NUM, mod8 = L % CACHE_READ_NUM;
 			for (i = 0; i < out_high; i++)
 			{
 				temp = bias->a[i];
-				for (j = 0; j < l; j++)
-				{
-					*o_a++ = temp;
-				}
+				LwVectSet(o_a, temp, div8, mod8);
 			}
-
 			o_a = m_out->a;
 		}
 		else
@@ -2087,7 +1965,6 @@ OSLW_TOOL_FUN(
 		LW_MAT_CLR(m_out);
 	}
 
-	div2 = kern_len / 2, mod2 = kern_len % 2;
 
 	if (FD_1_or_BK_0)
 	{
@@ -2095,6 +1972,9 @@ OSLW_TOOL_FUN(
 		sum_jump1 = m_in->col;
 		sum_jump2 = in_c*in_r;
 		out_jump = out_c*out_r;
+
+		div8 = kern_len / CACHE_READ_NUM, mod8 = kern_len % CACHE_READ_NUM;
+
 		for (i = 0, m_r = m_in->a; i < out_r; i++, m_r += move_y)
 		{
 			for (j = 0, m_c = m_r; j < out_c; j++, m_c += move_x)
@@ -2103,10 +1983,12 @@ OSLW_TOOL_FUN(
 				//抠图
 				pbuf = fast_buf;//得到缓冲区
 				for (k = 0, m_py = m_c; k < in_high; k++,m_py+=sum_jump2)
-					for (l = 0, m_px=m_py; l < kern_r; l++, m_px+=sum_jump1)
-						for (n = 0,m_p=m_px; n < kern_c; n++)
+					for (L = 0, m_px = m_py; L < kern_r; L++, m_px += sum_jump1)
+					{
+						//考虑到kern_c往往比较小 不进行提取了
+						for (n = 0, m_p = m_px; n < kern_c; n++)
 							*pbuf++ = *m_p++;
-
+					}
 				//求和
 				
 				for (k = 0, k_p = k_a,o_pic=o_a; k < out_high; k++, o_pic += out_jump)
@@ -2115,26 +1997,8 @@ OSLW_TOOL_FUN(
 					//{
 					//	sum_buf+= _ParaMpy(*k_p++, *pbuf++);
 					//}
-#if defined(OSLW_USING_CBLAS) && OSLW_USING_CBLAS
-
-					sum_buf = cblas_sdot(kern_len, k_p, 1, fast_buf, 1);
-					k_p += kern_len;
-
-#else
-					for (sum_buf = _ParaFint(0), pbuf = fast_buf, l = 0; l < div2; l++)
-					{
-						sum_buf += _ParaMpy(k_p[0], pbuf[0]);
-						sum_buf += _ParaMpy(k_p[1], pbuf[1]);
-						k_p += 2;
-						pbuf += 2;
-					}
-
-					l = mod2;
-					while (l--)
-					{
-						sum_buf += _ParaMpy(*k_p++, *pbuf++);
-					}
-#endif
+					pbuf = fast_buf;
+					LwVectDot(sum_buf, k_p, pbuf, div8, mod8);
 					(*o_pic) += sum_buf;
 				}
 
@@ -2156,11 +2020,11 @@ OSLW_TOOL_FUN(
 				pbuf = fast_buf;//得到缓冲区
 				for (k = i - kern_c + 1; k <= i; k++)
 				{
-					l = j - kern_r + 1;
-					for (m_c = m_r + k*in_c + l; l <= j; ++l, ++m_c)
+					L = j - kern_r + 1;
+					for (m_c = m_r + k*in_c + L; L <= j; ++L, ++m_c)
 					{
 						pbuf2 = pbuf++;						
-						if (!(k<0 || k >= in_c || l<0 || l >= in_r))
+						if (!(k<0 || k >= in_c || L<0 || L >= in_r))
 						{
 							//连续几张图片都采样这个点
 							for ( n = 0, m_p = m_c; n < in_high; n++, pbuf2+=kern_one_len, m_p += out_jump)
@@ -2183,7 +2047,7 @@ OSLW_TOOL_FUN(
 				for ( k = 0, o_pic=o_a,k_p=k_a; k < out_high; k++,k_p+=kern_one_len)
 				{
 					//循环每一个通道
-					for ( l = 0, pbuf = fast_buf, k_p2 = k_p + kern_one_len - 1, sum_buf = _ParaFint(0); l < in_high; l++, k_p2 += sum_jump1)
+					for ( L = 0, pbuf = fast_buf, k_p2 = k_p + kern_one_len - 1, sum_buf = _ParaFint(0); L < in_high; L++, k_p2 += sum_jump1)
 					{
 						for ( n = 0; n < kern_one_len; n++)
 						{
@@ -2224,20 +2088,24 @@ OSLW_TOOL_FUN(
 )
 {
 
-	lw_32 i, j, k, l, n;
+	lw_32 i, j, k, L, n;
 	lw_32 out_r, out_c;
-	lw_32 sum_jump1, sum_jump2, out_jump, kern_len;
+	lw_32 sum_jump1, sum_jump2 /*, out_jump, kern_len*/;
 	lw_32 kern_r, kern_c, kern_one_len;
 	lw_32 in_r, in_c;
 
 	lw_u32 col_count = 0, col_cmax, im2col_one_len;
 
-	ParaType temp, sum_buf;
+	ParaType temp;
 	ParaType *o_a;
-	ParaType *k_a, *k_p, *k_p2;
+	ParaType *k_a;
 	ParaType *m_r, *m_c, *m_p, *m_px, *m_py;
-	ParaType *pbuf, *pbuf2;
+	ParaType *pbuf;
 
+	LwMatLenType div8, mod8;
+
+	LwMat A, B, C;
+	
 	o_a = m_out->a;
 	out_r = m_out->row;
 	out_c = m_out->col;
@@ -2246,26 +2114,27 @@ OSLW_TOOL_FUN(
 	in_r = m_in->row;
 	in_c = m_in->col;
 	k_a = m_kernal->a;
-	kern_len = m_kernal->length;
+	//kern_len = m_kernal->length;
 	kern_one_len = kern_c*kern_r;
 	im2col_one_len = (kern_one_len*in_high);
 	col_cmax = now_flow_len / im2col_one_len;
-	col_cmax = col_cmax >= (out_c*out_r) ? (out_c*out_r) : col_cmax;
+	col_cmax = col_cmax >= (lw_u32)((out_c*out_r)) ? (out_c*out_r) : col_cmax;
 	OSLW_assert(!(col_cmax));
+
+
 
 	//先加上偏置
 	if (bias)
 	{
 		if (bias->a)
 		{
-			l = m_out->col*m_out->row;
+
+			L = m_out->col*m_out->row;
+			div8 = L / CACHE_READ_NUM, mod8 = L % CACHE_READ_NUM;
 			for (i = 0; i < out_high; i++)
 			{
 				temp = bias->a[i];
-				for (j = 0; j < l; j++)
-				{
-					*o_a++ = temp;
-				}
+				LwVectSet(o_a, temp, div8, mod8);
 			}
 
 			o_a = m_out->a;
@@ -2283,11 +2152,13 @@ OSLW_TOOL_FUN(
 	move_y *= m_in->col;
 	sum_jump1 = m_in->col;
 	sum_jump2 = in_c*in_r;
-	out_jump = out_c*out_r;
+	//out_jump = out_c*out_r;
 	pbuf = fast_buf;//得到缓冲区
 
 #if !(defined(OSLW_USING_CBLAS) && OSLW_USING_CBLAS)
-	OSLW_assert(1);
+	LwMatInit(&A, out_high, im2col_one_len, k_a);
+	LwMatInit(&B, col_cmax, im2col_one_len, fast_buf);
+	LwMatInit(&C, out_high, col_cmax, o_a);
 #endif
 
 
@@ -2297,7 +2168,7 @@ OSLW_TOOL_FUN(
 		{
 			//抠图
 			for (k = 0, m_py = m_c; k < in_high; k++, m_py += sum_jump2)
-				for (l = 0, m_px = m_py; l < kern_r; l++, m_px += sum_jump1)
+				for (L = 0, m_px = m_py; L < kern_r; L++, m_px += sum_jump1)
 					for (n = 0, m_p = m_px; n < kern_c; n++)
 						*pbuf++ = *m_p++;
 
@@ -2314,17 +2185,24 @@ OSLW_TOOL_FUN(
 					out_high, col_cmax, im2col_one_len,
 					_ParaFint(1), k_a, im2col_one_len,
 					pbuf, im2col_one_len,
-					_ParaFint(1), o_a, out_jump
+					_ParaFint(1), o_a, out_c*out_r//out_jump
 				);
+
+#else
+				C.a = o_a;
+				B.a = pbuf;
+				LwMatTurnMpy(&C, &A, &B, 0x11);
+
 #endif
 				o_a += col_cmax;
 			}
 		}
 	}
 
+	//处理残余项
 	if (col_count)
 	{
-		pbuf = fast_buf;
+		pbuf = fast_buf;	
 #if defined(OSLW_USING_CBLAS) && OSLW_USING_CBLAS
 		//计算矩阵乘法
 		cblas_sgemm(
@@ -2333,10 +2211,17 @@ OSLW_TOOL_FUN(
 			out_high, col_count, im2col_one_len,
 			_ParaFint(1), k_a, im2col_one_len,
 			pbuf, im2col_one_len,
-			_ParaFint(1), o_a, out_jump
+			_ParaFint(1), o_a, out_c*out_r//out_jump
 		);
+#else
+		//自定义的矩阵乘法
+		LwMatInit(&A, out_high, im2col_one_len, k_a);
+		LwMatInit(&B, col_count, im2col_one_len, pbuf);
+		LwMatInit(&C, out_high, col_count, o_a);
+
+		LwMatTurnMpy(&C, &A, &B, 0x11);
 #endif
-		o_a += col_cmax;
+		//o_a += col_cmax;
 	}
 
 
@@ -2362,6 +2247,7 @@ OSLW_TOOL_FUN(void*, OSlwToolMatrixMoments,
 	register ParaType _div_m;
 	register lw_u32 i, j;
 	register lw_u32 r, c;
+	LwMatLenType t_div, t_mod;
 	OSLW_assert(!(src));
 	OSLW_assert(!(mean));
 	OSLW_assert(!(var));
@@ -2369,6 +2255,8 @@ OSLW_TOOL_FUN(void*, OSlwToolMatrixMoments,
 	r = src->row;
 	c = src->col;
 	
+	t_div = c / CACHE_READ_NUM, t_mod = c%CACHE_READ_NUM;
+
 	if (dim==0x01)
 	{
 		pbase = src->a;
@@ -2377,13 +2265,13 @@ OSLW_TOOL_FUN(void*, OSlwToolMatrixMoments,
 		{
 			p = pbase;
 			
-			//求和
+			//求和			
+			//for (j = 0, _sum1 = _ParaFrom(0); j < c; ++j, ++p)
+			//{
+			//	_sum1 = _ParaAdd(_sum1, *p);
+			//}
+			LwVectSum(_sum1, p, t_div, t_mod);
 
-			
-			for (j = 0, _sum1 = _ParaFrom(0); j < c; ++j, ++p)
-			{
-				_sum1 = _ParaAdd(_sum1, *p);
-			}
 
 
 			//求平均
@@ -2468,6 +2356,7 @@ OSLW_TOOL_FUN(void*, OSlwToolMatrixVectShift,
 		ya = y->a;
 		xa = x->a;
 		wa_b = we->a;
+		ba_b = bi->a;
 		if (we->length == 1)
 		{
 			temp_w = *wa_b;
@@ -2497,7 +2386,7 @@ OSLW_TOOL_FUN(void*, OSlwToolMatrixVectShift,
 }
 
 
-OSLW_TOOL_FUN(void*, OSlwToolMatrixDotSum,
+OSLW_TOOL_FUN(ParaType, OSlwToolMatrixDotSum,
 (
 	OSlwToolMatrixSTU *y,
 	OSlwToolMatrixSTU *x1,
@@ -2508,14 +2397,15 @@ OSLW_TOOL_FUN(void*, OSlwToolMatrixDotSum,
 {
 
 	LwMatRowType i, _r;
-	LwMatColType j, _c;
-	LwMatLenType l, _L;
-	ParaType _sum;
+	//LwMatColType _c;
+	//LwMatLenType L1, _L;
+	LwMatLenType t_div, t_mod;
+	ParaType _sum = 0;
 	ParaType *ya, *ya_b;
-	ParaType *x1a, *x1a_b;
-	ParaType *x2a, *x2a_b;
+	ParaType *x1a;
+	ParaType *x2a;
 
-	OSLW_assert(!(y));
+	
 	OSLW_assert(!(x1));
 	OSLW_assert(!(x2));
 
@@ -2523,69 +2413,85 @@ OSLW_TOOL_FUN(void*, OSlwToolMatrixDotSum,
 	switch (dim)
 	{
 
-	case 0x00:
+	case 0x00://当做向量点积
 		x1a = x1->a;
 		x2a = x2->a;
-		_sum = _ParaFint(0);
-		for ( l = 0,_L=x1->length; l < _L; ++l,++x1a,++x2a)
-		{
-			_sum = _ParaAdd(_sum, (_ParaMpy(*x1a, *x2a)));
-		}
-		y->a[0] = _sum;
+		t_div = x1->length / CACHE_READ_NUM, t_mod = x1->length%CACHE_READ_NUM;
+
+		//_sum = _ParaFint(0);
+		//for (L1 = 0,_L=x1->length; L1 < _L; ++L1,++x1a,++x2a)
+		//{
+		//	_sum = _ParaAdd(_sum, (_ParaMpy(*x1a, *x2a)));
+		//}
+
+		LwVectDot(_sum, x1a, x2a, t_div, t_mod);
+		if (y!=NULL)
+			y->a[0] = _sum;
+		
 		break;
 
-	case 0x10:
+	case 0x10://当做向量点积 并加到y上面
+		OSLW_assert(!(y));
 		x1a = x1->a;
 		x2a = x2->a;
-		_sum = _ParaFint(0);
-		for (l = 0, _L = x1->length; l < _L; ++l, ++x1a, ++x2a)
-		{
-			_sum = _ParaAdd(_sum, (_ParaMpy(*x1a, *x2a)));
-		}
+		t_div = x1->length / CACHE_READ_NUM, t_mod = x1->length%CACHE_READ_NUM;
+
+		//_sum = _ParaFint(0);
+		//for (L1 = 0,_L=x1->length; L1 < _L; ++L1,++x1a,++x2a)
+		//{
+		//	_sum = _ParaAdd(_sum, (_ParaMpy(*x1a, *x2a)));
+		//}
+
+		LwVectDot(_sum, x1a, x2a, t_div, t_mod);
 		y->a[0] = _ParaAdd(y->a[0], _sum);
 		break;
 
-	case 0x01:
+	case 0x01://按照每一行求点积
+		OSLW_assert(!(y));
 		x1a = x1->a;
 		x2a = x2->a;
 		ya = y->a;
-		for (i = 0, _r = x1->row, _c = x1->col; i < _r; ++i, ++ya)
+		t_div = x1->col / CACHE_READ_NUM, t_mod = x1->col%CACHE_READ_NUM;
+		for (i = 0, _r = x1->row; i < _r; ++i, ++ya)
 		{
-			for (j = 0, _sum = _ParaFint(0); j < _c; ++j, ++x1a, ++x2a)
-			{
-				_sum = _ParaAdd(_sum, (_ParaMpy(*x1a, *x2a)));
-			}
+			//for (j = 0, _sum = _ParaFint(0); j < _c; ++j, ++x1a, ++x2a)
+			//	_sum = _ParaAdd(_sum, (_ParaMpy(*x1a, *x2a)));
+			LwVectDot(_sum, x1a, x2a, t_div, t_mod);
+
 			*ya = _sum;
 		}
-
 		break;
 
-	case 0x11:
+	case 0x11://按照每一行求点积 并把结果加上去
+		OSLW_assert(!(y));
 		x1a = x1->a;
 		x2a = x2->a;
 		ya = y->a;
-		for (i = 0, _r = x1->row, _c = x1->col; i < _r; ++i, ++ya)
+		t_div = x1->col / CACHE_READ_NUM, t_mod = x1->col%CACHE_READ_NUM;
+		for (i = 0, _r = x1->row; i < _r; ++i, ++ya)
 		{
-			for (j = 0, _sum = _ParaFint(0); j < _c; ++j, ++x1a, ++x2a)
-			{
-				_sum = _ParaAdd(_sum, (_ParaMpy(*x1a, *x2a)));
-			}
+			//for (j = 0, _sum = _ParaFint(0); j < _c; ++j, ++x1a, ++x2a)
+			//	_sum = _ParaAdd(_sum, (_ParaMpy(*x1a, *x2a)));
+			LwVectDot(_sum, x1a, x2a, t_div, t_mod);
+
 			*ya = _ParaAdd(*ya, _sum);
 		}
 		break;
 
-	case 0x02:
+	case 0x02://按照每一列求点积
 		LW_MAT_CLR(y);
-	case 0x12:
+	case 0x12://把结果加上去
+		OSLW_assert(!(y));
 		x1a = x1->a;
 		x2a = x2->a;
 		ya_b = y->a;
-		for (i = 0, _r = x1->row, _c = x1->col; i < _r; ++i, ++ya)
+		t_div = x1->col / CACHE_READ_NUM, t_mod = x1->col%CACHE_READ_NUM;
+		for (i = 0, _r = x1->row; i < _r; ++i, ++ya)
 		{
-			for (j = 0, ya = ya_b; j < _c; ++j, ++x1a, ++x2a, ++ya)
-			{
-				*ya = _ParaAdd(*ya, (_ParaMpy(*x1a, *x2a)));
-			}
+			//for (j = 0, ya = ya_b; j < _c; ++j, ++x1a, ++x2a, ++ya)
+			//	*ya = _ParaAdd(*ya, (_ParaMpy(*x1a, *x2a)));
+			ya = ya_b;
+			LwVectDotSum(ya, x1a, x2a, t_div, t_mod);		
 		}
 		break;
 
@@ -2594,6 +2500,7 @@ OSLW_TOOL_FUN(void*, OSlwToolMatrixDotSum,
 		break;
 	}
 
+	return _sum;
 
 }
 
@@ -2632,6 +2539,900 @@ OSlwToolMatrix_RATIO_ADD
 
 	return s;
 }
+
+
+#if OSLW_GLOBAL_MATH_TYPE==OSLW_GLOBAL_MATH_FLOAT || OSLW_GLOBAL_MATH_TYPE==OSLW_GLOBAL_MATH_DOUBLE
+#define LW_SVD_MAX(A,B) ((A)>(B)?(A):(B))
+#define LW_SVD_MIN(A,B) ((A)<(B)?(A):(B))
+
+#if OSLW_GLOBAL_MATH_TYPE == OSLW_GLOBAL_MATH_FLOAT
+#define LW_CHYPOT(X,Y,Z) do{\
+	(Z)=sqrtf((X)*(X)+(Y)*(Y));\
+}while(0)
+#else
+#define LW_CHYPOT(X,Y,Z) do{\
+	(Z)=sqrt((X)*(X)+(Y)*(Y));\
+}while(0)
+#endif
+
+inline int LW_svd_IsFinite(ParaType x)
+{
+#if OSLW_GLOBAL_MATH_TYPE == OSLW_GLOBAL_MATH_FLOAT
+	int32_t *hx;
+	hx = (void *)(&x);
+	return (int32_t)((uint32_t)(((*hx) & 0x7fffffff) - 0x7f800000) >> 31 != 0);
+#else
+	return isfinite(x);
+#endif
+}
+
+inline static void LW_svd_rotg(ParaType *x, ParaType *y, ParaType *c, ParaType *s)
+{
+	ParaType rho, r, z, absx, absy;
+
+	rho = ((absx = _ParaAbs(*x)) > (absy = _ParaAbs(*y))) ? *x : *y;
+	LW_CHYPOT(*x, *y, r);
+	r = (rho > 0.0F) ? r : -r;
+	*c = (r == 0.0F) ? 1.0F : *x / r;
+	*s = (r == 0.0F) ? 0.0F : *y / r;
+	z = (absx > absy) ? *s : 1.0F;
+	z = (absy >= absx && *c != 0.0F) ? 1.0F / *c : z;
+	*x = r;
+	*y = z;
+}
+
+
+inline static void LW_rot_real(
+	int	n,	
+	ParaType	c,	
+	ParaType	s, 	
+	ParaType	*x,	
+	ParaType	*y
+)
+{
+	ParaType t;
+	if (n <= 0) {
+		return;
+	}
+
+	while (n--) {
+		t = c * *x + s * *y;
+		*y = c * *y - s * *x;
+		*x++ = t;
+		y++;
+	}
+}
+
+OSLW_TOOL_FUN(lw_16, OSlwToolMatrix_SVD,
+(
+	OSlwMat *U,
+	OSlwMat *S,
+	OSlwMat *V,
+	OSlwMat *xin,
+	ParaType *temp_run
+),
+OSlwToolMatrix_SVD
+)
+{
+	OSLW_assert(!(xin));
+	OSLW_assert(!(U));
+	OSLW_assert(!(S));
+	OSLW_assert(!(temp_run));
+
+	ParaType *x = xin->a;
+	lw_32 n = (lw_32)(xin->row);
+	lw_32 p = (lw_32)(xin->col);
+	ParaType *e = temp_run;
+	ParaType *s = S->a;
+	ParaType *work_temp = temp_run + xin->col;
+	ParaType *u = U->a;
+	ParaType *v;
+	lw_u16 get_v_flag;
+
+	lw_32 nm1, np1;
+	lw_32 i_iter, k_case, j, k, kp1;
+	lw_32 l, lp1, lm1, ls, lu;
+	lw_32 m, mm, mm1, mm2;
+	lw_32 info = 0;
+	lw_32 nct, ncu, nrt, nml;
+	lw_32 ii;
+	lw_u32 pll, plj, pil;
+	ParaType t, t2, r;
+	ParaType sm, smm1, emm1, el, sl, b, c, cs, sn, scale, t1, f;
+	ParaType test, ztest, snorm, g, shift;
+	ParaType *pxll, *pxlj, *pel, *pel1, *psl, *pull, *pvll;
+	ParaType *tp1, *tp2, temp, temp1;
+
+	lw_32 nml_div, nml_mod;
+	lw_32 p_lp1_div, p_lp1_mod;
+	lw_32 n_lp1_div, n_lp1_mod;
+
+	lw_32 n_div, n_mod;
+	lw_32 p_div, p_mod;
+
+	n_div = n / CACHE_READ_NUM, n_mod = n%CACHE_READ_NUM;
+	p_div = p / CACHE_READ_NUM, p_mod = p%CACHE_READ_NUM;
+
+#if OSLW_GLOBAL_MATH_TYPE == OSLW_GLOBAL_MATH_FLOAT
+	const ParaType one_const = 1.0F, zero_const = 0.0F;
+	const ParaType eps_const = FLT_EPSILON;
+	const ParaType  tiny_const = FLT_MIN / FLT_EPSILON;
+#else
+	const ParaType one_const = 1.0, zero_const = 0.0;
+	const ParaType eps_const = DBL_EPSILON;
+	const ParaType  tiny_const = DBL_MIN / DBL_EPSILON;
+#endif
+
+
+	if (V==NULL)
+	{
+		get_v_flag = 0;
+	}
+	else
+	{
+		get_v_flag = 1;
+		v = V->a;
+	}
+	
+
+	ncu = LW_SVD_MIN(n, p);
+	np1 = n + 1;
+	nm1 = n - 1;
+	nct = LW_SVD_MIN(nm1, p);
+	nrt = LW_SVD_MAX(0, LW_SVD_MIN(p - 2, n));
+	lu = LW_SVD_MAX(nct, nrt);
+	for (l = 0; l<lu; l++) {
+		nml = n - l;
+		lp1 = l + 1;
+		pll = l * np1;
+		pxll = x + pll;		
+		psl = s + l;		
+		pel = e + l;	
+		pel1 = pel + 1;	
+		nml_div = nml / CACHE_READ_NUM, nml_mod = nml%CACHE_READ_NUM;
+		if (l < nct) {
+			ParaType tttemp1;
+			*psl = zero_const;
+			tp1 = pxll;
+			LwVectNorm2(tttemp1, tp1, nml_div, nml_mod);
+			*psl = tttemp1;
+			if (_ParaAbs(*psl) != zero_const) {
+				if (_ParaAbs(*pxll) != zero_const) {
+
+					*psl = (*pxll >= zero_const) ? _ParaAbs(*psl) : -_ParaAbs(*psl);
+
+				}
+
+				temp1 = one_const / *psl;
+				tp1 = pxll;
+				LwVectScale(tp1, temp1, nml_div, nml_mod);
+
+				*pxll += one_const;
+			}
+			*psl = -*psl;
+		}
+		for (j = lp1; j<p; j++) {
+			plj = j * n + l;
+			pxlj = x + plj;	
+			if (l < nct && _ParaAbs(*psl) != zero_const) {
+
+				tp1 = pxll;
+				tp2 = pxlj;
+				LwVectDot(t, tp1, tp2, nml_div, nml_mod);
+				t = -t;
+
+				t /= *pxll;
+
+
+				tp1 = pxlj;
+				tp2 = pxll;
+				LwVectAddKX(tp1, t, tp2, nml_div, nml_mod);
+
+
+			}
+
+			*(e + j) = *pxlj;
+		}
+
+		if (get_v_flag && l < nct) {
+			tp1 = u + pll;
+			tp2 = pxll;
+			LwVectCopy(tp1, tp2, nml_div, nml_mod);
+		}
+		if (l < nrt) {
+			ParaType tttemp1;
+			p_lp1_div = (p - lp1) / CACHE_READ_NUM, p_lp1_mod = (p - lp1) % CACHE_READ_NUM;
+
+			*pel = zero_const;
+			tp1 = pel1;
+			LwVectNorm2(tttemp1, tp1, p_lp1_div, p_lp1_mod);
+			*pel = tttemp1;
+
+
+			if (_ParaAbs(*pel) != zero_const) {
+				if (_ParaAbs(*pel1) != zero_const) {
+
+					*pel = (*pel1 >= zero_const) ? _ParaAbs(*pel) : -_ParaAbs(*pel);
+
+				}
+
+				temp1 = one_const / *pel;
+				tp1 = pel1;
+				LwVectScale(tp1, temp1, p_lp1_div, p_lp1_mod);
+
+				*(pel + 1) += one_const;
+			}
+			*pel = -*pel;
+			if (lp1 < n && _ParaAbs(*pel) != zero_const) {
+				n_lp1_div = (n - lp1) / CACHE_READ_NUM, n_lp1_mod = (n - lp1) % CACHE_READ_NUM;
+				tp1 = work_temp + lp1;
+
+				LwVectSet(tp1, zero_const, n_lp1_div, n_lp1_mod);
+
+				for (j = lp1; j<p; j++) {
+					plj = j*n + lp1;		
+
+					tp1 = work_temp + lp1;
+					tp2 = x + plj;
+					LwVectAddKX(tp1, *(e + j), tp2, n_lp1_div, n_lp1_mod);
+
+
+				}
+				for (j = lp1; j<p; j++) {
+					t2 = -*(e + j);
+					t = t2 / *pel1;
+					plj = j*n + lp1;		
+
+					tp1 = x + plj;
+					tp2 = work_temp + lp1;
+					LwVectAddKX(tp1, t, tp2, n_lp1_div, n_lp1_mod);
+
+				}
+			}
+			if (get_v_flag) {
+				pll = lp1 + l * p;  
+				tp1 = pel1;
+				tp2 = v + pll;
+				for (ii = 0; ii<p - lp1; ii++) {
+					*tp2++ = *tp1++;
+				}
+			}
+		}
+	}
+
+	mm1 = m = LW_SVD_MIN(p, np1);
+	mm1--;
+	if (nct < p) {
+		pil = nct * np1;	
+		*(s + nct) = *(x + pil);
+	}
+	if (n < m) {
+		*(s + mm1) = zero_const;
+	}
+	if (nrt < mm1) {
+		pil = nrt + n * mm1;	
+		*(e + nrt) = *(x + pil);
+	}
+	*(e + mm1) = zero_const;
+
+	if (get_v_flag) {
+		for (j = nct; j<ncu; j++) {
+			tp1 = u + j*n;
+			for (ii = 0; ii<n; ii++) {
+				*tp1++ = zero_const;
+			}
+			*(u + j*np1) = one_const;
+		}
+		for (l = nct - 1; l >= 0; l--) {
+			nml = n - l;
+			pll = l * np1;
+			pull = u + pll;	
+			nml_div = nml / CACHE_READ_NUM, nml_mod = nml%CACHE_READ_NUM;
+			if (_ParaAbs(*(s + l)) != zero_const) {
+				lp1 = l + 1;
+				for (j = lp1; j<ncu; j++) {
+					plj = j*n + l;	
+
+					tp1 = pull;
+					tp2 = u + plj;
+					LwVectDot(t, tp1, tp2, nml_div, nml_mod);
+					t = -t;
+					t /= *pull;
+					tp1 = u + plj;
+					tp2 = pull;
+					LwVectAddKX(tp1, t, tp2, nml_div, nml_mod);
+				}
+
+				tp1 = pull;
+				LwVectScale(tp1, _ParaFrom(-1), nml_div, nml_mod);
+
+
+				*pull += one_const;
+				if (l >= 1) {
+					tp1 = pull - l;
+					for (ii = 0; ii<l; ii++) {
+						*tp1++ = zero_const;
+					}
+				}
+			}
+			else {
+				tp1 = pull - l;
+				for (ii = 0; ii<n; ii++) {
+					*tp1++ = zero_const;
+				}
+				*pull = one_const;
+			}
+		}
+	}
+	if (get_v_flag) {
+		for (l = p - 1; l >= 0; l--) {
+			lp1 = l + 1;
+			pll = l*p + lp1;
+			pvll = v + pll;	
+			p_lp1_div = (p - lp1) / CACHE_READ_NUM, p_lp1_mod = (p - lp1) % CACHE_READ_NUM;
+			if (l < nrt && _ParaAbs(*(e + l)) != zero_const) {
+				for (j = lp1; j<p; j++) {
+					plj = j*p + lp1;	
+
+					tp1 = pvll;
+					tp2 = v + plj;
+					LwVectDot(t, tp1, tp2, p_lp1_div, p_lp1_mod);
+					t = -t;
+
+					t /= *pvll;
+
+					tp1 = v + plj;
+					tp2 = pvll;
+					LwVectAddKX(tp1, t, tp2, p_lp1_div, p_lp1_mod);
+				}
+			}
+			tp1 = pvll - lp1;
+			for (ii = 0; ii<p; ii++) {
+				*tp1++ = zero_const;
+			}
+			*(pvll - 1) = one_const;		
+		}
+	}
+
+
+	for (l = 0; l<m; l++) {
+		lp1 = l + 1;
+		psl = s + l;		
+		pel = e + l;		
+		t = _ParaAbs(*psl);
+		if (t != zero_const) {
+			r = *psl / t;
+			*psl = t;
+			if (lp1 < m) {
+				*pel /= r;
+			}
+			if (get_v_flag && l < n) {
+
+				tp1 = u + l*n;
+				LwVectScale(tp1, r, n_div, n_mod);
+
+			}
+		}
+		if (lp1 == m) break;		
+		t = _ParaAbs(*pel);
+		if (t != zero_const) {
+			temp = t;
+			r = temp / *pel;
+			*pel = t;
+			psl++;		
+			*psl = *psl * r;
+			if (get_v_flag) {
+				tp1 = v + p*lp1;
+				LwVectScale(tp1, r, p_div, p_mod);
+			}
+		}
+	}
+
+	mm = m;
+	i_iter = 0;
+	snorm = zero_const;
+	for (l = 0; l<m; l++) {
+		snorm = LW_SVD_MAX(snorm, LW_SVD_MAX(_ParaAbs(*(s + l)), _ParaAbs(*(e + l))));
+	}
+
+	while (m != 0 && i_iter <= 20) 
+	{
+
+		mm1 = m - 1;
+		mm2 = m - 2;
+		for (l = mm2; l >= 0; l--) {
+			test = _ParaAbs(*(s + l)) + _ParaAbs(*(s + l + 1));
+			ztest = _ParaAbs(*(e + l));
+			if (!LW_svd_IsFinite(test) || !LW_svd_IsFinite(ztest)) 
+			{
+				info = -1;
+				return(info);
+			}
+			if ((ztest <= eps_const*test) || (ztest <= tiny_const) ||(i_iter > 20 && ztest <= eps_const*snorm))
+			{
+				*(e + l) = zero_const;
+				break;		
+			}
+		}
+		if (l == mm2) 
+		{
+			k_case = 4;
+		}
+		else 
+		{
+			lp1 = l + 1;
+			for (ls = m; ls>lp1; ls--)
+			{
+				test = zero_const;
+				if (ls != m) 
+					test += _ParaAbs(*(e + ls - 1));
+				if (ls != l + 2) 
+					test += _ParaAbs(*(e + ls - 2));
+				ztest = _ParaAbs(*(s + ls - 1));
+				if (!LW_svd_IsFinite(test) || !LW_svd_IsFinite(ztest))
+				{
+					return(info);
+				}
+				if ((ztest <= eps_const*test) || (ztest <= tiny_const)) 
+				{
+					*(s + ls - 1) = zero_const;
+					break;			
+				}
+			}
+			if (ls == lp1) 
+			{
+				k_case = 3;
+			}
+			else if (ls == m) 
+			{
+				k_case = 1;
+			}
+			else 
+			{
+				k_case = 2;
+				l = ls - 1;
+			}
+		}
+		lm1 = ++l - 1;
+
+		switch (k_case) 
+		{
+
+		case 1:		
+			f = *(e + mm2);
+			*(e + mm2) = zero_const;
+			for (k = mm2; k >= l; k--) 
+			{
+				t1 = *(s + k);
+				LW_svd_rotg(&t1, &f, &cs, &sn);
+				*(s + k) = t1;
+				if (k != l) 
+				{
+					f = -sn * *(e + k - 1);
+					*(e + k - 1) *= cs;
+				}
+				if (get_v_flag)
+				{
+					LW_rot_real(p, cs, sn, v + k*p, v + mm1*p);
+				}
+			}
+			break;
+
+		case 2:		
+			f = *(e + lm1);
+			*(e + lm1) = zero_const;
+			for (k = l; k<m; k++) 
+			{
+				t1 = *(s + k);
+				LW_svd_rotg(&t1, &f, &cs, &sn);
+				*(s + k) = t1;
+				f = -sn * *(e + k);
+				*(e + k) *= cs;
+				if (get_v_flag) 
+				{
+					LW_rot_real(n, cs, sn, u + n*k, u + n*lm1);
+				}
+			}
+			break;
+
+		case 3:				
+			scale = LW_SVD_MAX(_ParaAbs(*(s + mm1)), LW_SVD_MAX(_ParaAbs(*(s + mm2)), _ParaAbs(*(e + mm2))));
+			scale = LW_SVD_MAX(_ParaAbs(scale), LW_SVD_MAX(_ParaAbs(*(s + l)), _ParaAbs(*(e + l))));
+			sm = *(s + mm1) / scale;
+			smm1 = *(s + mm2) / scale;
+			emm1 = *(e + mm2) / scale;
+			sl = *(s + l) / scale;
+			el = *(e + l) / scale;
+			b = ((smm1 + sm) * (smm1 - sm) + emm1 * emm1) / 2.0F;
+			c = sm * emm1;
+			c *= c;
+			shift = zero_const;
+			if (b != zero_const || c != zero_const) 
+			{
+				shift = _ParaSqrt(b * b + c);
+				if (b < zero_const) shift = -shift;
+				shift = c / (b + shift);
+			}
+			f = (sl + sm) * (sl - sm) + shift;
+			g = sl * el;
+
+			for (k = l; k<mm1; k++) 
+			{
+				kp1 = k + 1;
+				LW_svd_rotg(&f, &g, &cs, &sn);
+				if (k != l) *(e + k - 1) = f;
+				f = cs * *(s + k) + sn * *(e + k);
+				*(e + k) = cs * *(e + k) - sn * *(s + k);
+				g = sn * *(s + kp1);
+				*(s + kp1) *= cs;
+				if (get_v_flag) 
+				{
+					LW_rot_real(p, cs, sn, v + k*p, v + kp1*p);
+				}
+				LW_svd_rotg(&f, &g, &cs, &sn);
+				*(s + k) = f;
+				f = cs * *(e + k) + sn * *(s + kp1);
+				*(s + kp1) = -sn * *(e + k) + cs * *(s + kp1);
+				g = sn * *(e + kp1);
+				*(e + kp1) *= cs;
+				if (get_v_flag && k < nm1)
+				{
+					LW_rot_real(n, cs, sn, u + n*k, u + n*kp1);
+				}
+			}
+			*(e + mm2) = f;
+			++i_iter;
+			break;
+
+		case 4: 		
+			if (*(s + l) < zero_const) 
+			{
+				*(s + l) = -*(s + l);
+				if (get_v_flag) 
+				{
+
+					tp1 = v + l*p;
+					for (ii = 0; ii<p; ii++) 
+					{
+						*tp1 = -(*tp1);
+						tp1++;
+					}
+
+				}
+			}
+			while (l != mm - 1 && *(s + l) < *(s + l + 1)) {
+				lp1 = l + 1;
+				t = *(s + l);
+				*(s + l) = *(s + lp1);
+				*(s + lp1) = t;
+				if (get_v_flag && lp1 < p)
+				{
+
+					tp1 = v + l*p;
+					tp2 = v + lp1*p;
+					LwVectSwap(tp1, tp2, p_lp1_div, p_lp1_mod);
+
+				}
+				if (get_v_flag && lp1 < n)
+				{
+
+					tp1 = u + l*n;
+					tp2 = u + lp1*n;
+					LwVectSwap(tp1, tp2, n_lp1_div, n_lp1_mod);
+
+				}
+				++l;
+			}
+			i_iter = 0;
+			m--;
+			break;
+
+		default:
+			break;
+		}
+		info = m;
+	}
+
+	return(info);
+}
+
+#endif//END SVD
+
+
+//对扁平矩阵或者方阵化上三角
+static OSlwMatSolveStatusNUM _OSlwToolMatrixRowOptUpTrig(ParaType *a,LwMatRowType row,LwMatColType col)
+{
+	LwMatLenType i, j;
+	LwMatLenType temp_i, res_col, res_row, tdiv, tmod;
+	ParaType *pa, *pb, *p1, *p2;
+	ParaType temp1, temp2;
+
+	//暂时只对扁平的与正方形的矩阵进行处理
+	if (row>col)
+	{
+		return OSlwMatSolveShapeError;
+	}
+
+	for (i = 0; i < row - 1; i++)
+	{
+		//非零的列数 没有处理的行数
+		res_col = col - i;
+		res_row = row - i;
+		tdiv = res_col / CACHE_READ_NUM, tmod = res_col%CACHE_READ_NUM;
+		p1 = a + i*col + i;
+
+		//查找主元素 就是一列中最大的数字 间隔为列数 长度为行数-当前行
+		temp_i = LwVectAmax(p1, res_row, col);
+		j = i + temp_i;//temp_i是相对偏移 得到绝对行数
+		p2 = a + j*col + i;
+
+		//主元素为0 代表不满秩 返回错误
+		if (*p2 == _ParaFrom(0))
+			return OSlwMatSolveZeroError;
+		
+		temp1 = _ParaDiv(_ParaFrom(-1), *p2);
+
+		//当前行不是主行 交换行
+		if (temp_i != 0)
+		{		
+			pa = p1, pb = p2;
+			LwVectSwap(pa, pb, tdiv, tmod);
+		}
+
+		//将下方的元素消去 高斯消元
+		pb = p1 + col - i;
+		for (j = 0; j < res_row-1; j++)
+		{
+			pa = p1;
+			pb += i;
+			temp2 = _ParaMpy(*pb, temp1);
+			LwVectAddKX(pb, temp2, pa, tdiv, tmod);
+		}
+		
+	}
+
+	return OSlwMatSolveSucces;
+
+}
+
+//对扁平矩阵或者方阵的上三角矩阵按照主对角归一化 对_OSlwToolMatrixRowOptUpTrig结果处理
+static OSlwMatSolveStatusNUM _OSlwToolMatrixUpTrigNormal(ParaType *a, LwMatRowType row, LwMatColType col)
+{
+	LwMatLenType i;
+	LwMatLenType  res_col, tdiv, tmod;
+	ParaType *pa;
+	ParaType temp1;
+	//暂时只对扁平的与正方形的矩阵进行处理
+	if (row>col)
+	{
+		return OSlwMatSolveShapeError;
+	}
+
+	for (i = 0; i < row; i++)
+	{
+		res_col = col - i;
+		tdiv = res_col / CACHE_READ_NUM, tmod = res_col%CACHE_READ_NUM;
+		pa = a + i*col + i;
+		temp1 = _ParaDiv(_ParaFrom(1), *pa);
+		LwVectScale(pa, temp1, tdiv, tmod);
+	}
+
+	return OSlwMatSolveSucces;
+}
+
+//对扁平矩阵或者方阵的主对角归一化的上三角矩阵转化为单位阵 对_OSlwToolMatrixUpTrigNormal结果处理
+static OSlwMatSolveStatusNUM _OSlwToolMatrixUpTrigToElem(ParaType *a, LwMatRowType row, LwMatColType col)
+{
+	LwMatLenType i, j;
+	LwMatLenType  res_col, res_row, tdiv, tmod;
+	ParaType *pa, *pb, *p1;
+	ParaType temp1;
+
+	//暂时只对扁平的与正方形的矩阵进行处理
+	if (row>col)
+	{
+		return OSlwMatSolveShapeError;
+	}
+
+	for (i = row - 1; i > 0; i--)
+	{
+		//非零的列数 没有处理的行数
+		res_col = col - i;
+		res_row = i;
+
+		p1 = a + i*col + i;				
+		for (j = 0; j < res_row; j++)
+		{
+			pa = p1;
+			pb = a + j*col + i;
+			tdiv = res_col / CACHE_READ_NUM, tmod = res_col%CACHE_READ_NUM;
+			temp1 = _ParaMpy(_ParaFrom(-1), *pb);
+			LwVectAddKX(pb, temp1, pa, tdiv, tmod);
+			//*pb = _ParaAdd(*pb, _ParaMpy(temp1, *pa));
+
+		}
+	}
+
+	return OSlwMatSolveSucces;
+}
+
+
+OSLW_TOOL_FUN(OSlwMatSolveStatusNUM, OSlwToolMatrixSolve,
+(OSlwToolMatrixSTU *s),
+OSlwToolMatrixSolve
+)
+{
+	OSlwMatSolveStatusNUM status;
+	ParaType *a;
+	LwMatRowType r;
+	LwMatColType c;
+
+	OSLW_assert(!(s));
+
+	a = s->a, r = s->row, c = s->col;
+	status = _OSlwToolMatrixRowOptUpTrig(a, r, c);
+	if (status!=OSlwMatSolveSucces){
+		return status;
+	}
+
+	status = _OSlwToolMatrixUpTrigNormal(a, r, c);
+	if (status != OSlwMatSolveSucces){
+		return status;
+	}
+
+	status = _OSlwToolMatrixUpTrigToElem(a, r, c);
+	if (status != OSlwMatSolveSucces) {
+		return status;
+	}
+
+	return OSlwMatSolveSucces;
+}
+
+OSLW_TOOL_FUN(OSlwMatSolveStatusNUM, OSlwToolMatrixInv,
+(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *m1,ParaType *temp_work),
+OSlwToolMatrixInv
+)
+{
+	OSlwMatSolveStatusNUM status;
+	LwMatRowType i, r;
+	LwMatColType c1;
+	LwMatLenType tdiv, tmod;
+	ParaType *pt, *pma;
+	LwMat TempRun;
+	
+	OSLW_assert(!(s));
+	OSLW_assert(!(m1));
+	OSLW_assert(!(temp_work));
+
+	r = m1->row;
+	c1 = m1->col;
+
+	if (r!=c1)
+	{
+		return OSlwMatSolveShapeError;
+	}
+
+	tdiv = c1 / CACHE_READ_NUM, tmod = c1%CACHE_READ_NUM;
+	pt = temp_work;
+	pma = m1->a;
+	LwMatInit(&TempRun, r, 2 * c1, temp_work);
+
+	for (i = 0; i < r; i++)
+	{
+		//先复制m1
+		LwVectCopy(pt, pma, tdiv, tmod);
+
+		//清空
+		LwVectSet(pt, _ParaFrom(0), tdiv, tmod);
+
+		//放一个1
+		*OSlwMatGet(TempRun, i, i + r) = _ParaFrom(1);
+
+	}
+	
+	status = LwMatSolve(&TempRun);
+	if (status != OSlwMatSolveSucces) {
+		return status;
+	}
+
+	pma = s->a;
+
+	for (i = 0; i < r; i++)
+	{
+		//定位
+		pt = OSlwMatGet(TempRun, i, r);
+		//copy出来
+		LwVectCopy(pma, pt, tdiv, tmod);
+	}
+
+	return OSlwMatSolveSucces;
+}
+
+
+OSLW_TOOL_FUN(OSlwMatSolveStatusNUM, OSlwToolMatrixSolveCrout,
+(OSlwToolMatrixSTU *X, OSlwToolMatrixSTU *L, OSlwToolMatrixSTU *D, OSlwToolMatrixSTU *U, OSlwToolMatrixSTU *Y),
+OSlwToolMatrixSolveCrout
+)
+{
+	lw_32 i;
+	LwMatLenType len;
+	ParaType *a, *b, *c, *d, *x;
+
+	OSLW_assert(!(X));
+	OSLW_assert(!(L));
+	OSLW_assert(!(D));
+	OSLW_assert(!(U));
+	OSLW_assert(!(Y));
+
+	len = X->length;
+	x = X->a;
+	a = D->a;
+	b = Y->a;
+	c = U->a;
+	d = L->a;
+
+	if (!((len-1==L->length) && (D->length==len) && (U->length == len-1) && (Y->length ==len))){
+		return OSlwMatSolveShapeError;
+	}
+	for (i = 0; i < ((lw_32)len)-1; i++)
+	{
+		if (a[i] == _ParaFrom(0))
+			return OSlwMatSolveZeroError;
+
+		c[i] = _ParaDiv(c[i], a[i]);
+		a[i + 1] = a[i + 1] - _ParaMpy(d[i], c[i]);
+	}
+	
+	if (a[i] == _ParaFrom(0))
+		return OSlwMatSolveZeroError;
+
+	//求解y
+	b[0] = _ParaDiv(b[0], a[0]);
+	for (i = 1; i < (lw_32)len; i++){
+		b[i] = _ParaDiv(b[i] - _ParaMpy(d[i - 1], b[i - 1]), a[i]);
+	}
+
+	x[len - 1] = b[len - 1];
+
+	for (i = len - 2; i >= 0; i--) {
+		x[i] = b[i] - _ParaMpy(c[i], x[i + 1]);
+	}
+
+
+	////扩展
+	//for (i = len-1; i > 0; i--){
+	//	a[i] = a[i - 1];
+	//}
+	//if (b[0]==_ParaFrom(0)){
+	//	return OSlwMatSolveZeroError;
+	//}
+	//c[0] = _ParaDiv(c[0], b[0]);
+	//f[0] = _ParaDiv(f[0], b[0]);
+	//for (i = 1; i < len - 1; i++)
+	//{
+	//	if (b[i] == _ParaFrom(0))
+	//		return OSlwMatSolveZeroError;
+	//	b[i] -= _ParaDiv(_ParaMpy(a[i], f[i - 1]), b[i]);
+	//	c[i] = _ParaDiv(c[i], b[i]);
+	//	f[i] = _ParaDiv(f[i] - _ParaMpy(a[i], f[i - 1]), b[i]);
+	//}
+	//if (b[i] == _ParaFrom(0))
+	//	return OSlwMatSolveZeroError;
+	//f[i] = _ParaDiv(
+	//	f[i] - _ParaMpy(a[i], f[i - 1])
+	//	,
+	//	b[i] - _ParaMpy(a[i], c[i - 1])
+	//);
+	////整理结果
+	//x[i] = f[i];
+	//for (i = len - 2; i >= 0; i--) {
+	//	x[i] = f[i] - c[i] * f[i + 1];
+	//}
+
+	return OSlwMatSolveSucces;
+}
+
+
 
 #endif //OSLW_TOOL_IMPORT_MATH || OSLW_TOOL_IMPORT_ALL
 

@@ -1,4 +1,4 @@
-/*(Ver.=0.96)
+/*(Ver.=0.97)
  * OSLW_tool.c
  *
  *  Created on: 2019-03-16
@@ -18,7 +18,7 @@
 void *_OSlwNNLayerSplitOrMix(
 	ParaType *src,//
 	ParaType *dst,//
-	lw_u8 InDimLen,//1 ~ 4 
+	lw_u16 InDimLen,//1 ~ 4 
 	LwMatColType *InputDim,//block page row col
 	LwMatColType *SplitList,//
 	lw_u8 split_1_or_mix_0,
@@ -69,6 +69,9 @@ void *_OSlwNNLayerSplitOrMix(
 		break;
 
 	case 2:
+#ifdef for_loop_begin
+#undef for_loop_begin
+#endif // for_loop_begin
 
 #define for_loop_begin 	row_len = InputDim[1];\
 		for (i = SplitList[0], p1 = src + SplitList[0] * row_len, q = dst; i < SplitList[1]; ++i, p1 += row_len)\
@@ -110,6 +113,9 @@ void *_OSlwNNLayerSplitOrMix(
 
 
 	case 3:
+#ifdef for_loop_begin
+#undef for_loop_begin
+#endif // for_loop_begin
 #define for_loop_begin 		row_len = InputDim[2];\
 		page_len = row_len*InputDim[1];\
 		row_init=SplitList[2] * row_len;\
@@ -156,7 +162,9 @@ void *_OSlwNNLayerSplitOrMix(
 		
 
 	case 4:
-
+#ifdef for_loop_begin
+#undef for_loop_begin
+#endif // for_loop_begin
 #define for_loop_begin 		row_len = InputDim[3];\
 		page_len = row_len*InputDim[2];\
 		block_len=page_len*InputDim[1];\
@@ -836,7 +844,7 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerPadNew(
 lw_ptr OSlwToolNNLayerPadForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
 	OSlwToolNNLayerPadSTU *ppad;
-	LwMatLenType i, len, delt_in, in_len;
+	LwMatLenType i, len, delt_in;
 	ParaType *_in, *_out;
 	OSLW_assert(!(pNNSLB));
 
@@ -914,7 +922,7 @@ lw_ptr OSlwToolNNLayerPadForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNN
 lw_ptr OSlwToolNNLayerPadBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
 	OSlwToolNNLayerPadSTU *ppad;
-	LwMatLenType i, len, delt_in, in_len;
+	LwMatLenType i, len, delt_in;
 	ParaType *_in, *_out;
 	OSLW_assert(!(pNNSLB));
 
@@ -1110,7 +1118,7 @@ OSlwToolNNSubLayerBasicSTU * OSlwToolNNLayerExtendNew(
 lw_ptr OSlwToolNNLayerExtendForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
 	OSlwToolNNLayerExtendSTU *pEXT;
-	LwMatLenType i, len, delt_in, in_len;
+	LwMatLenType i, len, delt_in;
 	ParaType *_in, *_out;
 	OSLW_assert(!(pNNSLB));
 
@@ -1188,7 +1196,7 @@ lw_ptr OSlwToolNNLayerExtendForward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *
 lw_ptr OSlwToolNNLayerExtendBackward(struct OSLW_TOOL_NN_SUB_LAYER_BASIC_STRUCT *pNNSLB, lw_ptr mini_b_num)
 {
 	OSlwToolNNLayerExtendSTU *pEXT;
-	LwMatLenType i, len, delt_in, in_len;
+	LwMatLenType i, len, delt_in;
 	ParaType *_in, *_out;
 	OSLW_assert(!(pNNSLB));
 
@@ -1276,7 +1284,7 @@ void* OSlwToolBPnnPadAppend
 )
 {
 	OSlwToolNNSubLayerBasicSTU *pnode1;
-	OSlwToolNNLayerPadSTU *pPad;
+	//OSlwToolNNLayerPadSTU *pPad;
 	OSlwToolDListNodeSTU *pln1;
 	OSlwToolNNSubLayerBasicSTU **ppLIST1, **pptail;
 	LwMatColType in_col = 0;
@@ -1318,7 +1326,7 @@ void* OSlwToolBPnnExtendAppend
 )
 {
 	OSlwToolNNSubLayerBasicSTU *pnode1;
-	OSlwToolNNLayerPadSTU *pPad;
+	//OSlwToolNNLayerPadSTU *pPad;
 	OSlwToolDListNodeSTU *pln1;
 	OSlwToolNNSubLayerBasicSTU **ppLIST1, **pptail;
 	LwMatColType in_col = 0;
