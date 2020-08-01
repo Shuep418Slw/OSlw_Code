@@ -1,4 +1,4 @@
-/*(Ver.=0.96)
+ï»¿/*(Ver.=0.97)
  * OSLW_core.h
  *
  *  Created on: 2017-7-14
@@ -9,26 +9,26 @@
 #define OSLW_CORE_H_
 
 #include "OSLW_define.h"
-#include "OSLW_parameter.h"
+ //#include "OSLW_parameter.h"
 #include "OSLW_memory.h"
-#include "OSLW_show.h"
-#include "OSLW_communication.h"
+//#include "OSLW_show.h"
+//#include "OSLW_communication.h"
 #include "OSLW_timer.h"
 #include "OSLW_task.h"
 #include "OSLW_string_debug.h"
 #include <limits.h>
 #include <stdlib.h>
 
-typedef lw_16 (*_compar_fn)(const void *,const void *);
+typedef lw_16(*_compar_fn)(const void *, const void *);
 
 
 //------------------------------------------
-//<Ã¶¾Ù>OSlwCoreErrorNUM</Ã¶¾Ù>
-//<Ã¶¾Ù¹¦ÄÜ>Ã¶¾ÙÄÚºË´íÎóÀàĞÍ</Ã¶¾Ù¹¦ÄÜ>
+//<æšä¸¾>OSlwCoreErrorNUM</æšä¸¾>
+//<æšä¸¾åŠŸèƒ½>æšä¸¾å†…æ ¸é”™è¯¯ç±»å‹</æšä¸¾åŠŸèƒ½>
 //------------------------------------------
-typedef enum{
-	OSlwCoreError_NoError=0,//ÎŞ´íÎó
-	OSlwCoreError_PriorityRedefine,//ÈÎÎñÓÅÏÈ¼¶ÖØ¶¨Òå´íÎó
+typedef enum {
+	OSlwCoreError_NoError = 0,//æ— é”™è¯¯
+	OSlwCoreError_PriorityRedefine,//ä»»åŠ¡ä¼˜å…ˆçº§é‡å®šä¹‰é”™è¯¯
 	OSlwCoreError_GiftStatusError,
 	OSlwCoreError_ParaListLengthOver,
 	OSlwCoreError_TimerListLengthOver,
@@ -36,59 +36,59 @@ typedef enum{
 }OSlwCoreErrorNUM;
 
 //------------------------------------------
-//<Ã¶¾Ù>OSlwCoreStatusNUM</Ã¶¾Ù>
-//<Ã¶¾Ù¹¦ÄÜ>Ã¶¾ÙÄÚºË×´Ì¬ÀàĞÍ</Ã¶¾Ù¹¦ÄÜ>
+//<æšä¸¾>OSlwCoreStatusNUM</æšä¸¾>
+//<æšä¸¾åŠŸèƒ½>æšä¸¾å†…æ ¸çŠ¶æ€ç±»å‹</æšä¸¾åŠŸèƒ½>
 //------------------------------------------
-typedef enum{
-	OSlwCoreStatus_NAN=0,//Î´¶¨Òå×´Ì¬
-	OSlwCoreStatus_Initial=1,//³õÊ¼»¯ÖĞ
-	OSlwCoreStatus_Running=0x0a,//Õı³£ÔËĞĞÖĞ
-	OSlwCoreStatus_Error=0x05//ÄÚºË´íÎó
+typedef enum {
+	OSlwCoreStatus_NAN = 0,//æœªå®šä¹‰çŠ¶æ€
+	OSlwCoreStatus_Initial = 1,//åˆå§‹åŒ–ä¸­
+	OSlwCoreStatus_Running = 0x0a,//æ­£å¸¸è¿è¡Œä¸­
+	OSlwCoreStatus_Error = 0x05//å†…æ ¸é”™è¯¯
 }OSlwCoreStatusNUM;
 
 
 
 #if OSLW_OS_ENABLE
 //------------------------------------------
-//<½á¹¹ÌåÃû>OSlwParameter_toForm</½á¹¹ÌåÃû>
-//<½á¹¹Ìå¹¦ÄÜ>²Ù×÷ÏµÍ³ÄÚºË½á¹¹Ìå</½á¹¹Ìå¹¦ÄÜ>
+//<ç»“æ„ä½“å>OSlwParameter_toForm</ç»“æ„ä½“å>
+//<ç»“æ„ä½“åŠŸèƒ½>æ“ä½œç³»ç»Ÿå†…æ ¸ç»“æ„ä½“</ç»“æ„ä½“åŠŸèƒ½>
 //------------------------------------------
-typedef struct OSLW_CORE_STRUCT{
-	//³ÉÔ±±äÁ¿
+typedef struct OSLW_CORE_STRUCT {
+	//æˆå‘˜å˜é‡
 #if !OSLW_SIMPLE_MODE
-	_BP DispatchBreakPoint;//µ÷¶ÈÆ÷¶Ïµã
+	_BP DispatchBreakPoint;//è°ƒåº¦å™¨æ–­ç‚¹
 #endif
-	
-	OSlwCoreGroupUN InitialFlagGroup;//³õÊ¼»¯±êÖ¾×é
-	
-	OSlwCoreGroupUN ReadyFlagGroup;//×¼±¸Íê³É±êÖ¾×é
 
-	struct OSLW_TASK_STRUCT *pTaskList[OSLW_TASK_NUM_MAX];//×¢²á¹ıµÄÈÎÎñµÄ¿ØÖÆ¿é
+	OSlwCoreGroupUN InitialFlagGroup;//åˆå§‹åŒ–æ ‡å¿—ç»„
 
-	struct OSLW_TASK_STRUCT *pCurrentTask;//µ±Ç°ÈÎÎñ¿ØÖÆ¿é
+	OSlwCoreGroupUN ReadyFlagGroup;//å‡†å¤‡å®Œæˆæ ‡å¿—ç»„
+
+	struct OSLW_TASK_STRUCT *pTaskList[OSLW_TASK_NUM_MAX];//æ³¨å†Œè¿‡çš„ä»»åŠ¡çš„æ§åˆ¶å—
+
+	struct OSLW_TASK_STRUCT *pCurrentTask;//å½“å‰ä»»åŠ¡æ§åˆ¶å—
 
 #if !OSLW_SIMPLE_MODE	
-	struct OSLW_TASK_STRUCT *pLastTask;//Ö®Ç°ÈÎÎñµÄÓÅÏÈ¼¶
+	struct OSLW_TASK_STRUCT *pLastTask;//ä¹‹å‰ä»»åŠ¡çš„ä¼˜å…ˆçº§
 #endif
-	
+
 	struct OSLW_TASK_STRUCT OSlwInlineTaskBoring;
 
 	OSlwTimerCtrlSTU TimerCtrl;
-	
+
 	//OSlwShowSTU Show;
 
-	lw_u8 DispatchEable:1;//µ÷¶ÈÆ÷Ê¹ÄÜ±êÖ¾ 0:¹Ø±Õµ÷¶ÈÆ÷ 1:¿ªÆôµ÷¶ÈÆ÷
-	OSlwCoreStatusNUM CoreStatus:7;//ÄÚºË×´Ì¬
-	OSlwCoreErrorNUM CoreError:8;//ÄÚºË´íÎó
-	
-	lw_u8 TaskRunningNum;//µ±Ç°×¢²áÈÎÎñÊıÁ¿
-	
-	lw_u8 TaskRunningList[OSLW_TASK_NUM_MAX];//ÒÔ¼°×¢²áµÄÈÎÎñµÄÓÅÏÈ¼¶ ÓÃÓÚ¿ìËÙ²éÑ¯ÈÎÎñ
-	
-	lw_u8 CurrentTaskIndex;//µ±Ç°ÈÎÎñµÄÓÅÏÈ¼¶
-	
+	lw_u8 DispatchEable : 1;//è°ƒåº¦å™¨ä½¿èƒ½æ ‡å¿— 0:å…³é—­è°ƒåº¦å™¨ 1:å¼€å¯è°ƒåº¦å™¨
+	OSlwCoreStatusNUM CoreStatus : 7;//å†…æ ¸çŠ¶æ€
+	OSlwCoreErrorNUM CoreError : 8;//å†…æ ¸é”™è¯¯
+
+	lw_u8 TaskRunningNum;//å½“å‰æ³¨å†Œä»»åŠ¡æ•°é‡
+
+	lw_u8 TaskRunningList[OSLW_TASK_NUM_MAX];//ä»¥åŠæ³¨å†Œçš„ä»»åŠ¡çš„ä¼˜å…ˆçº§ ç”¨äºå¿«é€ŸæŸ¥è¯¢ä»»åŠ¡
+
+	lw_u8 CurrentTaskIndex;//å½“å‰ä»»åŠ¡çš„ä¼˜å…ˆçº§
+
 #if !OSLW_SIMPLE_MODE	
-	lw_u8 LastTaskIndex;//Ö®Ç°ÈÎÎñµÄÓÅÏÈ¼¶
+	lw_u8 LastTaskIndex;//ä¹‹å‰ä»»åŠ¡çš„ä¼˜å…ˆçº§
 #endif
 
 #if OSLW_SIMPLE_LEVEL<4 && OSLW_STR_DBG_EN
@@ -99,10 +99,10 @@ typedef struct OSLW_CORE_STRUCT{
 
 
 
-	
+
 	OSlwGroupAllType _flag_BK;
-	OSlwGroupAllType _mask_list[__OSLW_LOG2_TASK_NUM-2];
-	OSlwGroupAllType _move_reg[__OSLW_LOG2_TASK_NUM-2];
+	OSlwGroupAllType _mask_list[__OSLW_LOG2_TASK_NUM - 2];
+	OSlwGroupAllType _move_reg[__OSLW_LOG2_TASK_NUM - 2];
 
 #if OSLW_TASK_COMMUN_ENABLE==1
 	//struct OSLW_COMMUN_STRCUT Comm[OSLW_CORE_COMMUN_LIST_LENGTH];
@@ -114,20 +114,20 @@ typedef struct OSLW_CORE_STRUCT{
 
 
 
-	//³ÉÔ±º¯Êı
+	//æˆå‘˜å‡½æ•°
 #if OSLW_STEP_RUNNING
-	void(*StepFun)(struct OSLW_CORE_STRUCT *pOS);//ÏµÍ³¿ªÊ¼º¯Êı
+	void(*StepFun)(struct OSLW_CORE_STRUCT *pOS);//ç³»ç»Ÿå¼€å§‹å‡½æ•°
 #else
-	void(*StartFun)(struct OSLW_CORE_STRUCT *pOS);//ÏµÍ³¿ªÊ¼º¯Êı
+	void(*StartFun)(struct OSLW_CORE_STRUCT *pOS);//ç³»ç»Ÿå¼€å§‹å‡½æ•°
 #endif
-	struct OSLW_CORE_STRUCT *(*TaskAppendFun)(struct OSLW_CORE_STRUCT *pOS, struct OSLW_TASK_STRUCT *pta);//ÈÎÎñ×¢²áº¯Êı
+	struct OSLW_CORE_STRUCT *(*TaskAppendFun)(struct OSLW_CORE_STRUCT *pOS, struct OSLW_TASK_STRUCT *pta);//ä»»åŠ¡æ³¨å†Œå‡½æ•°
 	struct OSLW_CORE_STRUCT *(*TimerAppendFun)(struct OSLW_CORE_STRUCT *pOS, OSlwTimerSTU *pT);
-	/*(Ver.=0.96)
+	/*(Ver.=0.97)
 #if !(OSLW_SIMPLE_MODE)
-	void (*DispatchFun)(struct OSLW_CORE_STRUCT *pOS);//µ÷¶ÈÆ÷º¯Êı
-	void (*ClockCBFun)(struct OSLW_CORE_STRUCT *pOS);//ÏµÍ³Ê±ÖÓ»Øµôº¯Êı !!!!!!!!!²»½¨ÒéÒÔ³ÉÔ±º¯Êıµ÷ÓÃ!!!!!!!!!
-	void (*StartFun)(struct OSLW_CORE_STRUCT *pOS);//ÏµÍ³¿ªÊ¼º¯Êı
-	struct OSLW_CORE_STRUCT *(*TaskAppendFun)(struct OSLW_CORE_STRUCT *pOS,struct OSLW_TASK_STRUCT *pta);//ÈÎÎñ×¢²áº¯Êı
+	void (*DispatchFun)(struct OSLW_CORE_STRUCT *pOS);//è°ƒåº¦å™¨å‡½æ•°
+	void (*ClockCBFun)(struct OSLW_CORE_STRUCT *pOS);//ç³»ç»Ÿæ—¶é’Ÿå›æ‰å‡½æ•° !!!!!!!!!ä¸å»ºè®®ä»¥æˆå‘˜å‡½æ•°è°ƒç”¨!!!!!!!!!
+	void (*StartFun)(struct OSLW_CORE_STRUCT *pOS);//ç³»ç»Ÿå¼€å§‹å‡½æ•°
+	struct OSLW_CORE_STRUCT *(*TaskAppendFun)(struct OSLW_CORE_STRUCT *pOS,struct OSLW_TASK_STRUCT *pta);//ä»»åŠ¡æ³¨å†Œå‡½æ•°
 	struct OSLW_CORE_STRUCT *(*ParaAppendFun)(struct OSLW_CORE_STRUCT *pOS,lw_u8 num,struct OSLW_PARAMETER_STRUCT *p);
 	struct OSLW_CORE_STRUCT *(*TimerAppendFun)(struct OSLW_CORE_STRUCT *pOS,OSlwTimerSTU *pT);
 #endif
@@ -137,13 +137,13 @@ typedef struct OSLW_CORE_STRUCT{
 	lw_u8 *(*StrDbgFun)(struct OSLW_CORE_STRUCT *pOS, lw_u8 *instr);
 #endif // OSLW_SIMPLE_LEVEL<4 && OSLW_STR_DBG_EN
 
-	//²¿·ÖÁÙÊ±ÖĞ¼ä±äÁ¿
-	lw_u8 n1_Dispatch,n2_Dispatch;
+	//éƒ¨åˆ†ä¸´æ—¶ä¸­é—´å˜é‡
+	lw_u8 n1_Dispatch, n2_Dispatch;
 	lw_u8 Temp;
 	lw_u8 temp2;
 	lw_u8 _ReadyTaskIndex;
 
-	//ÎÈ¶¨ÔËĞĞÊ±¼ä¼ÆÊı
+	//ç¨³å®šè¿è¡Œæ—¶é—´è®¡æ•°
 	lw_u64 NormalRunningTimerCount;
 
 #if OSLW_SIMPLE_LEVEL >= 3
@@ -162,27 +162,27 @@ typedef struct OSLW_CORE_STRUCT{
 
 
 
-//º¯ÊıÉùÃ÷
+//å‡½æ•°å£°æ˜
 void OSlwTaskDispatch(OSlwCoreSTU *_pOS);
 void OSlwClockCallBack(OSlwCoreSTU *pOS);
 void OSlwCoreInitial(OSlwCoreSTU *pOS);
-OSlwCoreSTU* OSlwTaskAppend(OSlwCoreSTU *pOS,struct OSLW_TASK_STRUCT *pta);
-OSlwCoreSTU* OSlwParaAppend(OSlwCoreSTU *pOS,lw_u8 num,struct OSLW_PARAMETER_STRUCT *p);
-OSlwCoreSTU* OSlwTimerAppend(OSlwCoreSTU *pOS,OSlwTimerSTU *pT);
+OSlwCoreSTU* OSlwTaskAppend(OSlwCoreSTU *pOS, struct OSLW_TASK_STRUCT *pta);
+OSlwCoreSTU* OSlwParaAppend(OSlwCoreSTU *pOS, lw_u8 num, struct OSLW_PARAMETER_STRUCT *p);
+OSlwCoreSTU* OSlwTimerAppend(OSlwCoreSTU *pOS, OSlwTimerSTU *pT);
 #if OSLW_STEP_RUNNING
 void OSlwCoreStep(OSlwCoreSTU *pOS);
 #else
 void OSlwCoreStart(OSlwCoreSTU *pOS);
 #endif
 
-void _quicksort (void *const pbase, size_t total_elems, size_t size,_compar_fn cmp);
-lw_16 comp(const void*a,const void*b);
+void _quicksort(void *const pbase, size_t total_elems, size_t size, _compar_fn cmp);
+lw_16 comp(const void*a, const void*b);
 
 
 #endif //OSLW_OS_ENABLE
 
 
-//<ÅÅĞòËã·¨ºê>
+//<æ’åºç®—æ³•å®>
 #define SWAP(a, b, size)						      \
   do									      \
     {									      \
@@ -200,22 +200,22 @@ lw_16 comp(const void*a,const void*b);
 
 
 typedef struct
-  {
-    char *lo;
-    char *hi;
+{
+	char *lo;
+	char *hi;
 } stack_node;
 
 #define STACK_SIZE	(CHAR_BIT * sizeof(size_t))
 #define PUSH(low, high)	((void) ((top->lo = (low)), (top->hi = (high)), ++top))
 #define	POP(low, high)	((void) (--top, (low = top->lo), (high = top->hi)))
 #define	STACK_NOT_EMPTY	(stack < top)
-//</ÅÅĞòËã·¨ºê>
+//</æ’åºç®—æ³•å®>
 
 
-//ºêº¯Êı & ºêÄ£¿é
+//å®å‡½æ•° & å®æ¨¡å—
 
-//µÍ¹¦ºÄºê
-//¿ìËÙÄ£Ê½ÏÂÃ»ÓĞ
+//ä½åŠŸè€—å®
+//å¿«é€Ÿæ¨¡å¼ä¸‹æ²¡æœ‰
 #if !OSLW_SPEED_RUNNING
 #define OSLW_LOW_POW_ENABLE() ((void)0)
 #define OSLW_LOW_POW_DISABLE() ((void)0)
@@ -223,17 +223,17 @@ typedef struct
 
 
 
-//¶Ïµã±£´æ 
+//æ–­ç‚¹ä¿å­˜ 
 #define REMEMBER(x,r) r=_OSLW_SAVE((x));if(!(r))
 
 
 #if !OSLW_SIMPLE_MODE
 
-//µ÷¶È×¼±¸ AÎªÈÎÎñÖ¸Õë
+//è°ƒåº¦å‡†å¤‡ Aä¸ºä»»åŠ¡æŒ‡é’ˆ
 #define DISPATCH_READY(A) A->BreakPointReturn[OSLW_TASK_BREAKPOINT_DEEP - 1] = _OSLW_SAVE((A->BreakPoint[OSLW_TASK_BREAKPOINT_DEEP - 1]));\
 	if (!(A->BreakPointReturn[OSLW_TASK_BREAKPOINT_DEEP - 1]) && A->TaskStatus == OSlwTaskStatus_Running)
 
-//µ÷¶È·µ»Ø AÎªÈÎÎñÖ¸Õë
+//è°ƒåº¦è¿”å› Aä¸ºä»»åŠ¡æŒ‡é’ˆ
 #define DISPATCH_RETURN(A) else{A->TaskStatus = OSlwTaskStatus_Running;}
 
 #else
@@ -246,16 +246,16 @@ typedef struct
 #endif
 
 
-			
-//ÈÎÎñ¿ªÊ¼			
-		
+
+//ä»»åŠ¡å¼€å§‹			
+
 #if OSLW_SIMPLE_MODE 
 #define OSlw_5_2(A) 	switch((A)->BreakPoint){\
 		default:\
 		case 0:\
 		case __LINE__:(A)->BreakPoint=__LINE__;\
 		if((A)->TaskStatus == OSlwTaskStatus_Init){(A)->TaskStatus=OSlwTaskStatus_Running;return;}
-		
+
 
 #define	OSlw_2_5(A) }
 
@@ -271,43 +271,45 @@ typedef struct
 #define OSlw_2_5(A) ;
 
 #endif
-	
-	
-	
+
+
+
 #define OSLW_TASK_BENGIN(A) OSlw_5_2((A))
 
-//¼È¼ÃØÔ ÍòÊÂ¾ã±¸
+//æ—¢æµå¦ ä¸‡äº‹ä¿±å¤‡
 #define OSlwJiJi(A) OSlw_5_2(A)
 
-//Î´¼ÃØÔ	 ÈÔÇ·¶«·ç
+//æœªæµå¦	 ä»æ¬ ä¸œé£
 #define OSlwWeiJi(A) OSlw_2_5(A)			
 
 
-//ÈÎÎñ×Óº¯Êıµ÷ÓÃ
-//<ÊäÈë>LV:Ç¶Ì×µÈ¼¶µÈ¼¶(ÔÚÈÎÎñº¯ÊıÖĞÖ±½ÓÊ¹ÓÃµ÷ÓÃÔòµÈ¼¶Îª0 ÔÚÏÂÒ»¼¶Îª1 ÒÀ´ÎÀàÍÆ) pta:ÈÎÎñÖ¸Õë F:±»µ÷ÓÃµÄº¯Êı</ÊäÈë>
-//<Ê¾Àı> TaskSubFunCall(0,pta,fun1); ptaÈÎÎñµ÷ÓÃfun1Ç¶Ì×µÈ¼¶0 </Ê¾Àı> 
+//ä»»åŠ¡å­å‡½æ•°è°ƒç”¨
+//<è¾“å…¥>LV:åµŒå¥—ç­‰çº§ç­‰çº§(åœ¨ä»»åŠ¡å‡½æ•°ä¸­ç›´æ¥ä½¿ç”¨è°ƒç”¨åˆ™ç­‰çº§ä¸º0 åœ¨ä¸‹ä¸€çº§ä¸º1 ä¾æ¬¡ç±»æ¨) pta:ä»»åŠ¡æŒ‡é’ˆ F:è¢«è°ƒç”¨çš„å‡½æ•°</è¾“å…¥>
+//<ç¤ºä¾‹> TaskSubFunCall(0,pta,fun1); ptaä»»åŠ¡è°ƒç”¨fun1åµŒå¥—ç­‰çº§0 </ç¤ºä¾‹> 
 //!!!!!!!!!!!!void fun1(OSlwTaskSTU *pta,void *p)!!!!!!!!!!!!!!!!!!!!!!!!!
 
 #define OSlwTaskSubFunCall(LV,PTA,F) do {REMEMBER(PTA->BreakPoint[LV],PTA->BreakPointReturn[LV])\
 																				{F(PTA,(void *)(&(PTA->BreakPoint[LV])));}}while(0)
 
-																				
-																																				
-																				
-//ÈÎÎñ×Óº¯Êı·µ»Ø
-//!!!!!!ÓëTaskSubFunCall³É¶Ôµ÷ÓÃ ÓÃÓÚ·µ»Ø!!!!!!																				
+
+
+
+//ä»»åŠ¡å­å‡½æ•°è¿”å›
+//!!!!!!ä¸TaskSubFunCallæˆå¯¹è°ƒç”¨ ç”¨äºè¿”å›!!!!!!																				
 #define OSlwTaskSubFunReturn(PTA,P) do { _OSLW_LOAD((*((_BP *)(P))),PTA->Priority,(PTA));}while(0)
 
 
-#define OSlwCoreTaskIsReady(POS,PTA,ID) 					do{POS->ReadyFlagGroup.all|=(1<<ID);\
-					PTA->TaskStatus=OSlwTaskStatus_Ready;}while(0)
+//ä¿®æ­£æ­¤å¤„ä¸€ä¸ªbug 
+#define OSlwCoreTaskIsReady(POS,PTA,ID) 	do{\
+POS->ReadyFlagGroup.all|=((OSlwGroupAllType)1<<ID);\
+PTA->TaskStatus=OSlwTaskStatus_Ready;}while(0)
 
-					
-					
-					
 
-//Ë¯ÃßN¸öÊ±ÖÓ
-//<ÊäÈë>A:ÈÎÎñ¿ØÖÆ¿éÖ¸Õë N:ÖÜÆÚ</ÊäÈë>
+
+
+
+//ç¡çœ Nä¸ªæ—¶é’Ÿ
+//<è¾“å…¥>A:ä»»åŠ¡æ§åˆ¶å—æŒ‡é’ˆ N:å‘¨æœŸ</è¾“å…¥>
 #if OSLW_SIMPLE_MODE
 #define OSlwSleepN(A,N) do {DISPATCH_READY(A){ OSlwTaskSleep(A,N-1);DISPATCH_RETURN(A)}} while(0)
 #else
@@ -317,8 +319,8 @@ typedef struct
 
 #define OSlwSleepSec(A,SEC,MS) OSlwSleepN(A,((((lw_u32)(SEC)*1000+(MS)))/(lw_u32)OSLW_CORE_TICK_MS))
 
-//µÈ´ı½ÓÊÕÍê³É
-//<ÊäÈë>A:ÈÎÎñ¿ØÖÆ¿éÖ¸Õë</ÊäÈë>
+//ç­‰å¾…æ¥æ”¶å®Œæˆ
+//<è¾“å…¥>A:ä»»åŠ¡æ§åˆ¶å—æŒ‡é’ˆ</è¾“å…¥>
 #if OSLW_SIMPLE_MODE
 #define OSlwGiftReceiveWait(A) do {DISPATCH_READY(A){ OSlwTaskWaitGiftReceice(A);DISPATCH_RETURN(A)}} while(0)
 #else
@@ -327,16 +329,16 @@ typedef struct
 
 #define OSlwWaitGift(A) OSlwGiftReceiveWait((A))
 
-//µÈ´ı·¢ËÍÍê³É
-//<ÊäÈë>A:ÈÎÎñ¿ØÖÆ¿éÖ¸Õë</ÊäÈë>
+//ç­‰å¾…å‘é€å®Œæˆ
+//<è¾“å…¥>A:ä»»åŠ¡æ§åˆ¶å—æŒ‡é’ˆ</è¾“å…¥>
 #if OSLW_SIMPLE_MODE
 #define OSlwGiftTransmitWait(A) do {DISPATCH_READY(A){ OSlwTaskWaitGiftTransmit(A);DISPATCH_RETURN(A)}} while(0)
 #else
 #define OSlwGiftTransmitWait(A) do {DISPATCH_READY(A){ OSlwTaskWaitGiftTransmit(A);}DISPATCH_RETURN(A)} while(0)
 #endif
 
-//µÈ´ı±êÖ¾×é
-//<ÊäÈë>A:ÈÎÎñ¿ØÖÆ¿éÖ¸Õë</ÊäÈë>
+//ç­‰å¾…æ ‡å¿—ç»„
+//<è¾“å…¥>A:ä»»åŠ¡æ§åˆ¶å—æŒ‡é’ˆ</è¾“å…¥>
 #if OSLW_SIMPLE_MODE
 #define OSlwGroupFlagWait(A) do {DISPATCH_READY(A){ OSlwTaskWaitGroupFlag(A);DISPATCH_RETURN(A)}} while(0)
 #else
@@ -346,20 +348,20 @@ typedef struct
 
 #define OSlwWaitFlag(A) OSlwGroupFlagWait((A))
 
-//µÈ´ıÌõ¼ş
-//<ÊäÈë>A:ÈÎÎñ¿ØÖÆ¿éÖ¸Õë COND:Ìø³öÑ­»·µÄÌõ¼ş NUM:¼ÆÊıÆ÷±äÁ¿ ÓÉÍâ²¿¶¨Òå´«Èë MS:Ã¿´ÎÑÓÊ±ËùÓÃµÄºÁÃë</ÊäÈë>
+//ç­‰å¾…æ¡ä»¶
+//<è¾“å…¥>A:ä»»åŠ¡æ§åˆ¶å—æŒ‡é’ˆ COND:è·³å‡ºå¾ªç¯çš„æ¡ä»¶ NUM:è®¡æ•°å™¨å˜é‡ ç”±å¤–éƒ¨å®šä¹‰ä¼ å…¥ MS:æ¯æ¬¡å»¶æ—¶æ‰€ç”¨çš„æ¯«ç§’</è¾“å…¥>
 #define OSlwWaitCondition(A,COND,NUM,MS)  do{OSlwSleepSec((A),0,(MS));}while(--NUM && (COND))
 
-//·ÅÆúcpuÊ¹ÓÃÈ¨
-//<ÊäÈë>A:ÈÎÎñ¿ØÖÆ¿éÖ¸Õë</ÊäÈë>
+//æ”¾å¼ƒcpuä½¿ç”¨æƒ
+//<è¾“å…¥>A:ä»»åŠ¡æ§åˆ¶å—æŒ‡é’ˆ</è¾“å…¥>
 #define OSlwGiveUp(A) OSlwSleepN((A),2)
 
-//ÈÎÎñÍ£Ö¹
-//<ÊäÈë>A:ÈÎÎñ¿ØÖÆ¿éÖ¸Õë</ÊäÈë>
+//ä»»åŠ¡åœæ­¢
+//<è¾“å…¥>A:ä»»åŠ¡æ§åˆ¶å—æŒ‡é’ˆ</è¾“å…¥>
 #define OSlwTaskStop(A) do{(A)->TaskFrozenFlag=1;OSlwGiveUp(A);}while(0)
 
-//Âú×ãÌõ¼ş·ÅÆúCPUÊ¹ÓÃÈ¨
-//<ÊäÈë>A:ÈÎÎñ¿ØÖÆ¿éÖ¸Õë COND:Âú×ãÌõ¼ş</ÊäÈë>
+//æ»¡è¶³æ¡ä»¶æ”¾å¼ƒCPUä½¿ç”¨æƒ
+//<è¾“å…¥>A:ä»»åŠ¡æ§åˆ¶å—æŒ‡é’ˆ COND:æ»¡è¶³æ¡ä»¶</è¾“å…¥>
 #define OSlwConditionGiveUp(A,COND) do{\
 									if (COND)\
 									{\
@@ -368,39 +370,39 @@ typedef struct
 									}while(0)
 
 
-//ÉèÖÃÄÖÖÓ
-//<ÊäÈë>A:ÈÎÎñ¿ØÖÆ¿éÖ¸Õë</ÊäÈë>
+//è®¾ç½®é—¹é’Ÿ
+//<è¾“å…¥>A:ä»»åŠ¡æ§åˆ¶å—æŒ‡é’ˆ</è¾“å…¥>
 #define OSlwSetAlarm(A,SEC,MS) do{(A)->TimeSliceMax=((((lw_u32)(SEC)*1000+(MS)))/(lw_u32)OSLW_CORE_TICK_MS);}while(0)
 
 
-//¿´ÄÖÖÓ
-//<ÊäÈë>A:ÈÎÎñ¿ØÖÆ¿éÖ¸Õë</ÊäÈë>
+//çœ‹é—¹é’Ÿ
+//<è¾“å…¥>A:ä»»åŠ¡æ§åˆ¶å—æŒ‡é’ˆ</è¾“å…¥>
 #define OSlwWatchAlarm(A) OSlwConditionGiveUp((A),((A)->RunningTimeSinceRunning >= (A)->TimeSliceMax))
 
-//ÅÄÂô
-//<ÊäÈë>A:ÈÎÎñ¿ØÖÆ¿éÖ¸Õë</ÊäÈë>
+//æ‹å–
+//<è¾“å…¥>A:ä»»åŠ¡æ§åˆ¶å—æŒ‡é’ˆ</è¾“å…¥>
 #define OSlwAuction(A,PRICE) OSlwConditionGiveUp((A),(OSlwTaskAuctionJudge((A),(lw_8)(PRICE))))
 
 
-//²âÊÔ³ÌĞòÔËĞĞÊ±³¤ ¿ªÊ¼
-//<ÊäÈë>A:ÈÎÎñ¿ØÖÆ¿éÖ¸Õë</ÊäÈë>
+//æµ‹è¯•ç¨‹åºè¿è¡Œæ—¶é•¿ å¼€å§‹
+//<è¾“å…¥>A:ä»»åŠ¡æ§åˆ¶å—æŒ‡é’ˆ</è¾“å…¥>
 #define OSlwTic(A) do{(A)->BackToSleep.bits.timer_start_flag=1;}while(0)
 
 
-//²âÊÔ³ÌĞòÔËĞĞÊ±³¤ ½áÊø
-//<ÊäÈë>A:ÈÎÎñ¿ØÖÆ¿éÖ¸Õë</ÊäÈë>
+//æµ‹è¯•ç¨‹åºè¿è¡Œæ—¶é•¿ ç»“æŸ
+//<è¾“å…¥>A:ä»»åŠ¡æ§åˆ¶å—æŒ‡é’ˆ</è¾“å…¥>
 #define OSlwToc(A) OSlwTaskToc((A))
 
-//ÉèÖÃÒ»¹²ĞİÏ¢Ê±¼ä
-//<ÊäÈë>A:ÈÎÎñ¿ØÖÆ¿éÖ¸Õë</ÊäÈë>
+//è®¾ç½®ä¸€å…±ä¼‘æ¯æ—¶é—´
+//<è¾“å…¥>A:ä»»åŠ¡æ§åˆ¶å—æŒ‡é’ˆ</è¾“å…¥>
 #define OSlwSetNap(A,S,MS) do{(A)->BackToSleep.bits.all_time_count=((S)*1000+(MS))/(OSLW_CORE_TICK_MS);OSlwTic(pta);}while(0)
 
 
-//ÉèÖÃĞİÏ¢Ê±¼ä
-//<ÊäÈë>A:ÈÎÎñ¿ØÖÆ¿éÖ¸Õë</ÊäÈë>
+//è®¾ç½®ä¼‘æ¯æ—¶é—´
+//<è¾“å…¥>A:ä»»åŠ¡æ§åˆ¶å—æŒ‡é’ˆ</è¾“å…¥>
 #define OSlwNap(A) do{lw_u16 _res_t=OSlwToc((A));if((A)->BackToSleep.bits.all_time_count >(1+ _res_t)){OSlwSleepN(A,(A)->BackToSleep.bits.all_time_count - _res_t);}}while(0)
 
 
 //#define OSlwSleepN(A,N) do {DISPATCH_READY(A){ A->SleepFun(A,N-1);}} while(0)
 
-#endif /*(Ver.=0.96) OSLW_CORE_H_ */
+#endif /*(Ver.=0.97) OSLW_CORE_H_ */

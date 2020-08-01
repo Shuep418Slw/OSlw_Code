@@ -1,4 +1,4 @@
-/*(Ver.=0.96)
+﻿/*(Ver.=0.97)
  * OSLW_tool.h
  *
  *  Created on: 2017-7-25
@@ -16,11 +16,12 @@
 #include "OSLW_tool_basic_math.h"
 #include "OSLW_tool_string.h"
 #include "OSLW_tool_control.h"
+#include "OSLW_tool_random.h"
 #include "OSLW_tool_signal.h"
 #include "OSLW_tool_search.h"
-#include "OSLW_tool_random.h"
-#include "OSLW_tool_RL.h"
 #include "OSLW_tool_NN.h"
+#include "OSLW_tool_RL.h"
 
 
-#endif /*(Ver.=0.96) OSLW_TOOL_H_ */
+
+#endif /*(Ver.=0.97) OSLW_TOOL_H_ */

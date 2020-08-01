@@ -1,4 +1,4 @@
-/*(Ver.=0.96)
+Ôªø/*(Ver.=0.97)
  * OSLW_tool.h
  *
  *  Created on: 2017-7-25
@@ -10,37 +10,37 @@
 
 
 #include "OSLW_define.h"
-#include "OSLW_parameter.h"
+ //#include "OSLW_parameter.h"
 #include "OSLW_memory.h"
 #include "OSLW_tool_define.h"
 
 #if OSLW_TOOL_IMPORT_SLIP_WIN|| OSLW_TOOL_IMPORT_ALL
 //--------------------
-//<ª¨¥∞>
-//pMasterData ÷˜ ˝æ›≥ÿ
-//pBufferData ª∫≥Â ˝æ›≥ÿ
-//MDataLen_forSize_t ÷˜ ˝æ›∂‘”⁄size_tµƒ¥Û–°
-//BufferLength ª∫≥Â«¯“—¥Ê ˝æ›¥Û–°!!!!!!!!!”√ªß±ÿ–Î±£÷§ª∫≥Â«¯◊„πª!!!!!!!!!!!!!
-//MDataLockFlag ÷˜ ˝æ›À¯¥Ê±Í÷æ »Áπ˚Œ™1 ±Ì æ÷˜ ˝æ›À¯¥Ê  ˝æ›ÃÓ»Îª∫≥Â∆˜
-//AppendFun ≥…‘±∫Ø ˝ psw:this pd: ˝æ› ◊µÿ÷∑ num: ˝æ›≥§∂»
-//</ª¨¥∞>
+//<ÊªëÁ™ó>
+//pMasterData ‰∏ªÊï∞ÊçÆÊ±†
+//pBufferData ÁºìÂÜ≤Êï∞ÊçÆÊ±†
+//MDataLen_forSize_t ‰∏ªÊï∞ÊçÆÂØπ‰∫ésize_tÁöÑÂ§ßÂ∞è
+//BufferLength ÁºìÂÜ≤Âå∫Â∑≤Â≠òÊï∞ÊçÆÂ§ßÂ∞è!!!!!!!!!Áî®Êà∑ÂøÖÈ°ª‰øùËØÅÁºìÂÜ≤Âå∫Ë∂≥Â§ü!!!!!!!!!!!!!
+//MDataLockFlag ‰∏ªÊï∞ÊçÆÈîÅÂ≠òÊ†áÂøó Â¶ÇÊûú‰∏∫1 Ë°®Á§∫‰∏ªÊï∞ÊçÆÈîÅÂ≠ò Êï∞ÊçÆÂ°´ÂÖ•ÁºìÂÜ≤Âô®
+//AppendFun ÊàêÂëòÂáΩÊï∞ psw:this pd:Êï∞ÊçÆÈ¶ñÂú∞ÂùÄ num:Êï∞ÊçÆÈïøÂ∫¶
+//</ÊªëÁ™ó>
 //--------------------
-typedef struct OSLW_TOOL_SLIPWIN_STRUCT{
+typedef struct OSLW_TOOL_SLIPWIN_STRUCT {
 
 	void *pMasterData;
 	void *pBufferData;
 
 	lw_u32 MDataLen_forSize_t;
-	
-	
-	lw_u16 BufferLength;	
+
+
+	lw_u16 BufferLength;
 	lw_u8 MDataLockFlag;
-	
-	struct OSLW_TOOL_SLIPWIN_STRUCT* (*AppendFun)(struct OSLW_TOOL_SLIPWIN_STRUCT *psw,void *pd,lw_u8 num);
+
+	struct OSLW_TOOL_SLIPWIN_STRUCT* (*AppendFun)(struct OSLW_TOOL_SLIPWIN_STRUCT *psw, void *pd, lw_u8 num);
 
 }  OSlwToolSlipwinSTU;
 
-OSlwToolSlipwinSTU* OSlwToolSlipwinAppend(OSlwToolSlipwinSTU *psw,void *pd,lw_u8 num);
+OSlwToolSlipwinSTU* OSlwToolSlipwinAppend(OSlwToolSlipwinSTU *psw, void *pd, lw_u8 num);
 
 
 #define OSLW_TOOL_SLIPWIN_DEFAULT(MD,BUF,DTYPE,LEN) {(MD),(BUF),(sizeof(DTYPE)*LEN),0,0,OSlwToolSlipwinAppend};
@@ -52,21 +52,21 @@ OSlwToolSlipwinSTU* OSlwToolSlipwinAppend(OSlwToolSlipwinSTU *psw,void *pd,lw_u8
 
 #if OSLW_TOOL_IMPORT_DLIST|| OSLW_TOOL_IMPORT_ALL
 //-------------------
-//<¡¥±ÌΩ⁄µ„>
-//</¡¥±ÌΩ⁄µ„>
+//<ÈìæË°®ËäÇÁÇπ>
+//</ÈìæË°®ËäÇÁÇπ>
 //--------------------
-typedef struct OSLW_TOOL_DLIST_NODE_STRUCT{
+typedef struct OSLW_TOOL_DLIST_NODE_STRUCT {
 
 	OSlwToolDListNodeConnectSTU con;
 	OSlwExternMemorySTU Key;
 	OSlwExternMemorySTU Data;
-	
+
 }OSlwToolDListNodeSTU;
 
 
-typedef enum{
-	OSlwToolDListIndexMode_byNum=0,
-	OSlwToolDListIndexMode_byId=1
+typedef enum {
+	OSlwToolDListIndexMode_byNum = 0,
+	OSlwToolDListIndexMode_byId = 1
 
 }OSlwToolDListIndexModeNUM;
 
@@ -75,17 +75,17 @@ typedef lw_8(*pOSlwDlistCmpFun)(OSlwToolDListNodeSTU *pDLN, lw_u16 data, lw_u16 
 
 
 //--------------------
-//<À´œÚ¡¥±Ì>
-//</À´œÚ¡¥±Ì>
+//<ÂèåÂêëÈìæË°®>
+//</ÂèåÂêëÈìæË°®>
 //--------------------
-typedef struct OSLW_TOOL_DLIST_STRUCT{
-	OSlwToolDListNodeSTU Head,*pTail;
-	lw_u16 MaxLen,NowLen;
+typedef struct OSLW_TOOL_DLIST_STRUCT {
+	OSlwToolDListNodeSTU Head, *pTail;
+	lw_u16 MaxLen, NowLen;
 	OSlwToolDListNodeSTU* (*IndexOfFUN)(struct OSLW_TOOL_DLIST_STRUCT *pDL, OSLW_TOOL_DLIST_FUN_PARA_DEFAULT);
-	OSlwToolDListNodeSTU* (*AppendFUN)(struct OSLW_TOOL_DLIST_STRUCT *pDL,OSlwToolDListNodeSTU *pDLN);
-	OSlwToolDListNodeSTU* (*InsertFUN)(struct OSLW_TOOL_DLIST_STRUCT *pDL,OSlwToolDListNodeSTU *pDLN, OSLW_TOOL_DLIST_FUN_PARA_DEFAULT);
+	OSlwToolDListNodeSTU* (*AppendFUN)(struct OSLW_TOOL_DLIST_STRUCT *pDL, OSlwToolDListNodeSTU *pDLN);
+	OSlwToolDListNodeSTU* (*InsertFUN)(struct OSLW_TOOL_DLIST_STRUCT *pDL, OSlwToolDListNodeSTU *pDLN, OSLW_TOOL_DLIST_FUN_PARA_DEFAULT);
 	OSlwToolDListNodeSTU* (*RemoveFUN)(struct OSLW_TOOL_DLIST_STRUCT *pDL, OSLW_TOOL_DLIST_FUN_PARA_DEFAULT);
-	
+
 }OSlwToolDListSTU;
 
 #define OSLW_TOOL_DLIST_FUN_PARA_DEFAULT pOSlwDlistCmpFun pCmpFun,lw_u16 data,void *pdata
@@ -94,25 +94,25 @@ typedef struct OSLW_TOOL_DLIST_STRUCT{
 #if !(OSLW_SIMPLE_LEVEL >= 4)
 OSlwToolDListNodeSTU* OSlwToolDListIndexOf(OSlwToolDListSTU *pDL, OSLW_TOOL_DLIST_FUN_PARA_DEFAULT);
 OSlwToolDListNodeSTU* OSlwToolDListAppend(struct OSLW_TOOL_DLIST_STRUCT *pDL, OSlwToolDListNodeSTU *pDLN);
-OSlwToolDListNodeSTU* OSlwToolDListInsert(struct OSLW_TOOL_DLIST_STRUCT *pDL,OSlwToolDListNodeSTU *pDLN, OSLW_TOOL_DLIST_FUN_PARA_DEFAULT);
+OSlwToolDListNodeSTU* OSlwToolDListInsert(struct OSLW_TOOL_DLIST_STRUCT *pDL, OSlwToolDListNodeSTU *pDLN, OSLW_TOOL_DLIST_FUN_PARA_DEFAULT);
 OSlwToolDListNodeSTU* OSlwToolDListRemove(struct OSLW_TOOL_DLIST_STRUCT *pDL, OSLW_TOOL_DLIST_FUN_PARA_DEFAULT);
-OSlwToolDListNodeSTU* _OSlwToolDListRemoveNode (struct OSLW_TOOL_DLIST_STRUCT *pDL, OSlwToolDListNodeSTU *pDLNbuf);
+OSlwToolDListNodeSTU* _OSlwToolDListRemoveNode(struct OSLW_TOOL_DLIST_STRUCT *pDL, OSlwToolDListNodeSTU *pDLNbuf);
 #endif // !(OSLW_SIMPLE_LEVEL >= 4)
 
 
-#define OSLW_TOOL_DLIST_NODE_CONNECT(P1,P2) 	(P1)->con.pNext=(OSlwToolDListNodeConnectSTU *)(P2);/*(Ver.=0.96)Œ≤≤øµƒœ¬“ª∏ˆŒ™–¬µƒ*/\
-(P2)->con.pLast = (OSlwToolDListNodeConnectSTU *)(P1);/*(Ver.=0.96)–¬Ω⁄µ„µƒ…œ“ª∏ˆŒ™‘≠¿¥Œ≤≤ø*/
+#define OSLW_TOOL_DLIST_NODE_CONNECT(P1,P2) 	(P1)->con.pNext=(OSlwToolDListNodeConnectSTU *)(P2);/*(Ver.=0.97)Â∞æÈÉ®ÁöÑ‰∏ã‰∏Ä‰∏™‰∏∫Êñ∞ÁöÑ*/\
+(P2)->con.pLast = (OSlwToolDListNodeConnectSTU *)(P1);/*(Ver.=0.97)Êñ∞ËäÇÁÇπÁöÑ‰∏ä‰∏Ä‰∏™‰∏∫ÂéüÊù•Â∞æÈÉ®*/
 
 #define OSLW_TOOL_DLIST_NODE_INSERT(P1,P_INSERT) (P_INSERT)->con.pLast = (OSlwToolDListNodeConnectSTU *)(P1);\
 (P_INSERT)->con.pNext = (OSlwToolDListNodeConnectSTU *)(P1)->con.pNext;\
 (P1)->con.pNext->pLast = (OSlwToolDListNodeConnectSTU *)(P_INSERT);\
 (P1)->con.pNext = (OSlwToolDListNodeConnectSTU *)(P_INSERT);
 
-#define OSLW_TOOL_DLIST_NODE_DELECT(P) 			(P)->con.pLast->pNext=(P)->con.pNext;/*(Ver.=0.96)…œ“ª∏ˆµƒœ¬“ª∏ˆŒ™œ¬“ª∏ˆ*/\
-(P)->con.pNext->pLast = (P)->con.pLast;/*(Ver.=0.96)œ¬“ª∏ˆµƒ…œ“ª∏ˆŒ™…œ“ª∏ˆ*/
+#define OSLW_TOOL_DLIST_NODE_DELECT(P) 			(P)->con.pLast->pNext=(P)->con.pNext;/*(Ver.=0.97)‰∏ä‰∏Ä‰∏™ÁöÑ‰∏ã‰∏Ä‰∏™‰∏∫‰∏ã‰∏Ä‰∏™*/\
+(P)->con.pNext->pLast = (P)->con.pLast;/*(Ver.=0.97)‰∏ã‰∏Ä‰∏™ÁöÑ‰∏ä‰∏Ä‰∏™‰∏∫‰∏ä‰∏Ä‰∏™*/
 
 
-void OSlwToolDListInitial(OSlwToolDListSTU *pDL,lw_u8 len,void *p);
+void OSlwToolDListInitial(OSlwToolDListSTU *pDL, lw_u8 len, void *p);
 
 lw_8 OSlwToolDListCmpId(OSlwToolDListNodeSTU *pDLN, lw_u16 data, lw_u16 count, void *pdata);
 lw_8 OSlwToolDListCmpCount(OSlwToolDListNodeSTU *pDLN, lw_u16 data, lw_u16 count, void *pdata);
@@ -125,7 +125,7 @@ lw_8 OSlwToolDListCmpCount(OSlwToolDListNodeSTU *pDLN, lw_u16 data, lw_u16 count
 
 #if OSLW_TOOL_IMPORT_HASH_LIST|| OSLW_TOOL_IMPORT_ALL
 
-typedef lw_u8 (*HashCalFunType)(void *pData);
+typedef lw_u8(*HashCalFunType)(void *pData);
 lw_u8 HashCalStringBKDR(void *pData);
 
 
@@ -133,8 +133,8 @@ typedef lw_8(*HashKeyCmpFunType)(void *p1, void *p2);
 lw_8 HashCmpString(void *p1, void *p2);
 
 //--------------------
-//<π˛œ£±Ì>
-//</π˛œ£±Ì>
+//<ÂìàÂ∏åË°®>
+//</ÂìàÂ∏åË°®>
 //--------------------
 typedef struct OSLW_TOOL_HASH_STRUCT {
 	OSlwToolDListNodeSTU *pHashList[OSLW_TOOL_HASH_LIST_MAX];
@@ -151,7 +151,7 @@ typedef struct OSLW_TOOL_HASH_STRUCT {
 
 
 void OSlwToolHashInitial(OSlwToolHashSTU *pH, lw_u8 length, HashCalFunType pHashFun, HashKeyCmpFunType pHashKeyCmpFun);
-lw_u8 OSlwToolHashSelect(struct OSLW_TOOL_HASH_STRUCT *pH, void *pKey, lw_u8 *pIndexResult,OSlwToolDListNodeSTU **ppDLN);
+lw_u8 OSlwToolHashSelect(struct OSLW_TOOL_HASH_STRUCT *pH, void *pKey, lw_u8 *pIndexResult, OSlwToolDListNodeSTU **ppDLN);
 OSlwToolDListNodeSTU* OSlwToolHashAppend(struct OSLW_TOOL_HASH_STRUCT *pH, void *pKey, OSlwToolDListNodeSTU *pDLN);
 OSlwToolDListNodeSTU* OSlwToolHashDelete(struct OSLW_TOOL_HASH_STRUCT *pH, void *pKey);
 
@@ -159,7 +159,7 @@ OSlwToolDListNodeSTU* OSlwToolHashDelete(struct OSLW_TOOL_HASH_STRUCT *pH, void 
 
 
 #if OSLW_TOOL_IMPORT_TABLE|| OSLW_TOOL_IMPORT_ALL
-typedef struct OSLW_TOOL_TABLE_STRUCT{
+typedef struct OSLW_TOOL_TABLE_STRUCT {
 
 	OSlwExternMemorySTU Row;
 
@@ -169,10 +169,10 @@ typedef struct OSLW_TOOL_TABLE_STRUCT{
 
 	OSlwMemoryBasicSTU *pmem;
 
-	void *(*ReadFun)(struct OSLW_TOOL_TABLE_STRUCT *pT, lw_32 row,lw_32 col,lw_u16 *pLen);
-	lw_32 (*WriteFun)(struct OSLW_TOOL_TABLE_STRUCT *pT, lw_32 row, lw_32 col, void *psrc, lw_u16 len);
-	
-	
+	void *(*ReadFun)(struct OSLW_TOOL_TABLE_STRUCT *pT, lw_32 row, lw_32 col, lw_u16 *pLen);
+	lw_32(*WriteFun)(struct OSLW_TOOL_TABLE_STRUCT *pT, lw_32 row, lw_32 col, void *psrc, lw_u16 len);
+
+
 }OSlwToolTableSTU;
 
 

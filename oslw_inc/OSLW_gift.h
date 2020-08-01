@@ -1,4 +1,4 @@
-/*(Ver.=0.96)
+ï»¿/*(Ver.=0.97)
  * OSLW_gift.h
  *
  *  Created on: 2017-7-14
@@ -16,8 +16,8 @@
 
 
 //------------------------------------------
-//<¹²ÓÃÌåÃû>OSlwGiftUnitUN</¹²ÓÃÌåÃû>
-//<¹²ÓÃÌå¹¦ÄÜ>ÀñÎïÄ£¿éË½ÓĞµ¥Ôª ¾ÍÓĞ¶àÖØ·ÃÎÊ¹¦ÄÜ</¹²ÓÃÌå¹¦ÄÜ>
+//<å…±ç”¨ä½“å>OSlwGiftUnitUN</å…±ç”¨ä½“å>
+//<å…±ç”¨ä½“åŠŸèƒ½>ç¤¼ç‰©æ¨¡å—ç§æœ‰å•å…ƒ å°±æœ‰å¤šé‡è®¿é—®åŠŸèƒ½</å…±ç”¨ä½“åŠŸèƒ½>
 //------------------------------------------
 typedef struct OSLW_GIFT_UNIT_UNION{
 
@@ -36,8 +36,8 @@ typedef struct OSLW_GIFT_UNIT_UNION{
 
 
 //------------------------------------------
-//<½á¹¹ÌåÃû>OSlwGiftExternUnitSTU</½á¹¹ÌåÃû>
-//<½á¹¹Ìå¹¦ÄÜ>ÀñÎïÍâ²¿´æ´¢¿Õ¼ä</½á¹¹Ìå¹¦ÄÜ>
+//<ç»“æ„ä½“å>OSlwGiftExternUnitSTU</ç»“æ„ä½“å>
+//<ç»“æ„ä½“åŠŸèƒ½>ç¤¼ç‰©å¤–éƒ¨å­˜å‚¨ç©ºé—´</ç»“æ„ä½“åŠŸèƒ½>
 //------------------------------------------
 //typedef struct OSLW_GIFT_EXTERN_UNIT_STRUCT{
 //	lw_16 Length;
@@ -47,8 +47,8 @@ typedef struct OSLW_GIFT_UNIT_UNION{
 typedef OSlwExternMemorySTU OSlwGiftExternUnitSTU;
 
 //------------------------------------------
-//<Ã¶¾Ù>GiftUnitStatusNUM</Ã¶¾Ù>
-//<Ã¶¾Ù¹¦ÄÜ>ÀñÎï×´Ì¬ÀàĞÍ</Ã¶¾Ù¹¦ÄÜ>
+//<æšä¸¾>GiftUnitStatusNUM</æšä¸¾>
+//<æšä¸¾åŠŸèƒ½>ç¤¼ç‰©çŠ¶æ€ç±»å‹</æšä¸¾åŠŸèƒ½>
 //------------------------------------------
 typedef enum{
 	GiftUnitStatus_NAN=0,
@@ -58,35 +58,35 @@ typedef enum{
 }GiftUnitStatusNUM;
 
 //------------------------------------------
-//<Ã¶¾Ù>GiftPostmanStatusNUM</Ã¶¾Ù>
-//<Ã¶¾Ù¹¦ÄÜ>¿ìµİÔ±×´Ì¬ÀàĞÍ</Ã¶¾Ù¹¦ÄÜ>
+//<æšä¸¾>GiftPostmanStatusNUM</æšä¸¾>
+//<æšä¸¾åŠŸèƒ½>å¿«é€’å‘˜çŠ¶æ€ç±»å‹</æšä¸¾åŠŸèƒ½>
 //------------------------------------------
 typedef enum{
 
-	GiftPostmanStatus_NAN=0,//Îª³õÊ¼»¯
-	GiftPostmanStatus_Free=1,//×ÔÓÉ×´Ì¬
-	GiftPostmanStatus_InDelivery,//ÕıÔÚÅÉËÍ
-	GiftPostmanStatus_Received,//ÒÑÇ©ÊÕ ±íÊ¾Ä¿±êÈÎÎñÒÑ¾­½ÓÊÜ
-	GiftPostmanStatus_Return//·µ»Ø ±íÊ¾Ä¿±êÈÎÎñÒÑ¾­·µ»Ø(ÓÃÓÚÊı¾İ¾ßÓĞË«ÏòĞÔµÄÄ£Ê½)
+	GiftPostmanStatus_NAN=0,//ä¸ºåˆå§‹åŒ–
+	GiftPostmanStatus_Free=1,//è‡ªç”±çŠ¶æ€
+	GiftPostmanStatus_InDelivery,//æ­£åœ¨æ´¾é€
+	GiftPostmanStatus_Received,//å·²ç­¾æ”¶ è¡¨ç¤ºç›®æ ‡ä»»åŠ¡å·²ç»æ¥å—
+	GiftPostmanStatus_Return//è¿”å› è¡¨ç¤ºç›®æ ‡ä»»åŠ¡å·²ç»è¿”å›(ç”¨äºæ•°æ®å…·æœ‰åŒå‘æ€§çš„æ¨¡å¼)
 }GiftPostmanStatusNUM;
 
 
 //------------------------------------------
-//<½á¹¹ÌåÃû>OSlwGiftUnitSTU</½á¹¹ÌåÃû>
-//<½á¹¹Ìå¹¦ÄÜ>ÀñÎïµ¥Ôª¿Õ¼ä °üº¬Ò»Æ¬Ë½ÓĞÓëÍâ²¿µ¥Ôª</½á¹¹Ìå¹¦ÄÜ>
+//<ç»“æ„ä½“å>OSlwGiftUnitSTU</ç»“æ„ä½“å>
+//<ç»“æ„ä½“åŠŸèƒ½>ç¤¼ç‰©å•å…ƒç©ºé—´ åŒ…å«ä¸€ç‰‡ç§æœ‰ä¸å¤–éƒ¨å•å…ƒ</ç»“æ„ä½“åŠŸèƒ½>
 //------------------------------------------
 typedef struct OSLW_GIFT_UNIT_STRUCT{
 	
-	OSlwGiftExternUnitSTU ExternUnit;//ÀñÎïÍâ²¿µ¥Ôª
-	OSlwGiftUnitUN PrivateUnit;//ÀñÎïË½ÓĞµ¥Ôª
+	OSlwGiftExternUnitSTU ExternUnit;//ç¤¼ç‰©å¤–éƒ¨å•å…ƒ
+	OSlwGiftUnitUN PrivateUnit;//ç¤¼ç‰©ç§æœ‰å•å…ƒ
 	
 	
 }OSlwGiftUnitSTU;
 
 
 //------------------------------------------
-//<½á¹¹ÌåÃû>OSlwGiftPostmanSTU</½á¹¹ÌåÃû>
-//<½á¹¹Ìå¹¦ÄÜ>¿ìµİÔ± ½á¹¹Ìå ±¾ÖÊÎªË«ÏòÁ´±íµÄ½Úµã</½á¹¹Ìå¹¦ÄÜ>
+//<ç»“æ„ä½“å>OSlwGiftPostmanSTU</ç»“æ„ä½“å>
+//<ç»“æ„ä½“åŠŸèƒ½>å¿«é€’å‘˜ ç»“æ„ä½“ æœ¬è´¨ä¸ºåŒå‘é“¾è¡¨çš„èŠ‚ç‚¹</ç»“æ„ä½“åŠŸèƒ½>
 //------------------------------------------
 typedef struct OSLW_GIFT_POSTMAN_STRUCT{
 
@@ -96,34 +96,34 @@ typedef struct OSLW_GIFT_POSTMAN_STRUCT{
 	
 	lw_u8 PostmanID;
 
-	struct OSLW_TASK_STRUCT *pSource,*pAim;//Ö¸ÏòÔ´ÈÎÎñÓëÄ¿±êÈÎÎñµÄÖ¸Õë ÔİÊ±ÎŞÓÃ
+	struct OSLW_TASK_STRUCT *pSource,*pAim;//æŒ‡å‘æºä»»åŠ¡ä¸ç›®æ ‡ä»»åŠ¡çš„æŒ‡é’ˆ æš‚æ—¶æ— ç”¨
 	
 	struct OSLW_MEMORY_BASIC_STRUCT *pmem;
 	
-	GiftPostmanStatusNUM Status,Method;//¿ìµİÔ±µ±Ç°×´Ì¬ÓëÄ¿±ê µ±Ä¿±êÓë×´Ì¬ÏàÍ¬Ê± ±íÊ¾¿ìµİÔ±Ê¹Ãü½áÊø
+	GiftPostmanStatusNUM Status,Method;//å¿«é€’å‘˜å½“å‰çŠ¶æ€ä¸ç›®æ ‡ å½“ç›®æ ‡ä¸çŠ¶æ€ç›¸åŒæ—¶ è¡¨ç¤ºå¿«é€’å‘˜ä½¿å‘½ç»“æŸ
 		
-	struct OSLW_GIFT_TRANSMIT_STRUCT *pGT;//Ö¸ÏòËùÊô·¢ËÍµ¥Î»µÄÖ¸Õë
+	struct OSLW_GIFT_TRANSMIT_STRUCT *pGT;//æŒ‡å‘æ‰€å±å‘é€å•ä½çš„æŒ‡é’ˆ
 
 
 }OSlwGiftPostmanSTU;
 
 
 //------------------------------------------
-//<½á¹¹ÌåÃû>OSlwGiftReceiveSTU</½á¹¹ÌåÃû>
-//<½á¹¹Ìå¹¦ÄÜ>ÀñÎï½ÓÊÕÆ÷½á¹¹Ìå ±¾ÖÊÎªË«ÏòÁ´±íµÄ¿ØÖÆµ¥Ôª</½á¹¹Ìå¹¦ÄÜ>
+//<ç»“æ„ä½“å>OSlwGiftReceiveSTU</ç»“æ„ä½“å>
+//<ç»“æ„ä½“åŠŸèƒ½>ç¤¼ç‰©æ¥æ”¶å™¨ç»“æ„ä½“ æœ¬è´¨ä¸ºåŒå‘é“¾è¡¨çš„æ§åˆ¶å•å…ƒ</ç»“æ„ä½“åŠŸèƒ½>
 //------------------------------------------
 typedef struct OSLW_GIFT_RECEIVE_STRUCT{
-	//³ÉÔ±±äÁ¿
+	//æˆå‘˜å˜é‡
 
 	OSlwToolDListSTU List;
 	
-	struct OSLW_GIFT_CONCIERGE_STRUCT *pGC;//Ö¸Ïò×Ô¼ºËùÊôÃÅÎÀ»ú¹¹µÄÖ¸Õë
+	struct OSLW_GIFT_CONCIERGE_STRUCT *pGC;//æŒ‡å‘è‡ªå·±æ‰€å±é—¨å«æœºæ„çš„æŒ‡é’ˆ
 	
-	//³ÉÔ±º¯Êı
+	//æˆå‘˜å‡½æ•°
 #if !(OSLW_SIMPLE_MODE)	
-	struct OSLW_GIFT_POSTMAN_STRUCT *(*AppendFun)(struct OSLW_GIFT_RECEIVE_STRUCT *pgr,struct OSLW_GIFT_POSTMAN_STRUCT *pgp);//×·¼Óº¯Êı
-	struct OSLW_GIFT_POSTMAN_STRUCT *(*MoveNextFun)(struct OSLW_GIFT_RECEIVE_STRUCT *pgr);//ÒÆ¶¯º¯Êı 
-	struct OSLW_GIFT_POSTMAN_STRUCT *(*SlipNextFun)(struct OSLW_GIFT_RECEIVE_STRUCT *pgr,struct OSLW_GIFT_POSTMAN_STRUCT **ppGP);//»¬¶¯º¯Êı 	
+	struct OSLW_GIFT_POSTMAN_STRUCT *(*AppendFun)(struct OSLW_GIFT_RECEIVE_STRUCT *pgr,struct OSLW_GIFT_POSTMAN_STRUCT *pgp);//è¿½åŠ å‡½æ•°
+	struct OSLW_GIFT_POSTMAN_STRUCT *(*MoveNextFun)(struct OSLW_GIFT_RECEIVE_STRUCT *pgr);//ç§»åŠ¨å‡½æ•° 
+	struct OSLW_GIFT_POSTMAN_STRUCT *(*SlipNextFun)(struct OSLW_GIFT_RECEIVE_STRUCT *pgr,struct OSLW_GIFT_POSTMAN_STRUCT **ppGP);//æ»‘åŠ¨å‡½æ•° 	
 #endif
 }OSlwGiftReceiveSTU;
 
@@ -131,18 +131,18 @@ typedef struct OSLW_GIFT_RECEIVE_STRUCT{
 
 
 //------------------------------------------
-//<½á¹¹ÌåÃû>OSlwGiftTransmitSTU</½á¹¹ÌåÃû>
-//<½á¹¹Ìå¹¦ÄÜ>ÀñÎï·¢ËÍÆ÷½á¹¹Ìå</½á¹¹Ìå¹¦ÄÜ>
-//Öğ½¥·ÅÆú ²ÉÓÃÄÚ´æ·ÖÅä»úÖÆ´úÌæ
+//<ç»“æ„ä½“å>OSlwGiftTransmitSTU</ç»“æ„ä½“å>
+//<ç»“æ„ä½“åŠŸèƒ½>ç¤¼ç‰©å‘é€å™¨ç»“æ„ä½“</ç»“æ„ä½“åŠŸèƒ½>
+//é€æ¸æ”¾å¼ƒ é‡‡ç”¨å†…å­˜åˆ†é…æœºåˆ¶ä»£æ›¿
 //------------------------------------------
 #if 0
 typedef struct OSLW_GIFT_TRANSMIT_STRUCT{
 	
-	OSlwGiftPostmanSTU PostmanList[OSLW_GIFT_POSTMAN_MAX];//¿ìµİÔ±ÁĞ±í ´æ´¢Ò»²¿·Ö¿ìµİÔ±
+	OSlwGiftPostmanSTU PostmanList[OSLW_GIFT_POSTMAN_MAX];//å¿«é€’å‘˜åˆ—è¡¨ å­˜å‚¨ä¸€éƒ¨åˆ†å¿«é€’å‘˜
 	
-	union OSLW_CORE_GROUP_UNION PostmanFlag;//×´Ì¬±êÖ¾×é Îª0±íÊ¾·¢ËÍÍê³É Ò»Î»´ú±íÒ»¸ö¿ìµİÔ± 
+	union OSLW_CORE_GROUP_UNION PostmanFlag;//çŠ¶æ€æ ‡å¿—ç»„ ä¸º0è¡¨ç¤ºå‘é€å®Œæˆ ä¸€ä½ä»£è¡¨ä¸€ä¸ªå¿«é€’å‘˜ 
 	
-	struct OSLW_GIFT_CONCIERGE_STRUCT *pGC;	//Ö¸Ïò×Ô¼ºËùÊôÃÅÎÀ»ú¹¹µÄÖ¸Õë
+	struct OSLW_GIFT_CONCIERGE_STRUCT *pGC;	//æŒ‡å‘è‡ªå·±æ‰€å±é—¨å«æœºæ„çš„æŒ‡é’ˆ
 #if !(OSLW_SIMPLE_MODE)		
 	OSlwGiftPostmanSTU* (*IdleFun)(struct OSLW_GIFT_TRANSMIT_STRUCT *pgt);
 #endif	
@@ -150,24 +150,24 @@ typedef struct OSLW_GIFT_TRANSMIT_STRUCT{
 #endif // 0
 
 //------------------------------------------
-//<½á¹¹ÌåÃû>OSlwGiftConciergeSTU</½á¹¹ÌåÃû>
-//<½á¹¹Ìå¹¦ÄÜ>ÃÅÎÀ»ú¹¹½á¹¹Ìå</½á¹¹Ìå¹¦ÄÜ>
+//<ç»“æ„ä½“å>OSlwGiftConciergeSTU</ç»“æ„ä½“å>
+//<ç»“æ„ä½“åŠŸèƒ½>é—¨å«æœºæ„ç»“æ„ä½“</ç»“æ„ä½“åŠŸèƒ½>
 //------------------------------------------
 typedef struct OSLW_GIFT_CONCIERGE_STRUCT{
 
 	
-	OSlwGiftReceiveSTU giftR;//½ÓÊÕ
-	//OSlwGiftTransmitSTU giftT;//·¢ËÍ
+	OSlwGiftReceiveSTU giftR;//æ¥æ”¶
+	//OSlwGiftTransmitSTU giftT;//å‘é€
 
-	struct OSLW_TASK_STRUCT *pta;//Ö¸Ïò×Ô¼ºËùÊôÈÎÎñµÄÖ¸Õë
+	struct OSLW_TASK_STRUCT *pta;//æŒ‡å‘è‡ªå·±æ‰€å±ä»»åŠ¡çš„æŒ‡é’ˆ
 	
 }OSlwGiftConciergeSTU;
 
 
-//º¯ÊıÉùÃ÷
+//å‡½æ•°å£°æ˜
 void OSlwGiftConciergeInitial(OSlwGiftConciergeSTU *pgc);
 
-//Öğ½¥·ÅÆú ²ÉÓÃÄÚ´æ·ÖÅä»úÖÆ´úÌæ
+//é€æ¸æ”¾å¼ƒ é‡‡ç”¨å†…å­˜åˆ†é…æœºåˆ¶ä»£æ›¿
 #if 0
 void OSlwGiftTransmitInitial(OSlwGiftTransmitSTU *pgt);
 OSlwGiftPostmanSTU * OSlwGiftTransmitIdle(OSlwGiftTransmitSTU *pgt);
@@ -221,7 +221,7 @@ OSlwGiftPostmanSTU * OSlwGiftAllocPostman(struct OSLW_MEMORY_BASIC_STRUCT *pmem)
 void * OSlwGiftReceiveMoveNext(OSlwToolDListNodeConnectSTU *pgr);
 
 
-//È¡Ïû²¿·Öºê¶¨Òå
+//å–æ¶ˆéƒ¨åˆ†å®å®šä¹‰
 #undef OSLW_GIFT_SEND_GIFT
 #undef OSLW_GIFT_GET_GIFT
 #undef OSLW_GIFT_RECE_GIFT
@@ -263,4 +263,4 @@ typedef OSlwGiftPostmanSTU LwPostman;
 
 #define LwSendGiFg OSLW_GIFT_SG_SF
 
-#endif /*(Ver.=0.96) OSLW_GIFT_H_ */
+#endif /*(Ver.=0.97) OSLW_GIFT_H_ */

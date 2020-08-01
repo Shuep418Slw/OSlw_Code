@@ -18,7 +18,7 @@ typedef void(*FunType_9)(void *a1, void *a2, void *a3, void *a4, void *a5, void 
 
 
 
-typedef struct OSLW_STRING_DEBUG_DATA_STRUCT{
+typedef struct OSLW_STRING_DEBUG_DATA_STRUCT {
 	void *pdata;
 	lw_u8 *name;
 	lw_u8 kind;
@@ -26,7 +26,7 @@ typedef struct OSLW_STRING_DEBUG_DATA_STRUCT{
 
 
 
-typedef struct OSLW_STRING_DEBUG_STRUCT{
+typedef struct OSLW_STRING_DEBUG_STRUCT {
 
 #if OSLW_STR_DBG_SIMPLE_MODE == 0	
 	OSlwToolHashSTU DebugHash;
@@ -37,21 +37,21 @@ typedef struct OSLW_STRING_DEBUG_STRUCT{
 	lw_u8 DebugHeap[16];
 #elif OSLW_STR_DBG_SIMPLE_MODE==2
 	OSlwStrDbgDataSTU Data[OSLW_STR_DBG_S2_DATA_LEN];
-	lw_u8 count;	
+	lw_u8 count;
 #endif	
-	
-	union 
+
+	union
 	{
 		lw_u8 OutStr[OSLW_STR_DBG_OUT_LEN];
-		struct 
+		struct
 		{
 			lw_u8 NameStr[OSLW_STR_DBG_NAME_LEN];
 			lw_u8 DataStr[OSLW_STR_DBG_DATA_LEN];
 
 		} UsingStr;
 	}StrDbgAllStr;
-	
-	
+
+
 }OSlwStrDbgSTU;
 
 void OSlwStrDbgInitial(struct OSLW_STRING_DEBUG_STRUCT *pSD);
@@ -88,11 +88,11 @@ lw_u8 _StringDebugFindCharNum(lw_8 *name, lw_8 c);
 lw_u8 _StringDebugSliceUPDATE(lw_u8 *instr, lw_u8 *name, lw_u8 *data);
 lw_u8 _StringDebugSliceSELECT(lw_u8 *instr, lw_u8 *name, lw_u8 *pkind);
 lw_u8 _StringDebugSliceFUN(lw_u8 *instr, lw_u8 *name, lw_u8 *data);
-void *_SD_MemCpy(void *dst, void *src, lw_u32 len) ;
-lw_u8 *_SD_Data2Str(lw_u8 *str, void *data, lw_u8 *form,lw_u8 *buf,lw_u8 *info);
+void *_SD_MemCpy(void *dst, void *src, lw_u32 len);
+lw_u8 *_SD_Data2Str(lw_u8 *str, void *data, lw_u8 *form, lw_u8 *buf, lw_u8 *info);
 lw_u8 * _SD_HashNode2Str(lw_u8 *str, OSlwToolDListNodeSTU *pdln);
-void OSlwStrDbgRun(struct OSLW_STRING_DEBUG_STRUCT *pSD,lw_u8 *instr);
-void *_StringDebugString2NumberSimple(void *pmem, lw_u8 *str, lw_u8 *info,lw_u8 *outstr);
+void OSlwStrDbgRun(struct OSLW_STRING_DEBUG_STRUCT *pSD, lw_u8 *instr);
+void *_StringDebugString2NumberSimple(void *pmem, lw_u8 *str, lw_u8 *info, lw_u8 *outstr);
 lw_8 * StringDebug(OSlwToolHashSTU *ph, void *pm, lw_8 *instr, lw_8 *outstr, lw_8 *data1, lw_8 *data2);
 
 
@@ -101,7 +101,7 @@ lw_8 * StringDebug(OSlwToolHashSTU *ph, void *pm, lw_8 *instr, lw_8 *outstr, lw_
 #define STRING_DEBUG_VER "v1.0SS"
 
 lw_8 * StringDebug(OSlwStrDbgSTU *pSD, lw_8 *instr, lw_8 *outstr, lw_8 *data1, lw_8 *data2);
-void * _StringDebugFind_S2(OSlwStrDbgSTU *pSD,lw_8 *name, lw_8 *pkind);
+void * _StringDebugFind_S2(OSlwStrDbgSTU *pSD, lw_8 *name, lw_8 *pkind);
 lw_u8 *_StringDebugSelectInfo(lw_8 c);
 
 #endif

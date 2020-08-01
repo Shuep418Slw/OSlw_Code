@@ -1,4 +1,4 @@
-/*(Ver.=0.96)
+/*(Ver.=0.97)
 * OSLW_define.h
 *
 *  Created on: 2018-7-14
@@ -10,18 +10,22 @@
 #define OSLW_TOOL_DEFINE_H_
 
 //ALL IMPORT
+//导入所有库
 #define OSLW_TOOL_IMPORT_ALL 1
 
+//开启cache优化类算法
 #define L1_L2_CACHE_OPTIM 1
 
+//cache优化大小 为2 4 8 16
+#define CACHE_READ_NUM 16
 
-//#define OSLW_USING_CBLAS 1
+#define OSLW_USING_CBLAS 0
 
 
 #if defined(OSLW_USING_CBLAS) && OSLW_USING_CBLAS
 
 #include "cblas.h"
-	
+
 #if OSLW_GLOBAL_MATH_TYPE!=OSLW_GLOBAL_MATH_FLOAT
 
 #error "Math type must be float"
@@ -38,6 +42,7 @@
 #define OSLW_TOOL_IMPORT_HASH_LIST 1
 #define OSLW_TOOL_IMPORT_TABLE 1
 
+
 //哈希表 分类大小
 #define OSLW_TOOL_HASH_LIST_MAX 20
 
@@ -45,6 +50,9 @@
 //MATH TOOL 
 #define OSLW_TOOL_IMPORT_MATH 1
 
+typedef lw_u32 LwMatRowType;
+typedef lw_u32 LwMatColType;
+typedef lw_u32 LwMatLenType;
 
 // NN TOOL
 #define OSLW_TOOL_IMPORT_NN 0 
@@ -89,6 +97,27 @@ typedef enum {
 	OSlwToolMatrixConvMethod_Full = 'f'
 
 }OSlwToolMatrixConvMethodNUM;
+
+
+
+//SIGNAL
+
+#define OSLW_TOOL_FFT_NOUSED 0
+#define OSLW_TOOL_FFT_MAXLEN_16 1
+#define OSLW_TOOL_FFT_MAXLEN_32 2
+#define OSLW_TOOL_FFT_MAXLEN_64 3
+#define OSLW_TOOL_FFT_MAXLEN_128 4
+#define OSLW_TOOL_FFT_MAXLEN_256 5
+#define OSLW_TOOL_FFT_MAXLEN_512 6
+#define OSLW_TOOL_FFT_MAXLEN_1024 7
+#define OSLW_TOOL_FFT_MAXLEN_2048 8
+#define OSLW_TOOL_FFT_MAXLEN_4096 6
+#define OSLW_TOOL_FFT_MAXLEN_8192 7
+#define OSLW_TOOL_FFT_MAXLEN_16384 8
+#define OSLW_TOOL_FFT_MAXLEN_32768 9
+#define OSLW_TOOL_FFT_MAXLEN_65536 10
+
+#define OSLW_TOOL_FFT_MAX_LEN OSLW_TOOL_FFT_MAXLEN_65536
 
 
 #endif // OSLW_TOOL_DEFINE_H_

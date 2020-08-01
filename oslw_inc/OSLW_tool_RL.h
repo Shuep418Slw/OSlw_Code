@@ -1,4 +1,4 @@
-/*(Ver.=0.96)
+/*(Ver.=0.97)
  * OSLW_tool.h
  *
  *  Created on: 2017-11-27
@@ -9,7 +9,7 @@
 #define OSLW_TOOL_RL_H_
 
 #include "OSLW_define.h"
-#include "OSLW_parameter.h"
+ //#include "OSLW_parameter.h"
 #include "OSLW_tool_basic.h"
 #include "OSLW_tool_basic_math.h"
 #include "OSLW_tool_random.h"
@@ -17,10 +17,10 @@
 #include "OSLW_memory.h"
 #if !(OSLW_SIMPLE_LEVEL >= 2)
 
-/*(Ver.=0.96)
+/*(Ver.=0.97)
 数据结构:
 例如	状态 3*2（一共3种状态 每一种状态2个特征量）
-		动作 2*4 （一共4种动作 每一个动作2种操作）---由于C语言是按照先列再行的方式存储 所以对应的是转置 既动作矩阵实际是4*2 
+		动作 2*4 （一共4种动作 每一个动作2种操作）---由于C语言是按照先列再行的方式存储 所以对应的是转置 既动作矩阵实际是4*2
 		!!!!!!!!!!!!!!行代表有几个动作
 		qtable 3*4
 			/									\T
@@ -28,18 +28,18 @@
 			|	|a0.1|	|a1.1|	|a2.1|	|a3.1|	|
 			\									/
 			  ********************************
-| s0.0 s0.0 | *	|q0 0|	|q0 1|	|q0 2|	|q0 3|	
+| s0.0 s0.0 | *	|q0 0|	|q0 1|	|q0 2|	|q0 3|
 | s1.0 s1.0 | *	|q1 0|	|q1 1|	|q1 2|	|q1 3|
 | s2.0 s2.0 | *	|q2 0|	|q2 1|	|q2 2|	|q2 3|
 
 */
-typedef struct OSLW_TOOL_Q_RL_DATA_STATIC_BASIC_STRUCT{
+typedef struct OSLW_TOOL_Q_RL_DATA_STATIC_BASIC_STRUCT {
 	OSlwToolMatrixSTU StateTable;//状态
 	OSlwToolMatrixSTU ActionTable;//行为
 	OSlwToolMatrixSTU Qtable;//qtable
-	
+
 }OSlwToolQRLDataSTU;
-	
+
 typedef struct OSLW_TOOL_RL_BASIC_STRUCT {
 	OSlwMemoryBasicSTU *pmem;
 	OSlwToolRandomBasicSTU *pRand;
@@ -48,14 +48,14 @@ typedef struct OSLW_TOOL_RL_BASIC_STRUCT {
 	OSlwToolMatrixSTU StateNow;
 	OSlwToolMatrixSTU StateTermial;//状态终点
 	OSlwToolMatrixSTU StateLast;
-	
+
 	ParaType RewardNow;
 	ParaType Gamma;
 
 
 	ParaType RewardSum;//回报总和
 	ParaType RewardSumMax, RewardSumMin;
-	
+
 	ParaType StatusTermialJudgeThreshold;//状态终点阈值 会计算当前状态与状态终点的欧式距离
 
 	lw_u32 RoundCount;//回合计数器
@@ -70,7 +70,7 @@ typedef struct OSLW_TOOL_RL_BASIC_STRUCT {
 	void * (*LearnFun)(struct OSLW_TOOL_RL_BASIC_STRUCT *pRLB);
 	void * (*StateStoreFun)(struct OSLW_TOOL_RL_BASIC_STRUCT *pQRLB, OSlwToolMatrixSTU *state);
 	lw_8(*isTermialFun)(struct OSLW_TOOL_RL_BASIC_STRUCT *pRLB);
-	union 
+	union
 	{
 		struct
 		{
@@ -88,7 +88,7 @@ typedef struct OSLW_TOOL_RL_BASIC_STRUCT {
 }OSlwToolRLBasicSTU;
 
 /*
-	SN 
+	SN
 	RO round over
 	RUO reward up over
 	RDO reward down over
@@ -118,7 +118,7 @@ lw_8 OSlwToolRL_isTermial(void *pRL);
 #define OSLW_RL_UPDATE(RL) 	do{((OSlwToolRLBasicSTU *)(RL))->RewardSum = _ParaAdd(((OSlwToolRLBasicSTU *)(RL))->RewardSum, ((OSlwToolRLBasicSTU *)(RL))->RewardNow);\
 	((OSlwToolRLBasicSTU *)(RL))->RoundCount++;}while(0)
 
-typedef struct OSLW_TOOL_Q_RL_BASIC_STRUCT{
+typedef struct OSLW_TOOL_Q_RL_BASIC_STRUCT {
 
 	OSlwToolRLBasicSTU basic;
 	OSlwToolQRLDataSTU DataTable;
@@ -134,12 +134,12 @@ typedef struct OSLW_TOOL_Q_RL_BASIC_STRUCT{
 
 }OSlwToolQRLBasicSTU;
 
-typedef void (*pActEnvFunType)(struct OSLW_TOOL_Q_RL_BASIC_STRUCT *pQRLB);
-typedef void (*pBornFunType)(struct OSLW_TOOL_Q_RL_BASIC_STRUCT *pQRLB);
+typedef void(*pActEnvFunType)(struct OSLW_TOOL_Q_RL_BASIC_STRUCT *pQRLB);
+typedef void(*pBornFunType)(struct OSLW_TOOL_Q_RL_BASIC_STRUCT *pQRLB);
 
 
 
-/*(Ver.=0.96)
+/*(Ver.=0.97)
 //Q-learing的顺序是先决策,再运行环境,再学习，所以是off-policy
 //
 //Slast------------>Snow-------->.........
@@ -152,7 +152,7 @@ typedef void (*pBornFunType)(struct OSLW_TOOL_Q_RL_BASIC_STRUCT *pQRLB);
 
 
 
-typedef struct OSLW_TOOL_Q_LEARNING_STRUCT{
+typedef struct OSLW_TOOL_Q_LEARNING_STRUCT {
 
 	OSlwToolQRLBasicSTU basic;
 
@@ -160,15 +160,15 @@ typedef struct OSLW_TOOL_Q_LEARNING_STRUCT{
 	ParaType Q_Now;
 	ParaType Lr;
 
-		
+
 }OSlwToolQLearningSTU;
 
 
-/*(Ver.=0.96)
+/*(Ver.=0.97)
 //sarsa 是直接学习action 所以是on-policy
 //
 //Slast------------>Snow-------->.........
-//		Alast			  Anow		
+//		Alast			  Anow
 //							|
 //							|
 //							learing(Slast,Alast,Snow,Anow)
@@ -176,7 +176,7 @@ typedef struct OSLW_TOOL_Q_LEARNING_STRUCT{
 //
 //lamber的作用是记录轨迹,如果收敛那么可以加速
 // Trace: a<1
-//		action	1	2	
+//		action	1	2
 //	state
 //	1			0	1*a^4	4步之前
 //	2			0	1*a^3	3步之前
@@ -199,7 +199,7 @@ typedef struct OSLW_TOOL_SARSA_LAMBER_STRUCT {
 
 	ParaType Lamber;
 	OSlwToolMatrixSTU Trace;
-	
+
 
 
 }OSlwToolSarsaLamberSTU;
@@ -219,7 +219,7 @@ void OSlwToolQLearningParaInitial
 	pBornFunType pBornfun//环境初始化函数指针
 );
 
-/*(Ver.=0.96)
+/*(Ver.=0.97)
 
 void OSlwToolQLearningStaticInitial
 	(
@@ -294,7 +294,7 @@ typedef struct OSLW_TOOL_DQN_EXP_REPLAY_FRAME_STRUCT
 	OSlwToolDListNodeConnectSTU con, *pcon;
 	ParaType Importance;
 	ParaType _new_Importance;
-	
+
 }OSlwToolDQNetExpReplayFrameSTU;
 
 
@@ -315,7 +315,7 @@ typedef struct OSLW_TOOL_DQN_EXP_REPLAY_STRUCT
 	ParaType Rmin, Rmax;
 	ParaType Sum;
 	ParaType Div;
-	
+
 
 	ParaType Alpha, Beta, Epsi;
 
@@ -325,10 +325,10 @@ typedef struct OSLW_TOOL_DQN_EXP_REPLAY_STRUCT
 	OSlwToolQRLBasicSTU *pTQL;
 	ParaType Min, Max;
 
-	struct OSLW_TOOL_DQN_EXP_REPLAY_STRUCT *(*AppendFun)(struct OSLW_TOOL_DQN_EXP_REPLAY_STRUCT *pExpRe,lw_u16 Num, lw_u8 method);
-	struct OSLW_TOOL_DQN_EXP_REPLAY_STRUCT *(*UpdateFun)(struct OSLW_TOOL_DQN_EXP_REPLAY_STRUCT *pExpRe,lw_u16 num);
+	struct OSLW_TOOL_DQN_EXP_REPLAY_STRUCT *(*AppendFun)(struct OSLW_TOOL_DQN_EXP_REPLAY_STRUCT *pExpRe, lw_u16 Num, lw_u8 method);
+	struct OSLW_TOOL_DQN_EXP_REPLAY_STRUCT *(*UpdateFun)(struct OSLW_TOOL_DQN_EXP_REPLAY_STRUCT *pExpRe, lw_u16 num);
 	struct OSLW_TOOL_DQN_EXP_REPLAY_STRUCT *(*MinMaxFun)(struct OSLW_TOOL_DQN_EXP_REPLAY_STRUCT *pExpRe);
-	lw_u16 (*SampleFun)(struct OSLW_TOOL_DQN_EXP_REPLAY_STRUCT *pExpRe);
+	lw_u16(*SampleFun)(struct OSLW_TOOL_DQN_EXP_REPLAY_STRUCT *pExpRe);
 
 }OSlwToolDQNetExpReplaySTU;
 
@@ -337,10 +337,10 @@ typedef OSlwToolDQNetExpReplaySTU OSlwToolExpReplaySTU;
 
 #define OSLW_TOOL_EXPRE_CAL_P(ERR,EXPRE) _ParaPow(_ParaAdd((ERR), (EXPRE).Epsi), (EXPRE).Alpha)
 
-OSlwToolDQNetExpReplaySTU *OSlwToolDQNetExpReplayAppend(OSlwToolDQNetExpReplaySTU *pExpRe,lw_u16 Num, lw_u8 method);
+OSlwToolDQNetExpReplaySTU *OSlwToolDQNetExpReplayAppend(OSlwToolDQNetExpReplaySTU *pExpRe, lw_u16 Num, lw_u8 method);
 OSlwToolDQNetExpReplaySTU *_OSlwToolDQNetExpReplayInsert(OSlwToolDQNetExpReplaySTU *pExpRe, OSlwToolDQNetExpReplayFrameSTU *pExpReF);
 OSlwToolDQNetExpReplaySTU *_OSlwToolDQNetExpReplayDelete(OSlwToolDQNetExpReplaySTU *pExpRe, OSlwToolDQNetExpReplayFrameSTU *pExpReF);
-OSlwToolDQNetExpReplaySTU *OSlwToolDQNetExpReplayUpdate(OSlwToolDQNetExpReplaySTU *pExpRe,lw_u16 num);
+OSlwToolDQNetExpReplaySTU *OSlwToolDQNetExpReplayUpdate(OSlwToolDQNetExpReplaySTU *pExpRe, lw_u16 num);
 OSlwToolDQNetExpReplaySTU *OSlwToolDQNetExpReplayMinMax(OSlwToolDQNetExpReplaySTU *pExpRe);
 lw_u16 OSlwToolDQNetExpReplaySample(OSlwToolDQNetExpReplaySTU *pExpRe);
 
@@ -349,7 +349,7 @@ lw_u16 OSlwToolDQNetExpReplaySample(OSlwToolDQNetExpReplaySTU *pExpRe);
 #define OSLW_TOOL_DQN_EXP_ACTION_SIZE(EXP_STU) (sizeof(ParaType)*(EXP_STU).Action_Col)
 
 #define OSLW_TOOL_DQN_EXP_FRAME_SIZE(EXP_STU) (\
-	sizeof(OSlwToolDQNetExpReplayFrameSTU) +/*(Ver.=0.96)节点长度*/\
+	sizeof(OSlwToolDQNetExpReplayFrameSTU) +/*(Ver.=0.97)节点长度*/\
 	(OSLW_TOOL_DQN_EXP_STATE_SIZE(EXP_STU)<<1) + \
 	OSLW_TOOL_DQN_EXP_REWARD_SIZE(EXP_STU) + \
 	OSLW_TOOL_DQN_EXP_ACTION_SIZE(EXP_STU) \
@@ -391,7 +391,7 @@ typedef struct OSLW_TOOL_DEEP_Q_NET_STRUCT
 	OSlwToolBPnnSTU TargetNet;//Q目标 异步更新
 
 	OSlwToolDQNetExpReplaySTU ExpReplay;//experience replay
-	OSlwToolMatrixSTU StateFactor; 
+	OSlwToolMatrixSTU StateFactor;
 	OSlwToolDQNetOptimNum Optim;
 
 	lw_u16 Count;
@@ -405,7 +405,7 @@ typedef struct OSLW_TOOL_DEEP_Q_NET_STRUCT
 	struct OSLW_TOOL_DEEP_Q_NET_STRUCT* (*StoreMemFun)(struct OSLW_TOOL_DEEP_Q_NET_STRUCT *pQRLB);
 	//struct OSLW_TOOL_DEEP_Q_NET_STRUCT* (*LearnFun)(struct OSLW_TOOL_DEEP_Q_NET_STRUCT *pQRLB);
 
-}OSlwToolDQNetSTU; 
+}OSlwToolDQNetSTU;
 
 
 
@@ -512,7 +512,7 @@ typedef struct OSLW_TOOL_POLICY_GRAD_STRUCT {
 }OSlwToolPGradSTU;
 
 
-typedef struct OSLW_TOOL_DEEP_DETE_POLICY_GRAD_STRUCT{
+typedef struct OSLW_TOOL_DEEP_DETE_POLICY_GRAD_STRUCT {
 
 	OSlwToolPGradSTU PGradBasic;
 
@@ -538,7 +538,7 @@ typedef struct OSLW_TOOL_DEEP_DETE_POLICY_GRAD_STRUCT{
 
 	OSlwToolDDPG_CopyMethod CopyMethod;
 
-	
+
 }OSlwToolDDPGradSTU;
 
 OSlwToolDDPGradSTU* OSlwToolDDPGradChoose(OSlwToolDDPGradSTU *pDDPG);
@@ -563,7 +563,7 @@ void OSlwToolDDPGradParaInitial//DDPG内存初始化函数
 void OSlwToolDDPGradInterfaceInitial
 (
 	OSlwToolDDPGradSTU *pDDPG,//this指针
-	lw_u16 state_dim,lw_u16 action_dim,
+	lw_u16 state_dim, lw_u16 action_dim,
 	void *pAction,//动作列表内存（可为NULL）
 	void *pStateNow,//当前状态（可为NULL）
 	void *pStateLast,//之前状态（可为NULL）
@@ -651,7 +651,7 @@ void OSlwToolPPOptimParaInitial//PPO内存初始化函数
 	OSlwMemoryBasicSTU *pMem,//内存指针
 	pActEnvFunType pActfun,//环境运行函数指针
 	pBornFunType pBornfun//环境初始化函数指针
-	
+
 );
 
 

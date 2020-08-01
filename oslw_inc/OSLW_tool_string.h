@@ -1,7 +1,7 @@
 #ifndef OSLW_TOOL_STRING_H_
 #define OSLW_TOOL_STRING_H_
 #include "OSLW_define.h"
-#include "OSLW_parameter.h"
+//#include "OSLW_parameter.h"
 #include "OSLW_tool_basic.h"
 #include "OSLW_memory.h"
 

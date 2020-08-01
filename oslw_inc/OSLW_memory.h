@@ -1,4 +1,4 @@
-/*(Ver.=0.96)
+ï»¿/*(Ver.=0.97)
  * OSLW_memory.h
  *
  *  Created on: 2017-7-14
@@ -26,11 +26,11 @@ typedef struct OSLW_MEMORY_BASIC_STRUCT {
 
 	lw_32(*init)
 		(
-			struct OSLW_MEMORY_BASIC_STRUCT *pMU,//´æ´¢Æ÷½á¹¹Ìå
-			void *pMem,//ÄÚ´æ³ØµØÖ·
-			lw_u16 lenMem,//ÄÚ´æÆ¬ÊýÁ¿
-			lw_u16 MemSize,//ÄÚ´æÆ¬´óÐ¡(sizeof)
-			lw_u32 sizeofmem//sizeof(ÄÚ´æÇøÓò)µÄ´óÐ¡ÓÃÀ´£¬ÑéÖ¤ÄÚ´æ´óÐ¡ÊÇ·ñ¶Ô£¬Ò»°ãsizeofmem>=¼ÆËãµÃµ½µÄÄÚ´æ´óÐ¡
+			struct OSLW_MEMORY_BASIC_STRUCT *pMU,//å­˜å‚¨å™¨ç»“æž„ä½“
+			void *pMem,//å†…å­˜æ± åœ°å€
+			lw_u16 lenMem,//å†…å­˜ç‰‡æ•°é‡
+			lw_u16 MemSize,//å†…å­˜ç‰‡å¤§å°(sizeof)
+			lw_u32 sizeofmem//sizeof(å†…å­˜åŒºåŸŸ)çš„å¤§å°ç”¨æ¥ï¼ŒéªŒè¯å†…å­˜å¤§å°æ˜¯å¦å¯¹ï¼Œä¸€èˆ¬sizeofmem>=è®¡ç®—å¾—åˆ°çš„å†…å­˜å¤§å°
 			);
 
 	void * (*Malloc)(struct OSLW_MEMORY_BASIC_STRUCT *pMU, lw_u32 dsize);
@@ -39,14 +39,34 @@ typedef struct OSLW_MEMORY_BASIC_STRUCT {
 	void * (*Calloc)(struct OSLW_MEMORY_BASIC_STRUCT *pMU, lw_u32 dsize);
 	OSlwMemSizeSTU MemSectionSize;
 
-	//Ïà¶Ô¸ÅÄî ¶ÔÓÚ²»Í¬µÄ·ÖÅä·½Ê½¸ÅÄî²»Í¬
-	lw_u32 memMax;//ÄÚ´æ×Ü´óÐ¡
-	lw_u32 memSurplus;//Ê£ÓàÄÚ´æÊýÁ¿
+	//ç›¸å¯¹æ¦‚å¿µ å¯¹äºŽä¸åŒçš„åˆ†é…æ–¹å¼æ¦‚å¿µä¸åŒ
+	lw_u32 memMax;//å†…å­˜æ€»å¤§å°
+	lw_u32 memSurplus;//å‰©ä½™å†…å­˜æ•°é‡
 
 }OSlwMemoryBasicSTU;
 
 typedef OSlwMemoryBasicSTU *lw_mem;
 
+typedef struct OSLW_MEMORY_EX_STRUCT {
+
+	OSlwMemoryBasicSTU basic;
+
+	void * (*Malloc)(lw_u32 dsize);
+	void * (*ReAlloc)(void *p, lw_u32 dsize);
+	void (*Free)(void *p);
+	void * (*Calloc)(lw_u32 dsize);
+
+}OSlwMemoryExSTU;
+
+
+//è¿™4ä¸ªå‡½æ•°ä»…ä»…æ˜¯å¼•å¯¼å‡½æ•°
+void *OSlwMemoryExAlloc(lw_mem pMU, lw_u32 dsize);
+void *OSlwMemoryExCalloc(lw_mem pMU, lw_u32 dsize);
+void *OSlwMemoryRealloc(lw_mem pMU, void *p, lw_u32 dsize);
+void *OSlwMemoryExFree(lw_mem pMU, void *p);
+
+void OSlwMemoryExInital(OSlwMemoryExSTU *pMU, void *malloc_fun, void *calloc_fun, void *free_fun, void *realloc_fun);
+#define STD_MALLOC malloc,calloc,free,realloc
 
 
 #if OSLW_MEMORY_IMPORT_MAP
@@ -59,7 +79,7 @@ typedef struct OSLW_MEMORY_MAP_STRUCT{
 	
 	OSlwExternMemorySTU MemInfo;
 	
-	void *pMemButtom,*pMemInfoButtom;//µ×²¿
+	void *pMemButtom,*pMemInfoButtom;//åº•éƒ¨
 		
 }OSlwMemoryMapSTU;
 
@@ -84,7 +104,7 @@ typedef struct OSLW_MEMORY_SIMPLE_STRUCT {
 
 	OSlwExternMemorySTU Mem;
 
-	size_t pMemNow,pMemButtom;//µ×²¿
+	size_t pMemNow,pMemButtom;//åº•éƒ¨
 
 }OSlwMemorySimpleSTU;
 
@@ -195,13 +215,14 @@ lw_u8 _##NAME##_heap[OSLW_MEM_LIST_LEN(LEN,NUM)]; \
 
 #endif //  OSLW_MEM_ALLOC_FAST
 
-
-
+#define LwMemMapDef(NAME,LEN,NUM) OSLW_MEM_MAP_DEF(NAME,LEN,NUM)
+#define LwMemSimpleDef(NAME,LEN,NUM) OSLW_MEM_SIMPLE_DEF(NAME,LEN,NUM)
+#define LwMemListDef(NAME,LEN,NUM) OSLW_MEM_LIST_DEF(NAME,LEN,NUM)
 
 
 
 #define OSLW_MEM_INIT(NAME) do{p##NAME->init((void *)(p##NAME), (void *)(_##NAME##_heap), _##NAME##_page_num, _##NAME##_page_len, sizeof(lw_u8)*sizeof(_##NAME##_heap));}while(0)
 
+#define LwMemInit(NAME) OSLW_MEM_INIT(NAME)
 
-
-#endif /*(Ver.=0.96) OSLW_MEMORY_H_ */
+#endif /*(Ver.=0.97) OSLW_MEMORY_H_ */

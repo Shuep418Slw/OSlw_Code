@@ -1,4 +1,4 @@
-/*(Ver.=0.96)
+ï»¿/*(Ver.=0.97)
  * OSLW_define.h
  *
  *  Created on: 2017-7-14
@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <math.h>
 
 typedef char lw_8;
 typedef unsigned char lw_u8;
@@ -31,36 +32,38 @@ typedef double lw_df;
 typedef intptr_t lw_ptr;
 
 //--------------------------------
-//<ÖØÒªºê¶¨Òå>
+//<é‡è¦å®å®šä¹‰>
 //--------------------------------
 
-//²Ù×÷ÏµÍ³Ê¹ÄÜ
+//æ“ä½œç³»ç»Ÿä½¿èƒ½
 #define OSLW_OS_ENABLE 1
 
-//²Ù×÷ÏµÍ³Ê±¼äÆ¬
-#define OSLW_CORE_TICK_MS 1
+//æ“ä½œç³»ç»Ÿæ—¶é—´ç‰‡
+#define OSLW_CORE_TICK_MS 10
 
-//²Ù×÷ÏµÍ³¾«¼òµÈ¼¶
-#define OSLW_SIMPLE_LEVEL 1
+//æ“ä½œç³»ç»Ÿç²¾ç®€ç­‰çº§
+#define OSLW_SIMPLE_LEVEL 0
 
-//²Ù×÷ÏµÍ³¸ßËÙÔËĞĞ
+//æ“ä½œç³»ç»Ÿé«˜é€Ÿè¿è¡Œ
 #define OSLW_SPEED_RUNNING 0
 
-//²Ù×÷ÏµÍ³²½½øÔËĞĞ
+//æ“ä½œç³»ç»Ÿæ­¥è¿›è¿è¡Œ
 #define OSLW_STEP_RUNNING 0
 
-//¾«¼òÄ£Ê½
+//ç²¾ç®€æ¨¡å¼
 #if OSLW_SIMPLE_LEVEL
-	#define OSLW_SIMPLE_MODE 1
+#define OSLW_SIMPLE_MODE 1
 #else
-	#define OSLW_SIMPLE_MODE 0
+#define OSLW_SIMPLE_MODE 0
 #endif // OSLW_SIMPLE_LEVEL
 
-//CPUÈÎÎñÊıÁ¿
-#define OSLW_TASK_NUM_MAX 32
+//CPUä»»åŠ¡æ•°é‡
+#define OSLW_TASK_NUM_MAX 64
 
-#define DEBUG
-#if !defined(DEBUG)
+#define OSLW_DEBUG 1
+
+
+#if !defined(OSLW_DEBUG) || OSLW_DEBUG==0
 #define OSLW_assert(is_error) ((void)0)
 #else
 #define OSLW_assert(is_error)   if((is_error)) {while(1);}
@@ -77,23 +80,30 @@ typedef jmp_buf _BP;
 #endif
 
 #if OSLW_STEP_RUNNING && OSLW_SIMPLE_MODE==0
- #error "STEP RUNNING MOST BE IN SIMPLE"
+#error "STEP RUNNING MOST BE IN SIMPLE"
 #endif
 
 
 //--------------------------------
-//</ÖØÒªºê¶¨Òå>
+//</é‡è¦å®å®šä¹‰>
 //--------------------------------
 
 
 #ifndef NULL
-	#define NULL ((void*)0)
+#define NULL ((void*)0)
 #endif
 
 #ifndef PI
-	#define PI 3.14159265358979f
+#define PI 3.14159265358979
 #endif
 
+#ifndef SQRT_2
+#define SQRT_2 1.414213562373095
+#endif // !SQRT_2
+
+#ifndef SQRT_3
+#define SQRT_3 1.73205080756888
+#endif // !SQRT_3
 
 //parameter define
 typedef lw_32 fixpoint;
@@ -113,135 +123,137 @@ typedef lw_32 fixpoint;
 
 #define OSLW_PAPA_CTRL_NAME_LENGTH 5
 
-typedef enum{
+typedef enum {
 
-	ParaUnitStatus_Free=0x00,
-	ParaUnitStatus_Lock=0x01,
-	ParaUnitStatus_Protect=0x02
-	
-	
+	ParaUnitStatus_Free = 0x00,
+	ParaUnitStatus_Lock = 0x01,
+	ParaUnitStatus_Protect = 0x02
+
+
 
 }ParaUnitStatusNUM;
 
-typedef enum{
-	
-	ParaOrder_IO_Prec=0,
-	ParaOrder_IO_Normal=1,
-	ParaOrder_IO_Data=2,
-	
+typedef enum {
+
+	ParaOrder_IO_Prec = 0,
+	ParaOrder_IO_Normal = 1,
+	ParaOrder_IO_Data = 2,
+
 	ParaOrder_I_SelfUp,
 	ParaOrder_I_SelfDown,
 	ParaOrder_O_Draw,
-	
+
 	ParaOrder_I_UnlockSave,
 	ParaOrder_I_UnlockNSave,
 	ParaOrder_I_lock
 }OSlwParaOrderNUM;
 
-typedef enum{
-	
-	ParaLOrder_Once=0,
-	ParaLOrder_More=1,
-	
+typedef enum {
+
+	ParaLOrder_Once = 0,
+	ParaLOrder_More = 1,
+
 }OSlwParaListOrderNUM;
 
 
-//<ºê×éËµÃ÷>Êı¾İÀàĞÍ¶¨Òå ¶¨Òå²ÎÊıËùÓÃµÄÀàĞÍ</ºê×éËµÃ÷>
+//<å®ç»„è¯´æ˜>æ•°æ®ç±»å‹å®šä¹‰ å®šä¹‰å‚æ•°æ‰€ç”¨çš„ç±»å‹</å®ç»„è¯´æ˜>
 #if OSLW_GLOBAL_MATH_TYPE==OSLW_GLOBAL_MATH_Q
-	 typedef fixpoint ParaType;
-	 #include "IQmathLib.h"
-    #define OSLW_GLOBAL_MATH_MAX 0X7FFFFFFFUL
-    #define OSLW_GLOBAL_MATH_MIN 0X80000000UL
-    #define OSLW_GLOBAL_MATH_DELT 1UL
+typedef fixpoint ParaType;
+#include <IQmathLib.h>
+#define OSLW_GLOBAL_MATH_MAX 0X7FFFFFFFUL
+#define OSLW_GLOBAL_MATH_MIN 0X80000000UL
+#define OSLW_GLOBAL_MATH_DELT 1UL
 #elif OSLW_GLOBAL_MATH_TYPE==OSLW_GLOBAL_MATH_FLOAT
-	 typedef float ParaType;
-		//#include "arm_math.h"
-		#include "math.h"
-        #define OSLW_GLOBAL_MATH_MAX 3.2E38f
-        #define OSLW_GLOBAL_MATH_MIN -3.2E38f
-        #define OSLW_GLOBAL_MATH_DELT 1.2E-38f
+typedef float ParaType;
+//#include "arm_math.h"
+#include <math.h>
+#include <float.h>
+#define OSLW_GLOBAL_MATH_MAX 3.2E38f
+#define OSLW_GLOBAL_MATH_MIN -3.2E38f
+#define OSLW_GLOBAL_MATH_DELT 1.2E-38f
 #elif OSLW_GLOBAL_MATH_TYPE==OSLW_GLOBAL_MATH_DOUBLE
-	 typedef double ParaType;
-		#include "math.h"
-    #define OSLW_GLOBAL_MATH_MAX 1.7E308
-    #define OSLW_GLOBAL_MATH_MIN -1.7E308
-    #define OSLW_GLOBAL_MATH_DELT 2.2E-308
+typedef double ParaType;
+#include <math.h>
+#include <float.h>
+#define OSLW_GLOBAL_MATH_MAX 1.7E308
+#define OSLW_GLOBAL_MATH_MIN -1.7E308
+#define OSLW_GLOBAL_MATH_DELT 2.2E-308
 #else
-	#error "MATH TYPE IS NOT DEFINED"
+#error "MATH TYPE IS NOT DEFINED"
 #endif
-//<ºê×éËµÃ÷>Êı¾İÀàĞÍ¶¨Òå ¶¨Òå²ÎÊıËùÓÃµÄËã·¨</ºê×éËµÃ÷>
+//<å®ç»„è¯´æ˜>æ•°æ®ç±»å‹å®šä¹‰ å®šä¹‰å‚æ•°æ‰€ç”¨çš„ç®—æ³•</å®ç»„è¯´æ˜>
 #if OSLW_GLOBAL_MATH_TYPE==OSLW_GLOBAL_MATH_Q
-	#define _ParaAdd(A,B) ((A)+(B))
-	#define _ParaSub(A,B) ((A)-(B))
-	#define _ParaMpy(A,B) (_IQ24mpy(A,B))
-	#define _ParaDiv(A,B) (_IQ24div(A,B))
-	#define _ParaInt(A) (_IQ24int(A))
-	#define _ParaFrac(A) (_IQ24frac(A))
-	#define _ParaFint(A) (((ParaType)(A))<<OSLW_GLOBAL_MATH_Q_FORM)
-	#define _ParaToF(A) (_IQ24toF(A))
-	#define _ParaFrom(A) (_IQ24(A))
-	#define _ParaSin(A) (_IQ24sin(A))
-	#define _ParaCos(A) (_IQ24cos(A))
-	#define _ParaTan(A) (_IQ24tan(A))
-	#define _ParaLn(A) (_IQ24(logf((lw_sf)_IQ26toF(A))))
-  #define _ParaLog(A) (_IQ26div(_ParaLn(A),_ParaLn(_IQ24(10))))
-	#define _ParaSqrt(A) (_IQ24sqrt(A))
-	#define _ParaAbs(A) (_IQ24abs(A))
-    #define _ParaPow(A,B) (A==0?0:(_IQ24exp(_IQ24mpy((B),_ParaLn(A)))))
-    #define _ParaCeil(A) (_ParaInt((A))+1)
-    #define _ParaExp(A) (_IQ24exp(A))
-	#define PARA_LEN 4
+#define _ParaAdd(A,B) ((A)+(B))
+#define _ParaSub(A,B) ((A)-(B))
+#define _ParaMpy(A,B) (_IQ24mpy(A,B))
+#define _ParaDiv(A,B) (_IQ24div(A,B))
+#define _ParaInt(A) (_IQ24int(A))
+#define _ParaFrac(A) (_IQ24frac(A))
+#define _ParaFint(A) (((ParaType)(A))<<OSLW_GLOBAL_MATH_Q_FORM)
+#define _ParaToF(A) (_IQ24toF(A))
+#define _ParaFrom(A) (_IQ24(A))
+#define _ParaSin(A) (_IQ24sin(A))
+#define _ParaCos(A) (_IQ24cos(A))
+#define _ParaTan(A) (_IQ24tan(A))
+#define _ParaLn(A) (_IQ24(logf((lw_sf)_IQ26toF(A))))
+#define _ParaLog(A) (_IQ26div(_ParaLn(A),_ParaLn(_IQ24(10))))
+#define _ParaSqrt(A) (_IQ24sqrt(A))
+#define _ParaAbs(A) (_IQ24abs(A))
+#define _ParaPow(A,B) (A==0?0:(_IQ24exp(_IQ24mpy((B),_ParaLn(A)))))
+#define _ParaCeil(A) (_ParaInt((A))+1)
+#define _ParaExp(A) (_IQ24exp(A))
+#define PARA_LEN 4
 #elif OSLW_GLOBAL_MATH_TYPE==OSLW_GLOBAL_MATH_FLOAT
-	#define _ParaAdd(A,B) ((lw_sf)(A)+(lw_sf)(B))
-	#define _ParaSub(A,B) ((lw_sf)(A)-(lw_sf)(B))
-	#define _ParaMpy(A,B) ((lw_sf)(A)*(lw_sf)(B))
-	#define _ParaDiv(A,B) ((lw_sf)(A)/(lw_sf)(B))
-	#define _ParaInt(A) ((long)(A))
-	#define _ParaFrac(A) ((A)-long(A))
-	#define _ParaFint(A)	((lw_sf)A)
-	#define _ParaToF(A) ((lw_sf)(A))
-	#define _ParaFrom(A) ((lw_sf)(A))
-	#define _ParaSin(A) (sinf(A))
-	#define _ParaCos(A) (cosf(A))
-	#define _ParaTan(A) (sinf(A)/cosf(A))		
-	#define _ParaSqrt(A) (sqrtf(A))
-	#define _ParaExp(A) (_OSlwToolMathExp1024(A))
-	#define _ParaAbs(A) (A > 0.0f?A:-A)		
-	#define _ParaPow(A,B) (powf((A),(B)))
-	#define _ParaCeil(A) (ceilf((A)))
-	#define _ParaLn(A) (logf((A)))
-	#define _ParaLog(A) (logf10((A)))
-	#define PARA_LEN 4
-	
+#define _ParaAdd(A,B) ((lw_sf)(A)+(lw_sf)(B))
+#define _ParaSub(A,B) ((lw_sf)(A)-(lw_sf)(B))
+#define _ParaMpy(A,B) ((lw_sf)(A)*(lw_sf)(B))
+#define _ParaDiv(A,B) ((lw_sf)(A)/(lw_sf)(B))
+#define _ParaInt(A) ((long)(A))
+#define _ParaFrac(A) ((A)-long(A))
+#define _ParaFint(A)	((lw_sf)A)
+#define _ParaToF(A) ((lw_sf)(A))
+#define _ParaFrom(A) ((lw_sf)(A))
+#define _ParaSin(A) (sinf(A))
+#define _ParaCos(A) (cosf(A))
+#define _ParaTan(A) (sinf(A)/cosf(A))		
+#define _ParaSqrt(A) (sqrtf(A))
+#define _ParaExp(A) (_OSlwToolMathExp1024(A))
+#define _ParaAbs(A) ((A) > 0.0f?(A):-(A))		
+#define _ParaPow(A,B) (powf((A),(B)))
+#define _ParaCeil(A) (ceilf((A)))
+#define _ParaLn(A) (logf((A)))
+#define _ParaLog(A) (logf10((A)))
+#define PARA_LEN 4
+
 #elif OSLW_GLOBAL_MATH_TYPE==OSLW_GLOBAL_MATH_DOUBLE
-	#define _ParaAdd(A,B) ((A)+(B))
-	#define _ParaSub(A,B) ((A)-(B))
-	#define _ParaMpy(A,B) ((A)*(B))
-	#define _ParaDiv(A,B) ((A)/(B))
-	#define _ParaInt(A) ((long)(A))
-	#define _ParaFrac(A) ((A)-long(A))
-	#define _ParaFint(A)	((lw_df)(A))
-	#define _ParaToF(A) ((lw_df)(A))	
-	#define _ParaFrom(A)	((lw_df)(A))	
-	#define _ParaSin(A) (sin(A))
-	#define _ParaCos(A) (cos(A))
-	#define _ParaTan(A) (tan(A))	
-	#define _ParaSqrt(A) (sqrt(A))
-	#define _ParaExp(A) (exp(A))
-	#define _ParaAbs(A) (A > 0.0f?A:-A)
-	#define _ParaPow(A,B) (pow((A),(B)))
-	#define _ParaCeil(A) (ceil((A)))
-	#define _ParaLn(A) (log((A)))
-	#define _ParaLog(A) (log10((A)))
-	#define PARA_LEN 8
+#define _ParaAdd(A,B) ((A)+(B))
+#define _ParaSub(A,B) ((A)-(B))
+#define _ParaMpy(A,B) ((A)*(B))
+#define _ParaDiv(A,B) ((A)/(B))
+#define _ParaInt(A) ((long)(A))
+#define _ParaFrac(A) ((A)-long(A))
+#define _ParaFint(A)	((lw_df)(A))
+#define _ParaToF(A) ((lw_df)(A))	
+#define _ParaFrom(A)	((lw_df)(A))	
+#define _ParaSin(A) (sin(A))
+#define _ParaCos(A) (cos(A))
+#define _ParaTan(A) (tan(A))	
+#define _ParaSqrt(A) (sqrt(A))
+#define _ParaExp(A) (exp(A))
+#define _ParaAbs(A) ((A) > 0.0f?(A):-(A))
+#define _ParaPow(A,B) (pow((A),(B)))
+#define _ParaCeil(A) (ceil((A)))
+#define _ParaLn(A) (log((A)))
+#define _ParaLog(A) (log10((A)))
+#define PARA_LEN 8
 #else
-	#error "MATH TYPE IS NOT DEFINED"
+#error "MATH TYPE IS NOT DEFINED"
 #endif
 
 #if PARA_LEN == 8
-	#define PARA_MEM_CAL(D) ((lw_u32)(D)*sizeof(ParaType))
+#define PARA_MEM_CAL(D) ((lw_u32)(D)*sizeof(ParaType))
 #elif PARA_LEN == 4
-	#define PARA_MEM_CAL(D) ((lw_u32)(D)*sizeof(ParaType))	
+#define PARA_MEM_CAL(D) ((lw_u32)(D)*sizeof(ParaType))	
 #endif // PARA_LEN == 8
 
 
@@ -250,19 +262,19 @@ typedef enum{
 
 #define OSLW_TASK_BREAKPOINT_DEEP 1
 
-	
+
 #if OSLW_SIMPLE_MODE
 #undef OSLW_TASK_BREAKPOINT_DEEP
 #define OSLW_TASK_BREAKPOINT_DEEP 1
 #endif	
-	
+
 #define OSLW_TASK_NAME_LENGTH_MAX 4
 
 #if OSLW_TASK_NAME_LENGTH_MAX<3
 #error "LENGTH OF TASK NAME IS TOO SHORT"
 #endif
 
-typedef struct OSLW_EXTERN_MEMORY_STRUCT{
+typedef struct OSLW_EXTERN_MEMORY_STRUCT {
 	void *pData;
 	lw_u32 uData;
 }OSlwExternMemorySTU;
@@ -272,7 +284,7 @@ typedef struct OSLW_EXTERN_MEMORY_STRUCT{
 #define OSLW_CORE_PARA_PAGE_NUM 2
 
 #if OSLW_CORE_PARA_PAGE_NUM <2
-	#error "parameter num is to little"
+#error "parameter num is to little"
 #endif
 
 #if OSLW_SIMPLE_LEVEL >= 3
@@ -293,7 +305,7 @@ typedef struct OSLW_EXTERN_MEMORY_STRUCT{
 #define OSLW_GIFT_POSTMAN_MAX 2
 
 #if OSLW_GIFT_POSTMAN_MAX > OSLW_TASK_NUM_MAX
-	#error "postman is too much"
+#error "postman is too much"
 #endif
 
 //communication
@@ -328,7 +340,7 @@ typedef struct OSLW_EXTERN_MEMORY_STRUCT{
 #define OSLW_SHOW_MOVE_CURSOR_POS (OSLW_SHOW_WIN_LENGTH-1)/2
 
 #if OSLW_SHOW_MOVE_CURSOR_POS >= OSLW_SHOW_WIN_LENGTH
-	#error "Curosr position is over"
+#error "Curosr position is over"
 #endif
 
 #define OSLW_SHOW_BUFFER_LEN 10
@@ -381,100 +393,100 @@ typedef struct OSLW_TOOL_DLIST_NODE_CONNECT_STRUCT {
 
 
 //String Debug Define
-//ÊÇ·ñÊ¹ÄÜStringDebug
-#define OSLW_STR_DBG_EN 1
+//æ˜¯å¦ä½¿èƒ½StringDebug
+#define OSLW_STR_DBG_EN 0
 
 #define OSLW_STR_DBG_SIMPLE_MODE 0
 
-//StringDebug Êä³ö×Ö·û´®´óĞ¡
+//StringDebug è¾“å‡ºå­—ç¬¦ä¸²å¤§å°
 #define OSLW_STR_DBG_OUT_LEN 100
-//StringDebug Ãû×Ö×Ö·û´®´óĞ¡
+//StringDebug åå­—å­—ç¬¦ä¸²å¤§å°
 #define OSLW_STR_DBG_NAME_LEN 10
-//StringDebug ÊıÖµ×Ö·û´®´óĞ¡
+//StringDebug æ•°å€¼å­—ç¬¦ä¸²å¤§å°
 #define OSLW_STR_DBG_DATA_LEN 200
 
-//StringDebug ÄÚ´æ´óĞ¡
+//StringDebug å†…å­˜å¤§å°
 #define OSLW_STR_DBG_MEM_SIZE 16
 #define OSLW_STR_DBG_MEM_LEN 100
 
-//StringDebug ¹şÏ£±í´óĞ¡
+//StringDebug å“ˆå¸Œè¡¨å¤§å°
 #define OSLW_STR_DBG_HASH_LEN 8
 
-//2ºÅ¾«¼òÄ£Ê½ÏÂDATAµÄÊıÁ¿
+//2å·ç²¾ç®€æ¨¡å¼ä¸‹DATAçš„æ•°é‡
 #define OSLW_STR_DBG_S2_DATA_LEN 20
 
 
 #if OSLW_TASK_NUM_MAX<=8
-	#define __OSLW_LOG2_TASK_NUM 3
-	typedef lw_u8 OSlwGroupAllType;
+#define __OSLW_LOG2_TASK_NUM 3
+typedef lw_u8 OSlwGroupAllType;
 #elif OSLW_TASK_NUM_MAX>8 && OSLW_TASK_NUM_MAX<=16
-	#define __OSLW_LOG2_TASK_NUM 4
-	typedef lw_u16 OSlwGroupAllType;
+#define __OSLW_LOG2_TASK_NUM 4
+typedef lw_u16 OSlwGroupAllType;
 #elif OSLW_TASK_NUM_MAX>16 && OSLW_TASK_NUM_MAX<=32
-	#define __OSLW_LOG2_TASK_NUM 5
-	typedef lw_u32 OSlwGroupAllType;
+#define __OSLW_LOG2_TASK_NUM 5
+typedef lw_u32 OSlwGroupAllType;
 #elif OSLW_TASK_NUM_MAX>32 && OSLW_TASK_NUM_MAX<=64
-	#define __OSLW_LOG2_TASK_NUM 6
-	typedef lw_u64 OSlwGroupAllType;
+#define __OSLW_LOG2_TASK_NUM 6
+typedef lw_u64 OSlwGroupAllType;
 #else
-	#error "TASK NUM IS OVER"
+#error "TASK NUM IS OVER"
 #endif
 
 
 #if OSLW_SIMPLE_LEVEL == 2 && OSLW_TASK_NUM_MAX>32
-	#error "TASK NUM IS OVER PLEASE DEFINE OSLW_SIMPLE_LEVEL OR OSLW_TASK_NUM_MAX AGAIN"
+#error "TASK NUM IS OVER PLEASE DEFINE OSLW_SIMPLE_LEVEL OR OSLW_TASK_NUM_MAX AGAIN"
 #endif // OSLW_SIMPLE_LEVEL == 2 && OSLW_TASK_NUM_MAX>32
 
 #if OSLW_SIMPLE_LEVEL ==3 && OSLW_TASK_NUM_MAX>16
-	#error "TASK NUM IS OVER PLEASE DEFINE OSLW_SIMPLE_LEVEL OR OSLW_TASK_NUM_MAX AGAIN"
+#error "TASK NUM IS OVER PLEASE DEFINE OSLW_SIMPLE_LEVEL OR OSLW_TASK_NUM_MAX AGAIN"
 #endif // OSLW_SIMPLE_LEVEL ==3 && OSLW_TASK_NUM_MAX>16
 
 
 #if OSLW_SIMPLE_LEVEL ==4 && OSLW_TASK_NUM_MAX>8
-	#error "TASK NUM IS OVER PLEASE DEFINE OSLW_SIMPLE_LEVEL OR OSLW_TASK_NUM_MAX AGAIN"
+#error "TASK NUM IS OVER PLEASE DEFINE OSLW_SIMPLE_LEVEL OR OSLW_TASK_NUM_MAX AGAIN"
 #endif // OSLW_SIMPLE_LEVEL ==4 && OSLW_TASK_NUM_MAX>8
 
 
 #define _OSLW_2_POW(NUM) ((OSlwGroupAllType)1<<NUM)
 #define _OSLW_IS_2_POW(n) ((n)==((n)&~(n)+1))
 //------------------------------------------
-//<¹²ÓÃÌåÃû>OSlwCoreGroupUN</¹²ÓÃÌåÃû>
-//<¹²ÓÃÌå¹¦ÄÜ>ÄÚºË±êÖ¾×é¹²ÓÃÌå ¸ù¾İOSLW_TASK_NUM_MAXÈ·¶¨³¤¶È</¹²ÓÃÌå¹¦ÄÜ>
+//<å…±ç”¨ä½“å>OSlwCoreGroupUN</å…±ç”¨ä½“å>
+//<å…±ç”¨ä½“åŠŸèƒ½>å†…æ ¸æ ‡å¿—ç»„å…±ç”¨ä½“ æ ¹æ®OSLW_TASK_NUM_MAXç¡®å®šé•¿åº¦</å…±ç”¨ä½“åŠŸèƒ½>
 //------------------------------------------
-typedef union OSLW_CORE_GROUP_UNION{
+typedef union OSLW_CORE_GROUP_UNION {
 	OSlwGroupAllType all;
 #if OSLW_TASK_NUM_MAX<=8
-	struct{
-		lw_u8 bit0:1;
-		lw_u8 bit1:1;
-		lw_u8 bit2:1;
-		lw_u8 bit3:1;
-		lw_u8 bit4:1;
-		lw_u8 bit5:1;
-		lw_u8 bit6:1;
-		lw_u8 bit7:1;
+	struct {
+		lw_u8 bit0 : 1;
+		lw_u8 bit1 : 1;
+		lw_u8 bit2 : 1;
+		lw_u8 bit3 : 1;
+		lw_u8 bit4 : 1;
+		lw_u8 bit5 : 1;
+		lw_u8 bit6 : 1;
+		lw_u8 bit7 : 1;
 	}bits;
 #elif OSLW_TASK_NUM_MAX>8 && OSLW_TASK_NUM_MAX<=16
-	struct{
-		lw_u16 bit0:1;
-		lw_u16 bit1:1;
-		lw_u16 bit2:1;
-		lw_u16 bit3:1;
-		lw_u16 bit4:1;
-		lw_u16 bit5:1;
-		lw_u16 bit6:1;
-		lw_u16 bit7:1;
-		lw_u16 bit8:1;
-		lw_u16 bit9:1;
-		lw_u16 bit10:1;
-		lw_u16 bit11:1;
-		lw_u16 bit12:1;
-		lw_u16 bit13:1;
-		lw_u16 bit14:1;
-		lw_u16 bit15:1;
+	struct {
+		lw_u16 bit0 : 1;
+		lw_u16 bit1 : 1;
+		lw_u16 bit2 : 1;
+		lw_u16 bit3 : 1;
+		lw_u16 bit4 : 1;
+		lw_u16 bit5 : 1;
+		lw_u16 bit6 : 1;
+		lw_u16 bit7 : 1;
+		lw_u16 bit8 : 1;
+		lw_u16 bit9 : 1;
+		lw_u16 bit10 : 1;
+		lw_u16 bit11 : 1;
+		lw_u16 bit12 : 1;
+		lw_u16 bit13 : 1;
+		lw_u16 bit14 : 1;
+		lw_u16 bit15 : 1;
 	}bits;
 #elif OSLW_TASK_NUM_MAX>16 && OSLW_TASK_NUM_MAX<=32
-	struct{
+	struct {
 		lw_u32 bit0 : 1;
 		lw_u32 bit1 : 1;
 		lw_u32 bit2 : 1;
@@ -509,7 +521,7 @@ typedef union OSLW_CORE_GROUP_UNION{
 		lw_u32 bit31 : 1;
 	}bits;
 #elif OSLW_TASK_NUM_MAX>32 && OSLW_TASK_NUM_MAX<=64
-	struct{
+	struct {
 		lw_u64 bit0 : 1;
 		lw_u64 bit1 : 1;
 		lw_u64 bit2 : 1;
@@ -576,11 +588,11 @@ typedef union OSLW_CORE_GROUP_UNION{
 		lw_u64 bit63 : 1;
 	}bits;
 #else
-	#error "TASK NUM IS OVER"
+#error "TASK NUM IS OVER"
 #endif
 }OSlwCoreGroupUN;
 
 
-#endif /*(Ver.=0.96) OSLW_DEFINE_H_ */
+#endif /*(Ver.=0.97) OSLW_DEFINE_H_ */
 
 

@@ -69,4 +69,152 @@ im2col模式下支持局部展开，可以在嵌入式设备上减小内存消�
 
 修改了部分bug
 
+0.97版本 2020/07/13
+提升了内核调度性能，修正了任务不能超过16的bug
+修改了数学底层代码 增加vect系列宏定义函数 作为数学函数底层与cblas兼容
+矩阵数学中，增加了SVD分解（仅仅float和double支持）,高斯消元法解方程，追赶法解方程，矩阵求逆 通过浮点测试
+修改了control包中的代码 去除了原始的参数机制，引入了全新的代码包括2~4阶IIR系统，PID,sogi，pr等
+全面提升signal代码，加入了FIR滤波器 RT形态学滤波 3次样条插值，插值迭代器，FFT(最高支持65536点 可通过宏定义修改最大支持点数 以减小内存使用)
+DWT(完成单次离散小波)，EMD（原始版）VMD(原始版本)
+提供python转化代码，可以将所有文件压缩成2个文件增加易用性 代码在最下面
+
 */
+
+#if 0
+import os
+import re
+
+'''
+file must be:
+-this_code.py
+-oslw_inc
+|-OSLW_include.h
+|-OSLW_define.h
+|-...
+-oslw_ruc
+|-OSLW_memory.c
+|-OSLW_gift.h
+|-...
+'''
+
+s = os.getcwd()
+print(s)
+
+
+h_dir = s + "\oslw_inc\\"
+inc_list = os.listdir(h_dir)
+print(inc_list)
+
+
+myinc_list = ['OSLW_include.h', 'OSLW_define.h', 'OSLW_tool_define.h', 'OSLW_memory.h', 'OSLW_tool_basic.h',
+              'OSLW_tool_vector_math.h', 'OSLW_tool_basic_math.h', 'OSLW_tool_string.h', 'OSLW_tool_random.h',
+              'OSLW_tool_NN.h', 'OSLW_tool_RL.h', 'OSLW_gift.h', 'OSLW_task.h', 'OSLW_timer.h']
+
+
+for i in inc_list:
+    try:
+        myinc_list.index(i)
+    except:
+        if (i == 'OSLW_core.h'):
+            print(i)
+        else:
+            myinc_list.append(i)
+            print(i)
+
+myinc_list.append('OSLW_core.h')
+print(myinc_list)
+
+s_dir = s + "\oslw_src\\"
+src_list = os.listdir(s_dir)
+print(src_list)
+
+
+def getLineNum(f):
+    t = f.read()
+    count = t.count('\n')
+    return count
+
+
+def Delete_note1(s):
+    code_content_temp = re.sub(r'((?<=\n)|^)[ \t]*\/\*.*?\*\/\n?|\/\*.*?\*\/|((?<=\n)|^)[ \t]*\/\/[^\n]*\n|\/\/[^\n]*',
+                               '', s)
+    code_content_temp = re.sub(r'(?<!/)/\*([^*/]|\*(?!/)|/(?<!\*))*((?=\*/))(\*/)',
+                               '', code_content_temp)
+    code_content_temp = re.sub(
+        r'((?<=\n)|^)[ \t]*\/\*.*?\*\/\n?|\/\*.*?\*\/|((?<=\n)|^)[ \t]*#include \"[^\n]*\n|#include \"[^\n]*',
+        '', code_content_temp)
+    return code_content_temp
+
+
+Count = 0
+IncStr = ""
+
+for n in myinc_list[0:]:
+    temp1 = h_dir + n
+    print(temp1)
+    try:
+        f = open(temp1, 'r', encoding='UTF-8')
+        temp1 = f.read()
+        temp1 = Delete_note1(temp1)
+        IncStr += "\n" + temp1
+        Count += len(f.readlines())
+        f.close()
+    except:
+        f.close()
+        f = open(temp1, 'r', encoding='GBK')
+        temp1 = f.read()
+        temp1 = Delete_note1(temp1)
+        IncStr += "\n" + temp1
+        Count += len(f.readlines())
+        f.close()
+
+
+SrcStr = ""
+for n in src_list[0:]:
+    temp1 = s_dir + n
+    print(temp1)
+    try:
+        f = open(temp1, 'r', encoding='UTF-8')
+        temp1 = f.read()
+        temp1 = Delete_note1(temp1)
+        SrcStr += "\n" + temp1
+        Count += len(f.readlines())
+        f.close()
+    except:
+        f.close()
+        f = open(temp1, 'r', encoding='GBK')
+        temp1 = f.read()
+        temp1 = Delete_note1(temp1)
+        SrcStr += "\n" + temp1
+        Count += len(f.readlines())
+        f.close()
+
+
+SrcStr = "#include \"OSLW_inc_min.h\"\n\n" + SrcStr
+SrcStr = "#ifdef __cplusplus\nextern \"C\" {\n#endif\n" + SrcStr + "\n#ifdef __cplusplus\n}\n#endif\n"
+SrcStr = "#ifndef OSLW_SRC_MIN_C_\n#define OSLW_SRC_MIN_C_\n\n" + SrcStr + "\n#endif\n\n"
+
+
+IncStr = "#ifdef __cplusplus\nextern \"C\" {\n#endif\n" + IncStr + "\n#ifdef __cplusplus\n}\n#endif\n"
+IncStr = "#ifndef OSLW_INC_MIN_H_\n#define OSLW_INC_MIN_H_\n\n" + IncStr + "\n#endif\n\n"
+
+
+f = open("OSLW_inc_min.h", "w+", encoding='ascii')
+IncStr = IncStr.encode('ascii', 'ignore').decode("ascii")
+f.write(IncStr)
+f.close()
+
+f = open("OSLW_inc_min.h", "r", encoding='ascii')
+print(getLineNum(f))
+f.close()
+
+f = open("OSLW_src_min.c", "w+", encoding='ascii')
+SrcStr = SrcStr.encode('ascii', 'ignore').decode("ascii")
+f.write(SrcStr)
+f.close()
+
+f = open("OSLW_src_min.c", "r", encoding='ascii')
+print(getLineNum(f))
+f.close()
+
+#endif

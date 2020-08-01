@@ -1,4 +1,4 @@
-/*(Ver.=0.96)
+/*(Ver.=0.97)
  * OSLW_tool.h
  *
  *  Created on: 2017-11-13
@@ -10,11 +10,11 @@
 
 
 #include "OSLW_define.h"
-#include "OSLW_parameter.h"
+ //#include "OSLW_parameter.h"
 #include "OSLW_tool_basic.h"
 #if !(OSLW_SIMPLE_LEVEL >= 3)
 
-typedef struct OSLW_TOOL_RANDOM_BASIC_STRUCT{
+typedef struct OSLW_TOOL_RANDOM_BASIC_STRUCT {
 
 	ParaType Rmin, Rmax;
 
@@ -32,47 +32,52 @@ typedef struct OSLW_TOOL_RANDOM_BASIC_STRUCT{
 	ParaType _normal_last;
 	lw_u8 _normal_gen_flag;
 #else
-	
+
 #endif // OSLW_TOOL_RAND_NORM_METHOD == OSLW_TOOL_RAND_NORM_BM
 
 }OSlwToolRandomBasicSTU;
+
+typedef OSlwToolRandomBasicSTU LwRand;
+typedef OSlwToolRandomBasicSTU *LwRandHandle;
+
+
 ParaType OSlwToolRandomNormal(OSlwToolRandomBasicSTU *pRB, ParaType Cent, ParaType Var);
 
 
-typedef struct OSLW_TOOL_RANDOM_CHAOS_LOGISTIC_STRUCT{
-	OSlwToolRandomBasicSTU basic;	
-	
-	lw_df u,x;	
+typedef struct OSLW_TOOL_RANDOM_CHAOS_LOGISTIC_STRUCT {
+	OSlwToolRandomBasicSTU basic;
+
+	lw_df u, x;
 }OSlwToolRandomChaosLogisticSTU;
 
 extern OSlwToolRandomChaosLogisticSTU OSlwTRCLog;
 extern OSlwToolRandomBasicSTU *pRCLog;
-ParaType OSlwToolRandomChaosLogisticFun(void *pRand,ParaType Rmin,ParaType Rmax);
-lw_32 OSlwToolRandomChaosLogisticFunInt(void *pRand,lw_32 Rmin,lw_32 Rmax);
+ParaType OSlwToolRandomChaosLogisticFun(void *pRand, ParaType Rmin, ParaType Rmax);
+lw_32 OSlwToolRandomChaosLogisticFunInt(void *pRand, lw_32 Rmin, lw_32 Rmax);
 
 
-typedef struct OSLW_TOOL_RANDOM_CHAOS_TENT_STRUCT{
-	OSlwToolRandomBasicSTU basic;	
-	
-	lw_df a,x;
+typedef struct OSLW_TOOL_RANDOM_CHAOS_TENT_STRUCT {
+	OSlwToolRandomBasicSTU basic;
+
+	lw_df a, x;
 }OSlwToolRandomChaosTentSTU;
 
 extern OSlwToolRandomChaosTentSTU OSlwTRCTent;
 extern OSlwToolRandomBasicSTU *pRCTent;
-ParaType OSlwToolRandomChaosTentFun(void *pRand,ParaType Rmin,ParaType Rmax);
-lw_32 OSlwToolRandomChaosTentFunInt(void *pRand,lw_32 Rmin,lw_32 Rmax);
+ParaType OSlwToolRandomChaosTentFun(void *pRand, ParaType Rmin, ParaType Rmax);
+lw_32 OSlwToolRandomChaosTentFunInt(void *pRand, lw_32 Rmin, lw_32 Rmax);
 
 
-typedef struct OSLW_TOOL_RANDOM_CHAOS_KENT_STRUCT{
-	OSlwToolRandomBasicSTU basic;	
-	
-	lw_df a,x;
+typedef struct OSLW_TOOL_RANDOM_CHAOS_KENT_STRUCT {
+	OSlwToolRandomBasicSTU basic;
+
+	lw_df a, x;
 }OSlwToolRandomChaosKentSTU;
 
 extern OSlwToolRandomChaosKentSTU OSlwTRCKent;
 extern OSlwToolRandomBasicSTU *pRCKent;
-ParaType OSlwToolRandomChaosKentFun(void *pRand,ParaType Rmin,ParaType Rmax);
-lw_32 OSlwToolRandomChaosKentFunInt(void *pRand,lw_32 Rmin,lw_32 Rmax);
+ParaType OSlwToolRandomChaosKentFun(void *pRand, ParaType Rmin, ParaType Rmax);
+lw_32 OSlwToolRandomChaosKentFunInt(void *pRand, lw_32 Rmin, lw_32 Rmax);
 
 
 
@@ -97,11 +102,12 @@ typedef struct OSLW_TOOL_RANDOM_WELL512_STRUCT {
 	lw_u32 _index;
 }OSlwToolRandomWELL512STU;
 
+typedef OSlwToolRandomWELL512STU LwRandWe;
 
 ParaType OSlwToolRandomWELL512Fun(void *pRand, ParaType Rmin, ParaType Rmax);
 lw_32 OSlwToolRandomWELL512FunInt(void *pRand, lw_32 Rmin, lw_32 Rmax);
 void OSlwToolRandomWELL512Seed(OSlwToolRandomWELL512STU *pRand, lw_u32 seed);
-
+#define LwRandWeInit(R,S) OSlwToolRandomWELL512Seed((void *)(R),(S))
 
 
 typedef struct OSLW_TOOL_RANDOM_MT_STRUCT {
@@ -110,13 +116,20 @@ typedef struct OSLW_TOOL_RANDOM_MT_STRUCT {
 	lw_u16 _index;
 }OSlwToolRandomMTSTU;
 
+typedef OSlwToolRandomMTSTU LwRandTw;
 
 ParaType OSlwToolRandomMTFun(void *pRand, ParaType Rmin, ParaType Rmax);
 lw_32 OSlwToolRandomMTFunInt(void *pRand, lw_32 Rmin, lw_32 Rmax);
 void OSlwToolRandomMTSeed(OSlwToolRandomMTSTU *pRand, lw_u32 seed);
+#define LwRandTwInit(R,S) OSlwToolRandomMTSeed((void *)(R),(S))
 
 
-void OSlwToolMatrixRandomInitial(OSlwToolMatrixSTU *m,void *pRand,ParaType Rmin,ParaType Rmax);
+void OSlwToolMatrixRandomInitial(OSlwToolMatrixSTU *m, void *pRand, ParaType Rmin, ParaType Rmax);
+#define LwRandInitMat(M,R,RMIN,RMAX) OSlwToolMatrixRandomInitial((M),(R),(RMIN),(RMAX))
+
+void OSlwToolMatrixRandomNormalInitial(OSlwToolMatrixSTU *m, void *pRand, ParaType mean, ParaType var);
+#define LwRandnInitMat(M,R,MEAN,VAR) OSlwToolMatrixRandomNormalInitial((M),(R),(MEAN),(VAR))
+
 void *OSlwToolMatrixToRandnChip(OSlwToolMatrixSTU *s, OSlwToolMatrixSTU *m, OSlwToolRandomBasicSTU *pRand, ParaType var, ParaType Rmin, ParaType Rmax);
 
 
